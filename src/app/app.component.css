@@ -1,0 +1,13 @@
+body {
+    font-family: sans-serif
+}
+
+nav {
+    outline: 0.05rem solid red;
+}
+
+img{
+    object-fit: cover;
+    width: 8rem;
+    height: 8rem;
+}
