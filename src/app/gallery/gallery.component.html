@@ -1,15 +1,16 @@
 <div class="container images-container">
 
-    <p class="image-number">Number of images</p>
     <p>Filter</p>
 
     <div class="row images">
-        <div class="col-6 ">
-            <img src="../assets/assassins-creed.jpg" alt="Assassin´s-creed logo.">
-            <img src="../assets/car.jpg" alt="Cool looking car.">
-            <img src="../assets/guinea-pig.jpg" alt="A Guinea Pig lifting weights.">
-            <img src="../assets/hamsterviel.bmp" alt="Hamsterviel laughing evily.">
-            <img src="../assets/snowman.JPG" alt="A person standing behind a devil looking snowman.">
+        <div class="col-auto text-center">
+            @for(i of images; track i.src; let last = $last){
+            <img [src]="i.src" [alt]="i.alt">
+            @if(last){
+            <p class="image-number">Number of images: {{images.length}}</p>
+            }
+            }
+
         </div>
     </div>
 
