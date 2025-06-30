@@ -1,0 +1,11 @@
+body {}
+
+p {
+    font-family: sans-serif;
+}
+
+img {
+    object-fit: contain;
+    width: 8rem;
+    height: 8rem;
+}

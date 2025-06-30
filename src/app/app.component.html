@@ -1,33 +1,26 @@
-<nav>
-    <select>
-        <option>View</option>
-        <option>All view</option>
-        <option>All pictures</option>
-    </select>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
 
-    <a>
-        <button href="device-settings">Device</button>
-    </a>
+	<div class="dropdown">
+		<button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+			View
+		</button>
+		<ul class="dropdown-menu" aria-label="Differnt ways of viewing the website.">
+			<li><a class="dropdown-item" href="#">View</a></li>
+			<li><a class="dropdown-item" href="#">All view</a></li>
+			<li><a class="dropdown-item" href="#">All pictures</a></li>
+		</ul>
+	</div>
 
-    <button>Add image</button>
+
+	<a href="device-settings">
+		<button class="btn">Device</button>
+	</a>
+
+	<button class="btn">Add image</button>
 </nav>
 
+
 <main>
-    <div class="images-container">
-        <p>Number of images</p>
-        <p>Filter</p>
-
-        <div class="images">
-            <img src="../assets/assassins-creed.jpg" alt="Assassin´s-creed logo.">
-            <img src="../assets/car.jpg" alt="Cool looking car.">
-            <img src="../assets/guinea-pig.jpg" alt="A Guinea Pig lifting weights.">
-            <img src="../assets/hamsterviel.bmp" alt="Hamsterviel laughing evily.">
-            <img src="../assets/snowman.JPG" alt="A person standing behind a devil looking snowman.">
-        </div>
-
-        <div class="drag-and-drop">
-            <p>Drag and drop </p>
-        </div>
-    </div>
+	<app-gallery></app-gallery>
 
 </main>

@@ -4,10 +4,10 @@ body {
 
 nav {
     outline: 0.05rem solid red;
+    display: flex;
+    justify-content: flex-end;
 }
 
-img{
-    object-fit: cover;
-    width: 8rem;
-    height: 8rem;
+.form-select {
+    width: auto;
 }

@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { GalleryComponent } from "./gallery/gallery.component";
+
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [GalleryComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -11,3 +12,4 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 export class AppComponent {
   title = 'bilderrahmen';
 }
+
