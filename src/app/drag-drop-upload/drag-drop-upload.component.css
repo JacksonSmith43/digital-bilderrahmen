@@ -4,3 +4,13 @@
     justify-content: center;
     align-items: center;
 }
+
+.browse-files-button {
+    margin-left: 1rem;
+}
+
+img {
+    object-fit: contain;
+    width: 8rem;
+    margin: 0.5rem;
+}

@@ -1,12 +1,12 @@
 <div class="row drag-and-drop-upload-container">
-    <p>Drag and drop upload</p>
 
     <div class="center">
         <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)" (onFileOver)="fileOver($event)"
             (onFileLeave)="fileLeave($event)">
             <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
-                Optional custom content that replaces the the entire default content.
-                <button type="button" (click)="openFileSelector()">Browse Files</button>
+                Drag and drop upload
+                <br>
+                <button class="browse-files-button" type="button" (click)="openFileSelector()">Browse Files</button>
             </ng-template>
         </ngx-file-drop>
         <div class="upload-table">
@@ -17,9 +17,14 @@
                     </tr>
                 </thead>
                 <tbody class="upload-name-style">
-                    <tr *ngFor="let item of files; let i=index">
+                    @for(item of files; track item.relativePath; let i = $index){
+                    <tr>
                         <td><strong>{{ item.relativePath }}</strong></td>
                     </tr>
+                    @for(i of imageUrls; track i){
+                    <img [src]="i" alt="item.relativePath">
+                    }
+                    }
                 </tbody>
             </table>
         </div>

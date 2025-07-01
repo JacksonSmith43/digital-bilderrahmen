@@ -12,19 +12,28 @@ import { NgxFileDropModule } from 'ngx-file-drop';
 export class DragDropUploadComponent {
 
   public files: NgxFileDropEntry[] = [];
+  public imageUrls: string[] = [];
 
   public dropped(files: NgxFileDropEntry[]) {
     this.files = files;
+    //this.imageUrls = []; // Empties the list after each drop. 
+
     for (const droppedFile of files) {
 
       // Is it a file?
       if (droppedFile.fileEntry.isFile) {
-        const fileEntry = droppedFile.fileEntry as FileSystemFileEntry;
+        const fileEntry = droppedFile.fileEntry as FileSystemFileEntry; // Casts the fileEntry to FileSystemFileEntry to access file methods. 
         fileEntry.file((file: File) => {
 
-          // Here you can access the real file
-          console.log(droppedFile.relativePath, file);
+          const reader = new FileReader(); // This is used to read the file as a data URL. 
+          reader.onload = (e: any) => { // This event is triggered when the file is read successfully. 
+            this.imageUrls.push(e.target.result);
+          };
+          reader.readAsDataURL(file); // This reads the file as a data URL, which is suitable for displaying images in the browser. 
 
+          // Here you can access the real file
+          console.log("droppedFile.relativePath, file: ", droppedFile.relativePath, file);
+          console.log("file: ", file);
           /**
           // You could upload it like this:
           const formData = new FormData()
@@ -45,16 +54,16 @@ export class DragDropUploadComponent {
       } else {
         // It was a directory (empty directories are added, otherwise only files)
         const fileEntry = droppedFile.fileEntry as FileSystemDirectoryEntry;
-        console.log(droppedFile.relativePath, fileEntry);
+        console.log("droppedFile.relativePath, fileEntry: ", droppedFile.relativePath, fileEntry);
       }
     }
   }
 
   public fileOver(event: any) {
-    console.log(event);
+    console.log("fileOver: ", event);
   }
 
   public fileLeave(event: any) {
-    console.log(event);
+    console.log("fileLeave: ", event);
   }
 }
