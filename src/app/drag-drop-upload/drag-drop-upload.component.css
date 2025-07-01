@@ -12,5 +12,6 @@
 img {
     object-fit: contain;
     width: 8rem;
+    height: 8rem;
     margin: 0.5rem;
 }
