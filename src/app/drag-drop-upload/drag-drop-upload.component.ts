@@ -25,6 +25,7 @@ export class DragDropUploadComponent {
   }
 
   public dropped(files: NgxFileDropEntry[]) {
+    this.files = files;
     for (const droppedFile of files) {
 
       // Is it a file?

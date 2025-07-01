@@ -1,5 +1,6 @@
 import { Component, inject, input } from '@angular/core';
 import { GalleryService } from './gallery.service';
+import { DragDropUploadService } from '../drag-drop-upload/drag-drop-upload.service';
 
 @Component({
   selector: 'app-gallery',
@@ -10,10 +11,9 @@ import { GalleryService } from './gallery.service';
 
 export class GalleryComponent {
   private galleryService = inject(GalleryService);
-  images = input(this.galleryService.images);
+  private dragDropUploadService = inject(DragDropUploadService);
 
-  gallery() {
-    return this.galleryService.images;
-  }
+  images = this.galleryService.images;
+  addedImages = this.dragDropUploadService.images;
 
 }

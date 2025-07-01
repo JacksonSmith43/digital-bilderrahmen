@@ -4,11 +4,14 @@
 
     <div class="row images">
         <div class="col-auto text-center">
-            @for(i of images(); track i.src; let last = $last){
+            @for(i of images; track i.src; let last = $last){
             <img [src]="i.src" [alt]="i.alt">
             @if(last){
-            <p class="image-number">Number of images: {{images().length}}</p>
+            <p class="image-number">Number of images: {{images.length}}</p>
             }
+            }
+            @for(j of addedImages(); track j){
+            <img [src]="j">
             }
         </div>
     </div>
