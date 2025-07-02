@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterLink, RouterModule } from '@angular/router';
+import { AppService } from './app.service';
 
 @Component({
   selector: 'app-root',
@@ -9,34 +10,22 @@ import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 })
 
 export class AppComponent {
-  selectedView: "viewAll" | "viewPictures" | "viewDragDrop" = "viewAll";
+  private appService = inject(AppService);
 
-  getSelectedViewLabel() {
-    switch (this.selectedView) {
-      case "viewAll":
-        return "View All";
-
-      case "viewPictures":
-        return "View Pictures";
-
-      case "viewDragDrop":
-        return "View Drag Drop";
-
-      default:
-        return "View";
-    }
+  onAllView() {
+    return this.appService.getAllView();
   }
 
   onPicturesView() {
-    this.selectedView = "viewPictures";
+    return this.appService.getPictureView();
   }
 
   onDragDropView() {
-    this.selectedView = "viewDragDrop";
+    return this.appService.getDragDropView();
   }
 
-  onAllView() {
-    this.selectedView = "viewAll";
+  getSelectedViewLabel() {
+    return this.appService.getSelectedViewLabel();
   }
 }
 
