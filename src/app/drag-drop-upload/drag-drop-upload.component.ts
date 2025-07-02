@@ -1,6 +1,7 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgxFileDropEntry, FileSystemFileEntry, FileSystemDirectoryEntry } from 'ngx-file-drop';
 import { NgxFileDropModule } from 'ngx-file-drop';
+
 import { DragDropUploadService } from './drag-drop-upload.service';
 
 @Component({
