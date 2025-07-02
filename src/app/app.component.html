@@ -2,12 +2,12 @@
 
 	<div class="dropdown">
 		<button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-			View
+			{{getSelectedViewLabel()}}
 		</button>
 		<ul class="dropdown-menu" aria-label="Differnt ways of viewing the website.">
-			<li><a class="dropdown-item" [class.active]="selectedView === 'viewAll'" (click)="onAllView()">View all</a></li>
-			<li><a class="dropdown-item" [class.active]="selectedView === 'viewPictures'" (click)="onPicturesView()">View pictures</a></li>
-			<li><a class="dropdown-item" [class.active]="selectedView === 'viewDragDrop'" (click)="onDragDropView()">View Drag Drop</a></li>
+			<li><a class="dropdown-item" (click)="onAllView()">View all</a></li>
+			<li><a class="dropdown-item" (click)="onPicturesView()">View pictures</a></li>
+			<li><a class="dropdown-item" (click)="onDragDropView()">View Drag Drop</a></li>
 		</ul>
 	</div>
 

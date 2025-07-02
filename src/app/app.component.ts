@@ -11,31 +11,46 @@ import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 })
 
 export class AppComponent {
-  title = 'bilderrahmen';
   isOnlyPictures = false;
   isDragDrop = false;
   isAllView = true;
   selectedView: "viewAll" | "viewPictures" | "viewDragDrop" = "viewAll";
 
+  getSelectedViewLabel() {
+    switch (this.selectedView) {
+      case "viewAll":
+        return "View All";
+
+      case "viewPictures":
+        return "View Pictures";
+
+      case "viewDragDrop":
+        return "View Drag Drop";
+
+      default:
+        return "View";
+    }
+  }
+
   onPicturesView() {
     this.isOnlyPictures = true;
     this.isAllView = false;
     this.isDragDrop = false;
-    this.selectedView = "viewPictures"
+    this.selectedView = "viewPictures";
   }
 
   onDragDropView() {
     this.isOnlyPictures = false;
     this.isAllView = false;
     this.isDragDrop = true;
-    this.selectedView = "viewDragDrop"
+    this.selectedView = "viewDragDrop";
   }
 
   onAllView() {
     this.isOnlyPictures = false;
     this.isAllView = true;
     this.isDragDrop = false;
-    this.selectedView = "viewAll"
+    this.selectedView = "viewAll";
   }
 }
 
