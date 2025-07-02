@@ -5,9 +5,9 @@
 			View
 		</button>
 		<ul class="dropdown-menu" aria-label="Differnt ways of viewing the website.">
-			<li><a class="dropdown-item" href="#">View</a></li>
-			<li><a class="dropdown-item" href="./app.component.html">All view</a></li>
-			<li><a class="dropdown-item" href="./gallery/gallery.component.html">All pictures</a></li>
+			<li><a class="dropdown-item" [class.active]="selectedView === 'viewAll'" (click)="onAllView()">View all</a></li>
+			<li><a class="dropdown-item" [class.active]="selectedView === 'viewPictures'" (click)="onPicturesView()">View pictures</a></li>
+			<li><a class="dropdown-item" [class.active]="selectedView === 'viewDragDrop'" (click)="onDragDropView()">View Drag Drop</a></li>
 		</ul>
 	</div>
 
@@ -21,6 +21,17 @@
 
 
 <main>
+	@if(isOnlyPictures){
+	<!---<router-outlet />--->
+	<app-gallery></app-gallery>
+
+	}@else if(isDragDrop){
+	<app-drag-drop-upload></app-drag-drop-upload>
+
+	}@else {
 	<app-gallery></app-gallery>
 	<app-drag-drop-upload></app-drag-drop-upload>
+
+	}
+
 </main>
