@@ -34,10 +34,14 @@ export class DragDropUploadComponent implements AfterViewInit {
     }
   }
 
-  private handleFile(file: File) {
+  private handleFile(file: File, relativePath: string) {
     const reader = new FileReader(); // This is used to read the file as a data URL. 
     reader.onload = (e: any) => { // This event is triggered when the file is read successfully. 
-      this.dragDropUploadService.addImage(e.target.result);
+      this.dragDropUploadService.addImage({
+        src: e.target.result,
+        alt: "",
+        relativePath
+      });
     };
     reader.readAsDataURL(file); // This reads the file as a data URL, which is suitable for displaying images in the browser. 
   }
@@ -50,7 +54,7 @@ export class DragDropUploadComponent implements AfterViewInit {
       if (droppedFile.fileEntry.isFile) {
         const fileEntry = droppedFile.fileEntry as FileSystemFileEntry; // Casts the fileEntry to FileSystemFileEntry to access file methods. 
         fileEntry.file((file: File) => {
-          this.handleFile(file);
+          this.handleFile(file, droppedFile.relativePath);
           // Here you can access the real file
           console.log("droppedFile.relativePath, file: ", droppedFile.relativePath, file);
         });

@@ -2,10 +2,10 @@ import { Injectable, signal } from "@angular/core";
 
 @Injectable({ providedIn: "root" })
 export class DragDropUploadService {
-    images = signal<string[]>([]);
+    images = signal<{ src: string, alt: string, relativePath: string }[]>([]);
 
-    addImage(url: string) {
-        this.images.update(imgs => [...imgs, url]);
+    addImage(image: { src: string, alt: string, relativePath: string }) {
+        this.images.update(imgs => [...imgs, image]);
     }
 
     getImages() {

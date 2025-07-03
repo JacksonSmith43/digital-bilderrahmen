@@ -5,9 +5,11 @@
     <div class="row images">
         <div class="col-auto text-center">
             @for(i of allImages(); track i.src; let last = $last){
-            <img [src]="i.src" [alt]="i.alt">
+            <img [src]="i.src" [alt]="i.alt ? i.alt : i.relativePath">
+
             @if(last){
             <p class="image-number">Number of images: {{allImages().length}}</p>
+
             }
             }
 

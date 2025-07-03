@@ -4,10 +4,14 @@ import { Injectable } from "@angular/core";
 export class GalleryService {
 
     images = [
-        { src: "assets/assassins-creed.jpg", alt: "Assassin´s-creed logo." },
-        { src: "assets/car.jpg", alt: "Cool looking car." },
-        { src: "assets/guinea-pig.jpg", alt: "A Guinea Pig lifting weights." },
-        { src: "assets/hamsterviel.bmp", alt: "Hamsterviel laughing evily." },
-        { src: "assets/snowman.JPG", alt: "A person standing behind a devil looking snowman." },
+        { src: "assets/assassins-creed.jpg", alt: "Assassin´s-creed logo.", relativePath: "" },
+        { src: "assets/car.jpg", alt: "Cool looking car.", relativePath: "" },
+        { src: "assets/guinea-pig.jpg", alt: "A Guinea Pig lifting weights.", relativePath: "" },
+        { src: "assets/hamsterviel.bmp", alt: "Hamsterviel laughing evily.", relativePath: "" },
+        { src: "assets/snowman.JPG", alt: "A person standing behind a devil looking snowman.", relativePath: "" },
     ]
+
+    getImageRemoval() {
+
+    }
 } 
