@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterModule } from '@angular/router';
+
 import { AppService } from './app.service';
 
 @Component({
@@ -26,6 +27,11 @@ export class AppComponent {
 
   getSelectedViewLabel() {
     return this.appService.getSelectedViewLabel();
+  }
+
+  onIsAddImage() {
+    console.log(this.appService.getIsAddImage());
+    return this.appService.getIsAddImage();
   }
 }
 

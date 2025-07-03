@@ -3,9 +3,10 @@ p {
 }
 
 img {
-    object-fit: contain;
+    object-fit: cover;
     width: 8rem;
     height: 8rem;
+    margin: 0rem 1rem;
 }
 
 .image-number {

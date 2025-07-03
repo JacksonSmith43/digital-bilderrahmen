@@ -1,9 +1,10 @@
-import { Injectable } from "@angular/core";
+import { Injectable, signal } from "@angular/core";
 
 @Injectable({ providedIn: "root" })
 export class AppService {
 
     selectedView: "viewAll" | "viewPictures" | "viewDragDrop" = "viewAll";
+    isAddImage = false;
 
     getSelectedViewLabel() {
         switch (this.selectedView) {
@@ -31,5 +32,10 @@ export class AppService {
 
     getAllView() {
         this.selectedView = "viewAll";
+    }
+
+    getIsAddImage() {
+        this.isAddImage = true;
+        return this.isAddImage;
     }
 }

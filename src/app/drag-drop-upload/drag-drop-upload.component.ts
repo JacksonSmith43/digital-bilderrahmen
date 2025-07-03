@@ -1,21 +1,38 @@
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject } from '@angular/core';
 import { NgxFileDropEntry, FileSystemFileEntry, FileSystemDirectoryEntry } from 'ngx-file-drop';
 import { NgxFileDropModule } from 'ngx-file-drop';
+import { CommonModule } from '@angular/common';
 
 import { DragDropUploadService } from './drag-drop-upload.service';
+import { AppService } from '../app.service';
 
 @Component({
   selector: 'app-drag-drop-upload',
-  imports: [NgxFileDropModule],
+  imports: [NgxFileDropModule, CommonModule],
   templateUrl: './drag-drop-upload.component.html',
   styleUrl: './drag-drop-upload.component.css'
 })
 
-export class DragDropUploadComponent {
+export class DragDropUploadComponent implements AfterViewInit {
 
   public files: NgxFileDropEntry[] = [];
   private dragDropUploadService = inject(DragDropUploadService);
+  private appService = inject(AppService);
   imageUrls = this.dragDropUploadService.images;
+
+  private openFileSelectorFn?: () => void; // Stores a function that opens the file selector dialog (provided by ngx-file-drop). 
+
+
+  setOpenFileSelector(fn: () => void) { // This method is called (from the template) to save the file selector function for later use. 
+    this.openFileSelectorFn = fn; // The value of the function is saved in the openFileSelectorFn variable. 
+  }
+
+  ngAfterViewInit() {
+    if (this.appService.isAddImage && this.openFileSelectorFn) {
+      this.openFileSelectorFn();
+      this.appService.isAddImage = false;
+    }
+  }
 
   private handleFile(file: File) {
     const reader = new FileReader(); // This is used to read the file as a data URL. 
@@ -52,4 +69,5 @@ export class DragDropUploadComponent {
   public fileLeave(event: any) {
     console.log("fileLeave: ", event);
   }
+
 }
