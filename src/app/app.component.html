@@ -8,15 +8,12 @@
 			<li><a class="dropdown-item" (click)="onAllView()" routerLink="/viewAll">View All</a></li>
 			<li><a class="dropdown-item" (click)="onPicturesView()" routerLink="/gallery">View Pictures</a></li>
 			<li><a class="dropdown-item" (click)="onDragDropView()" routerLink="/dragDrop">View Drag Drop</a></li>
+			<!--	<li><a class="dropdown-item" (click)="onDeviceSettingsView()" routerLink="/deviceSettings">View Device Settings</a></li> -->
 		</ul>
 	</div>
 
-
-	<a href="device-settings">
-		<button class="btn">Device</button>
-	</a>
-
-	<a class="btn" (click)="onIsAddImage()" [routerLink]="'/dragDrop'">Add image</a>
+	<button class="btn" (click)="onDeviceSettingsView()" routerLink="/deviceSettings">Device Settings</button>
+	<button class="btn" (click)="onIsAddImage()" [routerLink]="'/dragDrop'">Add image</button>
 
 </nav>
 

@@ -3,7 +3,7 @@ import { Injectable, signal } from "@angular/core";
 @Injectable({ providedIn: "root" })
 export class AppService {
 
-    selectedView: "viewAll" | "viewPictures" | "viewDragDrop" = "viewAll";
+    selectedView: "viewAll" | "viewPictures" | "viewDragDrop" | "deviceSettings" = "viewAll";
     isAddImage = false;
 
     getSelectedViewLabel() {
@@ -16,6 +16,9 @@ export class AppService {
 
             case "viewDragDrop":
                 return "View Drag Drop";
+
+            case "deviceSettings":
+                return "View Device Settings";
 
             default:
                 return "View";
@@ -36,6 +39,11 @@ export class AppService {
 
     getIsAddImage() {
         this.isAddImage = true;
+        this.selectedView = "viewDragDrop";
         return this.isAddImage;
+    }
+
+    getDeviceSettingsView() {
+        this.selectedView = "deviceSettings"
     }
 }

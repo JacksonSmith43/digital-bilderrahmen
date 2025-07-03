@@ -3,7 +3,6 @@ body {
 }
 
 nav {
-    outline: 0.05rem solid red;
     display: flex;
     justify-content: flex-end;
 }

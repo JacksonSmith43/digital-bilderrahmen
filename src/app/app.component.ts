@@ -25,6 +25,10 @@ export class AppComponent {
     return this.appService.getDragDropView();
   }
 
+  onDeviceSettingsView() {
+    return this.appService.getDeviceSettingsView();
+  }
+
   getSelectedViewLabel() {
     return this.appService.getSelectedViewLabel();
   }
@@ -33,5 +37,6 @@ export class AppComponent {
     console.log(this.appService.getIsAddImage());
     return this.appService.getIsAddImage();
   }
+
 }
 
