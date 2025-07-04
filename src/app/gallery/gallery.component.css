@@ -13,3 +13,11 @@ img {
     text-align: center;
     margin-top: 1rem;
 }
+
+.image-selected {
+    border: 0.14rem solid red;
+}
+
+.image-unselected {
+    border: 0.14rem solid black;
+}
