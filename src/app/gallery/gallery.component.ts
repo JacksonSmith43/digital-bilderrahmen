@@ -24,26 +24,30 @@ export class GalleryComponent {
   ]);
 
   onRemoveImage() {
-    console.log(this.selectedImages());
-    const galleryLength = this.images().length;
-    let index: number[];
+    console.log("Deleting.");
 
-    for (let i = 0; i < this.selectedImages.length; i++) {
-      index = this.selectedImages();
-      if (index[i] < galleryLength) { // Removes the hardcoded images. // 3 < 5 = Removes the image at the 3 index, so Hamsterviel. 
+    const galleryLength = this.images().length;
+    const indices = [...this.selectedImages()].sort((a, b) => b - a); // This sorts the indices in descending order so that when we remove images, we do not mess up the indices of the remaining images.
+
+    for (let i of indices) {
+      if (i < galleryLength) { // Removes the hardcoded images. // 3 < 5 = Removes the image at the 3 index, so Hamsterviel. 
+
         this.images.update((imageArray) => {
-          imageArray.splice(index[i], 1);
+          imageArray.splice(i, 1);
           return [...imageArray];
+
         })
 
       } else { // Removes the uploaded images. 
-        const uploadIndex = index[i] - galleryLength; // 3 - 5. 
+        const uploadIndex = i - galleryLength; // 3 - 5.  
+
         this.addedImages.update((imageArray) => {
           imageArray.splice(uploadIndex, 1);
           return [...imageArray];
         })
       }
     }
+    this.selectedImages.set([]); // This resets the selected images after deletion.
   }
 
   onHighlightImageSelection(index: number) {
@@ -54,6 +58,7 @@ export class GalleryComponent {
 
     } else { // Adds the image to the selection if it has not already been selected. 
       this.selectedImages.set([...selectedImagesArray, index]);
+
     }
 
     console.log("this.selectedImages(): ", this.selectedImages());
