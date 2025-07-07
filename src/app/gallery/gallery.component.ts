@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, inject, signal } from '@angular/core';
 import { GalleryService } from './gallery.service';
 import { DragDropUploadService } from '../drag-drop-upload/drag-drop-upload.service';
 import { CommonModule } from '@angular/common';
@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './gallery.component.css'
 })
 
-export class GalleryComponent {
+export class GalleryComponent implements AfterViewInit {
   private galleryService = inject(GalleryService);
   private dragDropUploadService = inject(DragDropUploadService);
 
@@ -22,6 +22,11 @@ export class GalleryComponent {
   allImages = computed(() => [
     ...this.images(), ...this.addedImages() // Combines the images from both sources. 
   ]);
+
+  ngAfterViewInit(): void {
+    localStorage.getItem("selectedImages_deselecting");
+    localStorage.getItem("selectedImages_selecting");
+  }
 
   onRemoveImage() {
     console.log("Deleting.");
@@ -55,9 +60,11 @@ export class GalleryComponent {
 
     if (selectedImagesArray.includes(index)) { // Checks if the image is already selected.
       this.selectedImages.set(selectedImagesArray.filter(i => i !== index)); // Removes the image from the selection if it is already selected. i => i !== index is a filter function that returns all elements that are not equal to the index of the clicked image.
+      localStorage.setItem("selectedImages_deselecting", JSON.stringify(this.selectedImages()));
 
     } else { // Adds the image to the selection if it has not already been selected. 
       this.selectedImages.set([...selectedImagesArray, index]);
+      localStorage.setItem("selectedImages_selecting", JSON.stringify(this.selectedImages()));
 
     }
 
