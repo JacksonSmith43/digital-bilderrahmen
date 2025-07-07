@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { GalleryService } from '../gallery/gallery.service';
 
 @Component({
   selector: 'app-device-settings',
@@ -9,5 +10,9 @@ import { RouterModule } from '@angular/router';
 })
 
 export class DeviceSettingsComponent {
+  private galleryService = inject(GalleryService);
 
+  getChosenImages() {
+    return this.galleryService.allImages();
+  }
 }

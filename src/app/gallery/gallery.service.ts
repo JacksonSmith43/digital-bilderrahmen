@@ -1,7 +1,11 @@
-import { Injectable, signal } from "@angular/core";
+import { Injectable, signal, inject, computed } from "@angular/core";
+import { DragDropUploadService } from "../drag-drop-upload/drag-drop-upload.service";
 
 @Injectable({ providedIn: "root" })
 export class GalleryService {
+    public selectedImages = signal<number[]>([]);
+    private dragDropUploadService = inject(DragDropUploadService);
+    addedImages = this.dragDropUploadService.images;
 
     images = signal([
         { src: "assets/assassins-creed.jpg", alt: "Assassin´s-creed logo.", relativePath: "" },
@@ -10,5 +14,48 @@ export class GalleryService {
         { src: "assets/hamsterviel.bmp", alt: "Hamsterviel laughing evily.", relativePath: "" },
         { src: "assets/snowman.JPG", alt: "A person standing behind a devil looking snowman.", relativePath: "" },
     ]);
+
+
+    allImages = computed(() => [
+        ...this.images(), ...this.addedImages() // Combines the images from both sources. 
+    ]);
+
+    getRemoveImage() {
+        const galleryLength = this.images().length;
+        const indices = [...this.selectedImages()].sort((a, b) => b - a); // This sorts the indices in descending order so that when we remove images, we do not mess up the indices of the remaining images.
+
+        for (let i of indices) {
+            if (i < galleryLength) { // Removes the hardcoded images. // 3 < 5 = Removes the image at the 3 index, so Hamsterviel. 
+
+                this.images.update((imageArray) => {
+                    imageArray.splice(i, 1);
+                    return [...imageArray];
+
+                })
+
+            } else { // Removes the uploaded images. 
+                const uploadIndex = i - galleryLength; // 3 - 5.  
+
+                this.addedImages.update((imageArray) => {
+                    imageArray.splice(uploadIndex, 1);
+                    return [...imageArray];
+                })
+            }
+        }
+        this.selectedImages.set([]); // This resets the selected images after deletion.
+    }
+
+
+    getHighlightImageSelection(index: number) {
+        const selectedImagesArray = this.selectedImages();
+
+        if (selectedImagesArray.includes(index)) { // Checks if the image is already selected.
+            this.selectedImages.set(selectedImagesArray.filter(i => i !== index)); // Removes the image from the selection if it is already selected. i => i !== index is a filter function that returns all elements that are not equal to the index of the clicked image.
+
+        } else { // Adds the image to the selection if it has not already been selected. 
+            this.selectedImages.set([...selectedImagesArray, index]);
+        }
+        console.log("this.selectedImages(): ", this.selectedImages());
+    }
 
 } 

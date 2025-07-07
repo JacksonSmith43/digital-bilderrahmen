@@ -21,7 +21,7 @@
                     </tr>
                 </thead>
                 <tbody class="upload-name-style">
-                    @for(item of files; track item.relativePath; let i = $index){
+                    @for(item of files(); track item.relativePath; let i = $index){
                     <tr>
                         <td><strong>{{ item.relativePath }}</strong></td>
                     </tr>

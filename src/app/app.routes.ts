@@ -10,5 +10,5 @@ export const routes: Routes = [
     { path: "gallery", component: GalleryComponent },
     { path: "dragDrop", component: DragDropUploadComponent },
     { path: "viewAll", component: ViewAllComponent },
-    { path: "deviceSettings", component: DeviceSettingsComponent }
+    { path: "deviceSettings", component: DeviceSettingsComponent },
 ];
