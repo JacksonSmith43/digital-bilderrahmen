@@ -6,10 +6,11 @@
         <div class="col-auto text-center">
             @for(i of allImages(); track i.src; let index = $index; let last = $last){
             <img [src]="i.src" [alt]="i.alt ? i.alt : i.relativePath" (click)="onHighlightImageSelection(index)"
-                [ngClass]="selectedImages().includes(index) ? 'image-selected' : 'image-unselected' ">
+                [ngClass]="galleryHighlightIndices().includes(index) ? 'image-selected' : 'image-unselected' ">
             @if(last){
             <p class="image-number">Number of images: {{allImages().length}}</p>
             <button (click)="onRemoveImage()">Delete</button>
+            <button (click)="onSelectForDevice()">Select for Device</button>
             }
             }
 

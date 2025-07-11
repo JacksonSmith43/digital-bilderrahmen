@@ -15,9 +15,17 @@ img {
 }
 
 .image-selected {
-    border: 0.14rem solid red;
+    border: 0.14rem solid blue;
 }
 
 .image-unselected {
     border: 0.14rem solid black;
+}
+
+.image-delete-selected {
+    border: 0.14rem solid red;
+}
+
+button {
+    margin: auto 1rem;
 }
