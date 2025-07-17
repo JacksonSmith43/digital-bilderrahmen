@@ -20,23 +20,23 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
     const savedImagesIndices = localStorage.getItem("chosenImagesIndices");
 
     if (savedImagesIndices) {
-      this.galleryService.galleryHighlightIndices.set(JSON.parse(savedImagesIndices));
+      this.galleryService.galleryHighlightSrcs.set(JSON.parse(savedImagesIndices));
     }
   }
 
   ngAfterViewInit(): void {
-    this.galleryService.galleryHighlightIndices.set([]);
+    this.galleryService.galleryHighlightSrcs.set([]);
   }
 
   getChosenImages() {
     console.log("getChosenImages().");
 
-    const all = this.galleryService.allImages();
     const deviceSrcsRaw = localStorage.getItem("chosenImagesSrcs");
     const deviceSrcs = deviceSrcsRaw ? JSON.parse(deviceSrcsRaw) : [];
+    const all = this.galleryService.allImages();
+    const chosenImages = all.filter(img => deviceSrcs.includes(img.src));
 
-    return all.filter(img => deviceSrcs.includes(img.src)); // Only returns the images that are in the deviceSrcs array. src is required because index caused the images to be out of order. 
-
+    return chosenImages; // Only returns the images that are in the deviceSrcs array. src is required because index caused the images to be out of order. 
   }
 
 }

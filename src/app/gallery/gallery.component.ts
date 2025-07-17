@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { GalleryService } from './gallery.service';
 import { CommonModule } from '@angular/common';
 
@@ -9,40 +9,44 @@ import { CommonModule } from '@angular/common';
   styleUrl: './gallery.component.css'
 })
 
-export class GalleryComponent {
+export class GalleryComponent implements OnInit {
   private galleryService = inject(GalleryService);
 
-  images = this.galleryService.images;
   allImages = this.galleryService.allImages;
-  galleryHighlightIndices = this.galleryService.galleryHighlightIndices;
+  galleryHighlightSrcs = this.galleryService.galleryHighlightSrcs;
+  notDeledtedImagesArray = this.galleryService.notDeletedImagesArray;
+  imagesLength = this.galleryService.imagesLength;
 
-  ngOnDestroy() {
-    this.galleryService.setGallerySelectedIndices([]);
+  ngOnInit() {
+    this.galleryService.notDeletedImages();
   }
 
 
-  onHighlightImageSelection(index: number) {
-    this.galleryService.getHighlightImageSelection(index);
-    this.galleryService.setGallerySelectedIndices(this.galleryService.galleryHighlightIndices());
+  onHighlightImageSelection(src: string) {
+    this.galleryService.getHighlightImageSelection(src);
   }
 
   onRemoveImage() {
-    console.log("Deleting.");
-    this.galleryService.getRemoveImage();
+    console.log("onRemoveImage()_Deleting.");
+
+    const srcsToDelete = this.galleryService.galleryHighlightSrcs();
+    this.galleryService.getRemoveImage(srcsToDelete);
+
+    console.log("onRemoveImage()_s", this.galleryService.notDeletedImagesArray());
+
+    this.galleryService.galleryHighlightSrcs.set([]);
+    this.galleryService.notDeletedImages();
+
+    console.log("onRemoveImage()_a", this.galleryService.notDeletedImagesArray());
   }
 
   onSelectForDevice() {
     console.log("onSelectForDevice().");
 
-    const all = this.galleryService.allImages();
-    const selectedSrcs = this.galleryService.galleryHighlightIndices().map(idx => all[idx]?.src).filter(src => !!src); // !!src is a filter function that returns all elements that are truthy. This is used to remove any falsy values from the array so any values that are not src are removed.
-    const deviceSrcsRaw = localStorage.getItem("chosenImagesSrcs");
-    const deviceSrcs = deviceSrcsRaw ? JSON.parse(deviceSrcsRaw) : [];
-    const appendedSrcs = [...deviceSrcs, ...selectedSrcs.filter(src => !deviceSrcs.includes(src))]; // This filters out the srcs that are already in the deviceSrcs array and appends them to the appendedSrcs array. 
+    const selectedSrcs = this.galleryService.galleryHighlightSrcs();
 
-    localStorage.setItem("chosenImagesSrcs", JSON.stringify(appendedSrcs));
-    this.galleryService.galleryHighlightIndices.set([]);
-
+    localStorage.setItem("chosenImagesSrcs", JSON.stringify(selectedSrcs));
+    this.galleryService.galleryHighlightSrcs.set([]);
   }
 
 

@@ -8,15 +8,13 @@ export class GalleryService {
     }
 
     private dragDropUploadService = inject(DragDropUploadService);
-    public galleryHighlightIndices = signal<number[]>([]);
+
+    galleryHighlightSrcs = signal<string[]>([]);
     public deviceSelectedIndices = signal<number[]>([]);
-    public deletedIndices = signal<number[]>([]);
+    deletedSrcArr = signal<string[]>([]);
+    notDeletedImagesArray = signal<{ src: string; alt: string; relativePath: string; }[]>([]);
 
-    private savedDeletions: number[] = (() => {
-        const item = localStorage.getItem("deletedImagesIndices");
-        return item ? JSON.parse(item) : [];
-    })();
-
+    imagesLength = 0;
     addedImages = this.dragDropUploadService.images;
 
     images = signal([
@@ -24,7 +22,7 @@ export class GalleryService {
         { src: "assets/car.jpg", alt: "Cool looking car.", relativePath: "" },
         { src: "assets/guinea-pig.jpg", alt: "A Guinea Pig lifting weights.", relativePath: "" },
         { src: "assets/hamsterviel.bmp", alt: "Hamsterviel laughing evily.", relativePath: "" },
-        { src: "assets/snowman.JPG", alt: "A person standing behind a devil looking snowman.", relativePath: "" },
+        { src: "assets/snowman.jpg", alt: "A person standing behind a devil looking snowman.", relativePath: "" },
     ]);
 
 
@@ -32,110 +30,86 @@ export class GalleryService {
         ...this.images(), ...this.addedImages() // Combines the images from both sources. 
     ]);
 
-    getRemoveImage() {
+    notDeletedImages() {
+        console.log("notDeletedImages().");
+
+        const deletedImagesSrcs = localStorage.getItem("deletedSrcArr");
+        this.deletedSrcArr.set(deletedImagesSrcs ? JSON.parse(deletedImagesSrcs) : []);
+
+        console.log("notDeletedImages()_deletedImagesSrcs", deletedImagesSrcs);
+        console.log("notDeletedImages()_deletedSrcArr", this.deletedSrcArr());
+
+        this.notDeletedImagesArray.set(this.allImages().filter(img => !this.deletedSrcArr().includes(img.src))); // If the src of the image is not in the deletedSrcArr, then it is not deleted. 
+        this.imagesLength = this.notDeletedImagesArray().length;
+
+        localStorage.setItem("deletedSrcArr", JSON.stringify(this.deletedSrcArr()));
+        return this.notDeletedImagesArray();
+    }
+
+    getRemoveImage(srcsToDelete: string[]) {
         console.log("getRemoveImage().");
-        const getDeletedImagesIndices = localStorage.getItem("deletedImagesIndices");
-        const galleryLength = this.images().length;
-        const indicesDescendingOrder = [...this.galleryHighlightIndices()].sort((a, b) => b - a); // This sorts the indices in descending order so that when we remove images, we do not mess up the indices of the remaining images.
-        let appendedDeletedIndices: number[] = [];
 
-        console.log("getRemoveImage()_indicesDescendingOrder: ", indicesDescendingOrder);
+        console.log("getRemoveImage()_srcsToDelete: ", srcsToDelete);
 
-        if (getDeletedImagesIndices) {
-            const deletedIndicesArr = JSON.parse(getDeletedImagesIndices);
-            this.deletedIndices.set(deletedIndicesArr);
+        this.deletedSrcArr.set([...this.deletedSrcArr(), ...srcsToDelete]);
 
-            appendedDeletedIndices = [
-                ...deletedIndicesArr,
-                ...indicesDescendingOrder.filter((idx: any) => !deletedIndicesArr.includes(idx)) // This filters out the indices that are already in the deletedIndices array and appends them to the appendedDeletedIndices array.
-            ];
+        for (let src of srcsToDelete) {
+            console.log("getRemoveImage()_src: ", src);
 
-            localStorage.setItem("deletedImagesIndices", JSON.stringify(appendedDeletedIndices));
+            const imageIndex = this.images().findIndex(img => img.src === src); // This will loop through the images array and for each image it will check if the src of the image is the same as the src of the image that is being deleted.
+            console.log("getRemoveImage()_imageIndex: ", imageIndex);
 
-        } else {
-            appendedDeletedIndices = [...indicesDescendingOrder];
-            localStorage.setItem("deletedImagesIndices", JSON.stringify(indicesDescendingOrder));
-        }
-
-        for (let i of indicesDescendingOrder) {
-            if (i < galleryLength) { // Removes the hardcoded images. // 3 < 5 = Removes the image at the 3 index, so Hamsterviel. 
+            if (imageIndex !== -1) { // Removes the hardcoded images. // 3 < 5 = Removes the image at the 3 index, so Hamsterviel. -1 = Checks if the image has been found. 
 
                 this.images.update((imageArray) => {
-                    imageArray.splice(i, 1);
+                    imageArray.splice(imageIndex, 1);
+                    console.log("getRemoveImage()_imageArray: ", imageArray);
                     return [...imageArray];
-
                 })
+                continue;
+            }
 
-            } else { // Removes the uploaded images. 
-                const uploadIndex = i - galleryLength; // 3 - 5.  
+            const uploadIndex = this.addedImages().findIndex(img => img.src === src); // 3 - 5.  
+            if (uploadIndex !== -1) { // Removes the uploaded images.
 
                 this.addedImages.update((imageArray) => {
                     imageArray.splice(uploadIndex, 1);
                     return [...imageArray];
-                })
+                });
             }
         }
+        console.log("getRemoveImage()_this.deletedSrcArr(): ", this.deletedSrcArr());
 
-        this.saveDeletions(appendedDeletedIndices);
-        this.galleryHighlightIndices.set([]); // This resets the selected images after deletion.
+        localStorage.setItem("deletedSrcArr", JSON.stringify(this.deletedSrcArr()));
+        this.galleryHighlightSrcs.set([]); // This resets the selected images after deletion.
+
     }
 
-    saveDeletions(indicesDescendingOrder: number[]) {
-        console.log("saveDeletions().");
-
-        const uniqueDeletions = [...new Set([...this.savedDeletions, ...indicesDescendingOrder])]; // ...new Set is generally used to remove duplicates from an array. The values from indicesDescendingOrder are added to the savedDeletions array and then the unique values are extracted.
-        this.savedDeletions = uniqueDeletions;
-
-        localStorage.setItem("deletedImagesIndices", JSON.stringify(this.savedDeletions));
-        console.log("saveDeletions()_this.deletedIndices(): ", this.deletedIndices());
-    }
-
-    getSavedDeletions(): number[] {
-        return this.savedDeletions;
-    }
-
-    getHighlightImageSelection(index: number) {
+    getHighlightImageSelection(src: string) {
         console.log("getHighlightImageSelection().");
-        const selectedImagesIndicesArray = this.galleryHighlightIndices();
 
-        if (selectedImagesIndicesArray.includes(index)) { // Checks if the image is already selected.
-            this.galleryHighlightIndices.set(selectedImagesIndicesArray.filter(i => i !== index)); // Removes the image from the selection if it is already selected. i => i !== index is a filter function that returns all elements that are not equal to the index of the clicked image.
+        const selectedSrcs = this.galleryHighlightSrcs();
+
+        if (selectedSrcs.includes(src)) { // Checks if the image is already selected.
+            this.galleryHighlightSrcs.set(selectedSrcs.filter(i => i !== src)); // Removes the image from the selection if it is already selected. i => i !== index is a filter function that returns all elements that are not equal to the index of the clicked image.
 
         } else { // Adds the image to the selection if it has not already been selected. 
-            this.galleryHighlightIndices.set([...selectedImagesIndicesArray, index]);
+            this.galleryHighlightSrcs.set([...selectedSrcs, src]);
         }
-        console.log("getHighlightImageSelection()_this.galleryHighlightIndices(): ", this.galleryHighlightIndices());
+        console.log("getHighlightImageSelection()_this.galleryHighlightIndices(): ", this.galleryHighlightSrcs());
     }
 
     getSelectForDevice() {
         console.log("getSelectForDevice().");
 
-        const deviceSelectedIndicesArray = this.galleryHighlightIndices();
-        const deviceSelectedIndices = [...deviceSelectedIndicesArray];
+        const deviceSelectedSrcArray = this.galleryHighlightSrcs();
+        const deviceSelected = [...deviceSelectedSrcArray];
 
-        console.log("getSelectForDevice()_this.galleryHighlightIndices: ", this.galleryHighlightIndices);
-        console.log("getSelectForDevice()_deviceSelectedIndicesArray: ", deviceSelectedIndicesArray);
-        console.log("getSelectForDevice()_deviceSelectedIndices: ", deviceSelectedIndices);
+        console.log("getSelectForDevice()_this.galleryHighlightIndices: ", this.galleryHighlightSrcs);
+        console.log("getSelectForDevice()_deviceSelectedSrcArray: ", deviceSelectedSrcArray);
+        console.log("getSelectForDevice()_deviceSelected: ", deviceSelected);
 
-        return deviceSelectedIndices;
-    }
-
-    setGallerySelectedIndices(indices: number[]) {
-        console.log("setGallerySelectedIndices().");
-
-        this.galleryHighlightIndices.set(indices);
-        localStorage.setItem("chosenImagesGalleryIndices", JSON.stringify(this.galleryHighlightIndices()));
-
-        console.log("setGallerySelectedIndices()_this.galleryHighlightIndices(): ", this.galleryHighlightIndices());
-        console.log("setGallerySelectedIndices()_indices: ", indices);
-    }
-
-
-    getDeviceSettingsIndices(): number[] {
-        console.log("getDeviceSettingsIndices().");
-
-        const saved = localStorage.getItem("chosenImagesDeviceIndices");
-        return saved ? JSON.parse(saved) : []; // JSON.parse is used to convert the string to an array.
+        return deviceSelected;
     }
 
 } 
