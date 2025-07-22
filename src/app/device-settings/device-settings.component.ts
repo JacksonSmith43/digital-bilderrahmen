@@ -2,10 +2,11 @@ import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { GalleryService } from '../gallery/gallery.service';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-device-settings',
-  imports: [RouterModule, CommonModule],
+  imports: [RouterModule, CommonModule, FormsModule],
   templateUrl: './device-settings.component.html',
   styleUrl: './device-settings.component.css'
 })
@@ -13,6 +14,8 @@ import { CommonModule } from '@angular/common';
 export class DeviceSettingsComponent implements OnInit, AfterViewInit {
   private galleryService = inject(GalleryService);
   imagesLength = 0;
+  currentImageIndex = 0;
+  interval: any;
 
   ngOnInit(): void {
     console.log("DeviceSettingsComponent INIT.");
@@ -46,7 +49,49 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
     const all = this.galleryService.allImages();
     const chosenImages = all.filter(img => deviceSrcs.includes(img.src)); // Only returns the images that are in the deviceSrcs array.
 
+    console.log("getChosenImages()_chosenImages: ", chosenImages);
+
     return chosenImages; // Only returns the images that are in the deviceSrcs array. src is required because index caused the images to be out of order. 
+  }
+
+
+  onSetTime(time: string) {
+    console.log("onSetTime().");
+
+    if (time === "") {
+      console.log("Interval time required.");
+      return;
+    }
+
+    const intervalTime = parseInt(time);
+    console.log("onSetTime()_intervalTime: ", intervalTime);
+
+    this.imageInterval(intervalTime);
+  }
+
+  imageInterval(time: number) {
+    console.log("imageInterval().");
+    const chosenImages = this.getChosenImages();
+
+    if (chosenImages.length > 0) {
+      this.currentImageIndex = 0;
+
+      if (this.interval) {
+        clearInterval(this.interval); // Clears the interval, so that it doesn't run multiple times.
+      }
+
+      this.interval = setInterval(() => {
+        this.currentImageIndex = (this.currentImageIndex + 1) % chosenImages.length;
+      }, time);
+
+    } else {
+      console.log("No images found.");
+    }
+  }
+
+  stopDiashow() {
+    console.log("stopDiashow().");
+    clearInterval(this.interval);
   }
 
 }

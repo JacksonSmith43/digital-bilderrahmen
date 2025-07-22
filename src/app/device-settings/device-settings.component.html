@@ -1,22 +1,58 @@
 <h3>Device Settings</h3>
 <p>Version: </p>
-<p>Picture interval settings</p>
 <p>Switch device off</p>
 
+<div class="accordion" id="device-settings-interval-accordion">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseDisplayedImagesInterval" aria-expanded="true"
+                aria-controls="collapseDisplayedImagesInterval">
+                Interval settings
+            </button>
+        </h2>
+        <div id="collapseDisplayedImagesInterval" class="accordion-collapse collapse show"
+            data-bs-parent="#device-settings-interval-accordion">
+            <div class="accordion-body interval-container">
+
+                @if(getChosenImages().length > 0){
+                <div class="interval-time">
+                    <form (ngSubmit)="onSetTime(intervalTime.value)">
+                        <label for="interval-time-input">Interval time (in ms):</label>
+                        <br>
+                        <input type="number" id="interval-time-input" placeholder="1000" #intervalTime>
+                        <button type="submit" class=".btn interval-time-button">Set Time</button>
+                    </form>
+                </div>
+
+                <br>
+
+                <div class="interval-images">
+                    <img [src]="getChosenImages()[currentImageIndex].src"
+                        [alt]="getChosenImages()[currentImageIndex].alt">
+                    <button type="button" class="stop-diashow-button" (click)="stopDiashow()">Stop diashow</button>
+                </div>
+                }
+                @else {
+                <p>No images to display.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
 
 
-<div class="accordion" id="device-settings-accordion">
-
+<div class="accordion" id="device-settings-gallery-accordion">
     <div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button" type="button" data-bs-toggle="collapse"
                 data-bs-target="#collapseDisplayedImages" aria-expanded="true" aria-controls="collapseDisplayedImages">
-                Choose displayed images
+                Chosen displayed images
             </button>
         </h2>
 
-
-        <div id="collapseDisplayedImages" class="accordion-collapse collapse show" data-bs-parent="#device-settings-accordion">
+        <div id="collapseDisplayedImages" class="accordion-collapse collapse show"
+            data-bs-parent="#device-settings-gallery-accordion">
 
             @if(imagesLength > 0){
 
@@ -32,5 +68,4 @@
             }
         </div>
     </div>
-
 </div>

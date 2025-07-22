@@ -11,3 +11,23 @@ img {
     height: 8rem;
     margin: 0rem 1rem;
 }
+
+.interval-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.interval-time-button {
+    margin-left: 1rem;
+}
+
+.interval-time input {
+    width: 5rem;
+}
+
+.stop-diashow-button {
+    display: flex;
+    margin-top: 1rem;
+}
