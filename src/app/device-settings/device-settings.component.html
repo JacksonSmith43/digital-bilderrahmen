@@ -6,6 +6,7 @@
 
 
 <div class="accordion" id="device-settings-accordion">
+
     <div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button" type="button" data-bs-toggle="collapse"
@@ -13,12 +14,23 @@
                 Choose displayed images
             </button>
         </h2>
+
+
         <div id="collapseDisplayedImages" class="accordion-collapse collapse show" data-bs-parent="#device-settings-accordion">
+
+            @if(imagesLength > 0){
+
             <div class="accordion-body">
                 @for(i of getChosenImages(); track i.src){
                 <img [src]="i.src" [alt]="i.alt">
                 }
             </div>
+
+            }
+            @else {
+            <p>No images to display.</p>
+            }
         </div>
     </div>
+
 </div>

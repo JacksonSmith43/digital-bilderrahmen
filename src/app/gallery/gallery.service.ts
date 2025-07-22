@@ -3,6 +3,7 @@ import { DragDropUploadService } from "../drag-drop-upload/drag-drop-upload.serv
 
 @Injectable({ providedIn: "root" })
 export class GalleryService {
+
     constructor() {
         console.log("GalleryService INIT.");
     }
@@ -13,9 +14,10 @@ export class GalleryService {
     public deviceSelectedIndices = signal<number[]>([]);
     deletedSrcArr = signal<string[]>([]);
     notDeletedImagesArray = signal<{ src: string; alt: string; relativePath: string; }[]>([]);
+    imagesLength = signal<number>(0);
 
-    imagesLength = 0;
     addedImages = this.dragDropUploadService.images;
+
 
     images = signal([
         { src: "assets/assassins-creed.jpg", alt: "Assassin´s-creed logo.", relativePath: "" },
@@ -26,9 +28,11 @@ export class GalleryService {
     ]);
 
 
-    allImages = computed(() => [
-        ...this.images(), ...this.addedImages() // Combines the images from both sources. 
-    ]);
+    allImages = computed(() => {
+        const uploadedImages = this.addedImages();
+        return [...this.images(), ...(Array.isArray(uploadedImages) ? uploadedImages : [])]; // This will return an array of the images that are in the images array and the uploadedImages array.
+    });
+
 
     notDeletedImages() {
         console.log("notDeletedImages().");
@@ -40,7 +44,10 @@ export class GalleryService {
         console.log("notDeletedImages()_deletedSrcArr", this.deletedSrcArr());
 
         this.notDeletedImagesArray.set(this.allImages().filter(img => !this.deletedSrcArr().includes(img.src))); // If the src of the image is not in the deletedSrcArr, then it is not deleted. 
-        this.imagesLength = this.notDeletedImagesArray().length;
+        this.imagesLength.set(this.notDeletedImagesArray().length);
+
+        console.log("this.notDeletedImagesArray(): ", this.notDeletedImagesArray());
+        localStorage.setItem("notDeletedImagesArray", JSON.stringify(this.notDeletedImagesArray()));
 
         localStorage.setItem("deletedSrcArr", JSON.stringify(this.deletedSrcArr()));
         return this.notDeletedImagesArray();
@@ -48,7 +55,6 @@ export class GalleryService {
 
     getRemoveImage(srcsToDelete: string[]) {
         console.log("getRemoveImage().");
-
         console.log("getRemoveImage()_srcsToDelete: ", srcsToDelete);
 
         this.deletedSrcArr.set([...this.deletedSrcArr(), ...srcsToDelete]);
@@ -97,19 +103,6 @@ export class GalleryService {
             this.galleryHighlightSrcs.set([...selectedSrcs, src]);
         }
         console.log("getHighlightImageSelection()_this.galleryHighlightIndices(): ", this.galleryHighlightSrcs());
-    }
-
-    getSelectForDevice() {
-        console.log("getSelectForDevice().");
-
-        const deviceSelectedSrcArray = this.galleryHighlightSrcs();
-        const deviceSelected = [...deviceSelectedSrcArray];
-
-        console.log("getSelectForDevice()_this.galleryHighlightIndices: ", this.galleryHighlightSrcs);
-        console.log("getSelectForDevice()_deviceSelectedSrcArray: ", deviceSelectedSrcArray);
-        console.log("getSelectForDevice()_deviceSelected: ", deviceSelected);
-
-        return deviceSelected;
     }
 
 } 

@@ -12,15 +12,25 @@ import { CommonModule } from '@angular/common';
 
 export class DeviceSettingsComponent implements OnInit, AfterViewInit {
   private galleryService = inject(GalleryService);
-  selectedImagesIndicesCopy = this.galleryService.getSelectForDevice();
-
+  imagesLength = 0;
 
   ngOnInit(): void {
     console.log("DeviceSettingsComponent INIT.");
-    const savedImagesIndices = localStorage.getItem("chosenImagesIndices");
 
-    if (savedImagesIndices) {
-      this.galleryService.galleryHighlightSrcs.set(JSON.parse(savedImagesIndices));
+    const chosenImagesRaw = localStorage.getItem("chosenImagesSrcs");
+    const deletedImagesRaw = localStorage.getItem("deletedSrcArr");
+    const deletedSrcs = deletedImagesRaw ? JSON.parse(deletedImagesRaw) : [];
+
+    if (chosenImagesRaw) {
+      try {
+        const chosenSrcs = JSON.parse(chosenImagesRaw);
+        const filtersDeletedSrcs = (chosenSrcs).filter((src: string) => !deletedSrcs.includes(src)); // This filters out the deleted images.
+        this.imagesLength = filtersDeletedSrcs.length;
+        localStorage.setItem("chosenImagesSrcs", JSON.stringify(filtersDeletedSrcs));
+
+      } catch (e) {
+        console.error("DeviceSettingsComponent: An error has occured while trying to get the chosen images.", e);
+      }
     }
   }
 
@@ -34,7 +44,7 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
     const deviceSrcsRaw = localStorage.getItem("chosenImagesSrcs");
     const deviceSrcs = deviceSrcsRaw ? JSON.parse(deviceSrcsRaw) : [];
     const all = this.galleryService.allImages();
-    const chosenImages = all.filter(img => deviceSrcs.includes(img.src));
+    const chosenImages = all.filter(img => deviceSrcs.includes(img.src)); // Only returns the images that are in the deviceSrcs array.
 
     return chosenImages; // Only returns the images that are in the deviceSrcs array. src is required because index caused the images to be out of order. 
   }

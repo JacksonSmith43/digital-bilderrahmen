@@ -22,7 +22,6 @@ export class DragDropUploadComponent implements AfterViewInit {
 
   private openFileSelectorFn?: () => void; // Stores a function that opens the file selector dialog (provided by ngx-file-drop). 
 
-
   setOpenFileSelector(fn: () => void) { // This method is called (from the template) to save the file selector function for later use. 
     this.openFileSelectorFn = fn; // The value of the function is saved in the openFileSelectorFn variable. 
   }

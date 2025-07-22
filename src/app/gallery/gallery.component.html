@@ -4,11 +4,11 @@
 
     <div class="row images">
         <div class="col-auto text-center">
-            @for(i of notDeledtedImagesArray(); track i.src; let index = $index; let last = $last){
+            @for(i of notDeletedImagesArray(); track i.src; let index = $index; let last = $last){
             <img [src]="i.src" [alt]="i.alt ? i.alt : i.relativePath" (click)="onHighlightImageSelection(i.src)"
                 [ngClass]="galleryHighlightSrcs().includes(i.src) ? 'image-selected' : 'image-unselected' ">
             @if(last){
-            <p class="image-number">Number of images: {{imagesLength}}</p>
+            <p class="image-number">Number of images: {{imagesLength()}}</p>
             <button (click)="onRemoveImage()">Delete</button>
             <button (click)="onSelectForDevice()">Select for Device</button>
             }
