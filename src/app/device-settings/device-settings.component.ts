@@ -2,11 +2,11 @@ import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { GalleryService } from '../gallery/gallery.service';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, Validators, FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-device-settings',
-  imports: [RouterModule, CommonModule, FormsModule],
+  imports: [RouterModule, CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './device-settings.component.html',
   styleUrl: './device-settings.component.css'
 })
@@ -16,6 +16,11 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
   imagesLength = 0;
   currentImageIndex = 0;
   interval: any;
+
+
+  intervalForm = new FormGroup({
+    intervalTimeInput: new FormControl("", [Validators.required, Validators.min(300), Validators.max(100000)])
+  });
 
   ngOnInit(): void {
     console.log("DeviceSettingsComponent INIT.");
@@ -58,11 +63,6 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
   onSetTime(time: string) {
     console.log("onSetTime().");
 
-    if (time === "") {
-      console.log("Interval time required.");
-      return;
-    }
-
     const intervalTime = parseInt(time);
     console.log("onSetTime()_intervalTime: ", intervalTime);
 
@@ -94,4 +94,22 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
     clearInterval(this.interval);
   }
 
+  get intervalTimeFormControl() {
+    return this.intervalForm.controls.intervalTimeInput;
+  }
+
+  get intervalFormErrorMessages() {
+    if (this.intervalTimeFormControl.hasError("required")) {
+      return "An input is required."
+
+    } else if (this.intervalTimeFormControl.hasError("min")) {
+      return "A minimum time of 300ms is required."
+
+    } else if (this.intervalTimeFormControl.hasError("max")) {
+      return "A maximum time of 100000ms is allowed."
+
+    } else {
+      return "";
+    }
+  }
 }

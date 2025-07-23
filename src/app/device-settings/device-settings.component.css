@@ -5,6 +5,10 @@ p {
     margin-top: 1rem;
 }
 
+label {
+    font-weight: bold;
+}
+
 img {
     object-fit: cover;
     width: 8rem;
@@ -19,15 +23,48 @@ img {
     align-items: center;
 }
 
+
 .interval-time-button {
     margin-left: 1rem;
 }
 
+.interval-time-button :disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-row {
+    display: flex;
+}
+
 .interval-time input {
     width: 5rem;
+    background-color: rgb(94, 87, 87);
+}
+
+.interval-time {
+    position: relative;
+    max-height: 5.5rem;
 }
 
 .stop-diashow-button {
     display: flex;
     margin-top: 1rem;
+}
+
+.error-message {
+    color: red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-height: 4.5rem;
+    margin: 0;
+    padding: 0;
 }

@@ -17,20 +17,30 @@
 
                 @if(getChosenImages().length > 0){
                 <div class="interval-time">
-                    <form (ngSubmit)="onSetTime(intervalTime.value)">
-                        <label for="interval-time-input">Interval time (in ms):</label>
-                        <br>
-                        <input type="number" id="interval-time-input" placeholder="1000" #intervalTime>
-                        <button type="submit" class=".btn interval-time-button">Set Time</button>
-                    </form>
-                </div>
 
+                    <form (ngSubmit)="onSetTime(intervalTime.value)" [formGroup]="intervalForm">
+                        
+                        <div class="input-group">
+                            <label for="interval-time-input" class="form-label">Interval time (in ms):</label>
+                            <div class="input-row">
+                                <input type="number" class="form-control" id="interval-time-input" placeholder="1000" #intervalTime formControlName="intervalTimeInput">
+                                <button type="submit" class="btn btn-primary interval-time-button" [disabled]="intervalTimeFormControl.invalid">Set Time</button>
+                            </div>
+                        </div>
+
+                    </form>
+                    @if(intervalTimeFormControl.invalid && (intervalTimeFormControl.dirty || intervalTimeFormControl.touched)){
+                    <p class="error-message">{{intervalFormErrorMessages || '\u00A0' }}</p> <!-- \u00A0 is used to add a non-breaking space. Non-breaking spaces are used to prevent the error message from being shifted to the right. -->
+                    }
+
+                </div>
                 <br>
 
                 <div class="interval-images">
                     <img [src]="getChosenImages()[currentImageIndex].src"
                         [alt]="getChosenImages()[currentImageIndex].alt">
-                    <button type="button" class="stop-diashow-button" (click)="stopDiashow()">Stop diashow</button>
+                    <button type="button" class="btn btn-primary stop-diashow-button" (click)="stopDiashow()">Stop
+                        diashow</button>
                 </div>
                 }
                 @else {
