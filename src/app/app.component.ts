@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterModule } from '@angular/router';
 
 import { AppService } from './app.service';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ import { AppService } from './app.service';
 })
 
 export class AppComponent {
+  isProd = environment.prod; // Is it the production environment. 
   private appService = inject(AppService);
 
   onAllView() {
