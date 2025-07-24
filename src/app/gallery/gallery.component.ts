@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { GalleryService } from './gallery.service';
 import { CommonModule } from '@angular/common';
+import { addDoc, collection, Firestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-gallery',
@@ -11,6 +12,7 @@ import { CommonModule } from '@angular/common';
 
 export class GalleryComponent implements OnInit {
   private galleryService = inject(GalleryService);
+  firestore = inject(Firestore);
 
   allImages = this.galleryService.allImages;
   galleryHighlightSrcs = this.galleryService.galleryHighlightSrcs;
@@ -57,6 +59,11 @@ export class GalleryComponent implements OnInit {
     console.log("onSelectForDevice()_filteredSrcs: ", filteredSrcs);
 
     this.galleryService.galleryHighlightSrcs.set([]);
+
+    const imageCollectionReference = collection(this.firestore, 'images'); // This will create a reference to the images collection in the firestore database. This can be seen in the firebase console (website).
+    addDoc(imageCollectionReference, { // This will add a new document to the images collection in the firestore database. Google Firebase will automatically generate a unique ID for the document.
+      images: filteredSrcs
+    });
   }
 
 

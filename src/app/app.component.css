@@ -10,3 +10,18 @@ nav {
 .form-select {
     width: auto;
 }
+
+.development-mode,
+.production-mode {
+    color: black;
+    font-family: sans-serif;
+    text-align: center;
+}
+
+.development-mode {
+    background-color: blue;
+}
+
+.production-mode {
+    background-color: red;
+}
