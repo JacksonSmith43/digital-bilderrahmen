@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { GalleryService } from './gallery.service';
 import { CommonModule } from '@angular/common';
-import { addDoc, collection, Firestore } from '@angular/fire/firestore';
+import { GalleryStorageService } from './gallery-storage.service';
 
 @Component({
   selector: 'app-gallery',
@@ -12,12 +12,13 @@ import { addDoc, collection, Firestore } from '@angular/fire/firestore';
 
 export class GalleryComponent implements OnInit {
   private galleryService = inject(GalleryService);
-  firestore = inject(Firestore);
+  private galleryStorageService = inject(GalleryStorageService);
 
   allImages = this.galleryService.allImages;
   galleryHighlightSrcs = this.galleryService.galleryHighlightSrcs;
   notDeletedImagesArray = this.galleryService.notDeletedImagesArray;
   imagesLength = this.galleryService.imagesLength;
+
 
   ngOnInit() {
     this.galleryService.notDeletedImages();
@@ -60,11 +61,7 @@ export class GalleryComponent implements OnInit {
 
     this.galleryService.galleryHighlightSrcs.set([]);
 
-    const imageCollectionReference = collection(this.firestore, 'images'); // This will create a reference to the images collection in the firestore database. This can be seen in the firebase console (website).
-    addDoc(imageCollectionReference, { // This will add a new document to the images collection in the firestore database. Google Firebase will automatically generate a unique ID for the document.
-      images: filteredSrcs
-    });
+    this.galleryStorageService.uploadImages(filteredSrcs);
   }
-
 
 }
