@@ -24,7 +24,7 @@ export class GalleryService {
         { src: "assets/car.jpg", alt: "Cool looking car.", relativePath: "" },
         { src: "assets/guinea-pig.jpg", alt: "A Guinea Pig lifting weights.", relativePath: "" },
         { src: "assets/hamsterviel.bmp", alt: "Hamsterviel laughing evily.", relativePath: "" },
-        { src: "assets/snowman.jpg", alt: "A person standing behind a devil looking snowman.", relativePath: "" },
+        { src: "assets/snowman.JPG", alt: "A person standing behind a devil looking snowman.", relativePath: "" },
     ]);
 
 

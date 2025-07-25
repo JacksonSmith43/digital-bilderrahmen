@@ -1,7 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { GalleryService } from './gallery.service';
 import { CommonModule } from '@angular/common';
-import { GalleryStorageService } from './gallery-storage.service';
+import { getDownloadURL } from '@angular/fire/storage';
+
+import { GalleryService } from './gallery.service';
+import { GalleryStorageService } from '../gallery/gallery-storage.service';
+import { DragDropUploadService } from '../drag-drop-upload/drag-drop-upload.service';
 
 @Component({
   selector: 'app-gallery',
@@ -19,6 +22,10 @@ export class GalleryComponent implements OnInit {
   notDeletedImagesArray = this.galleryService.notDeletedImagesArray;
   imagesLength = this.galleryService.imagesLength;
 
+  dragDropUploadService = inject(DragDropUploadService);
+  
+    files = this.dragDropUploadService.files;
+    images = this.dragDropUploadService.images;
 
   ngOnInit() {
     this.galleryService.notDeletedImages();
@@ -61,7 +68,28 @@ export class GalleryComponent implements OnInit {
 
     this.galleryService.galleryHighlightSrcs.set([]);
 
-    this.galleryStorageService.uploadImages(filteredSrcs);
+    this.galleryStorageService.uploadImageNames(filteredSrcs);
+    this.selectedImage();
+  }
+
+
+  selectedImage() {
+
+    const imageNames = this.images().map(img => img.relativePath); 
+    const ngxFileDropEntries = this.files(); // This will return an array of the files that were dropped. 
+    
+    if (ngxFileDropEntries.length > 0) {
+      const fileEntry = ngxFileDropEntries[0].fileEntry as FileSystemFileEntry;
+      fileEntry.file((file: File) => {
+        this.galleryStorageService.uploadImages(imageNames, file)
+          .then((snapshot) => {
+            getDownloadURL(snapshot.ref)
+              .then((downloadUrl) => {
+                console.log("selectedImage()_downloadUrl: ", downloadUrl);
+              })
+          })
+      });
+    }
   }
 
 }

@@ -1,8 +1,9 @@
-import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, Component, inject, input, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { GalleryService } from '../gallery/gallery.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, Validators, FormControl, FormGroup } from '@angular/forms';
+
+import { GalleryService } from '../gallery/gallery.service';
 
 @Component({
   selector: 'app-device-settings',
@@ -112,4 +113,5 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
       return "";
     }
   }
+
 }
