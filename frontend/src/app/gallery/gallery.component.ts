@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { GalleryService } from './gallery.service';
 import { GalleryStorageService } from '../gallery/gallery-storage.service';
 import { DragDropUploadService } from '../drag-drop-upload/drag-drop-upload.service';
-import { map } from 'rxjs';
 
 @Component({
   selector: 'app-gallery',
@@ -34,11 +33,12 @@ export class GalleryComponent implements OnInit {
 
 
   onHighlightImageSelection(src: string) {
+    console.log("onHighlightImageSelection().");
     this.galleryService.getHighlightImageSelection(src);
   }
 
   onRemoveImage() {
-    console.log("onRemoveImage()_Deleting.");
+    console.log("onRemoveImage().");
 
     const srcsToDelete = this.galleryService.galleryHighlightSrcs();
     this.galleryService.getRemoveImage(srcsToDelete);
@@ -64,24 +64,33 @@ export class GalleryComponent implements OnInit {
     const availableImageSrcs = this.galleryService.notDeletedImagesArray().map(img => img.src); // This will return an array of the srcs of the images that are not deleted. 
     const filteredSrcs = combinedSrcs.filter(src => !deletedSrcs.includes(src) && availableImageSrcs.includes(src)); // This will filter out the deleted images and the images that are not available.
 
-    const imageNames = filteredSrcs.map(src =>
-      src.substring(src.lastIndexOf('/') + 1) // This will return the name of the image. lastIndexOf('/') + 1 means that the first character after the last / will be returned. 
-    );
+    const images = this.galleryService.allImages();
 
     localStorage.setItem("chosenImagesSrcs", JSON.stringify(filteredSrcs));
     console.log("onSelectForDevice()_combinedSrcs: ", combinedSrcs);
     console.log("onSelectForDevice()_filteredSrcs: ", filteredSrcs);
     console.log("onSelectForDevice()_typeoffilteredSrcs: ", typeof filteredSrcs);
 
-    this.galleryService.galleryHighlightSrcs.set([]);
-
     if (filteredSrcs.length > 0) { // Checks if the filteredSrcs array is empty. 
-      this.galleryStorageService.convertToBlobs(filteredSrcs[0]) // [filteredSrcs[0]] creates an array with the first element of the filteredSrcs array because this methode requires an array. 
-        .then((blobs: Blob[]) => { // The result of the convertToBlobs method is stored in the blobs variable which is an array of Blobs.
-          this.galleryStorageService.uploadSingleImage(imageNames[0], blobs[0], this.action);
-          console.log("onSelectForDevice()_blobs: ", blobs);
-        });
+      for (let img of filteredSrcs) {
+
+        const imageObj = images.find(imge => imge.src === img);
+        const alt = imageObj ? imageObj.alt : '';
+        const relativePath = imageObj ? imageObj.relativePath : '';
+        console.log("onSelectForDevice()_alt: ", alt);
+
+        const imageName = this.getImageFileName(alt, relativePath, filteredSrcs.indexOf(img));
+        console.log("onSelectForDevice()_imageName_1: ", imageName);
+
+        this.galleryStorageService.convertToBlobs([img]) // [filteredSrcs[0]] creates an array with the first element of the filteredSrcs array because this methode requires an array. 
+          .then((blobs: Blob[]) => { // The result of the convertToBlobs method is stored in the blobs variable which is an array of Blobs.
+            console.log("onSelectForDevice()_imageName_2: ", imageName);
+            this.galleryStorageService.uploadSingleImage(alt === "" ? imageName : alt, blobs[0], this.action);
+            console.log("onSelectForDevice()_blobs: ", blobs);
+          });
+      }
     }
+    this.galleryService.galleryHighlightSrcs.set([]);
   }
 
 
@@ -90,26 +99,33 @@ export class GalleryComponent implements OnInit {
 
     this.action = "uploadAllImages";
     const images = this.galleryService.allImages();
-    let imageName: string = "";
     console.log("onUploadAllImages()_images: ", images);
 
     for (let img of images) {
       let uploadTasks: any[] = await this.galleryStorageService.convertToBlobs([img.src]);
       console.log("onUploadAllImages()_uploadTasks: ", uploadTasks);
 
-      if (img.alt === "") {
-        imageName = img.relativePath;
-
-      } else if (img.relativePath === "") {
-        imageName = img.alt;
-
-      } else {
-        imageName = `image_${Date.now()}_${img}`; // Incase both the alt and relativePath are empty. 
-      }
-
+      const imageName = this.getImageFileName(img.alt, img.relativePath, images.indexOf(img));
       await this.galleryStorageService.uploadSingleImage(imageName, uploadTasks[0], this.action);
     }
     this.galleryService.galleryHighlightSrcs.set([]); // Incase any images are selected. 
+  }
+
+  getImageFileName(alt: string, relativePath: string, i: number) {
+    console.log("getImageFileName().");
+    let imageName: string = "";
+
+    if (alt === "") {
+      imageName = relativePath;
+
+    } else if (relativePath === "") {
+      imageName = alt;
+
+    } else {
+      imageName = `image_${Date.now()}_${i}`; // Incase both the alt and relativePath are empty. 
+    }
+    console.log("getImageFileName()_imageName: ", imageName);
+    return imageName;
   }
 
 }

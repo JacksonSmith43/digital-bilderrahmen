@@ -102,7 +102,7 @@ export class GalleryService {
         } else { // Adds the image to the selection if it has not already been selected. 
             this.galleryHighlightSrcs.set([...selectedSrcs, src]);
         }
-        console.log("getHighlightImageSelection()_this.galleryHighlightIndices(): ", this.galleryHighlightSrcs());
+        console.log("getHighlightImageSelection()_this.galleryHighlightSrcs(): ", this.galleryHighlightSrcs());
     }
 
 } 
