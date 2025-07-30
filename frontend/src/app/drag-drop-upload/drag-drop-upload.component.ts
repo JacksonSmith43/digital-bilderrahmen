@@ -4,7 +4,7 @@ import { NgxFileDropModule } from 'ngx-file-drop';
 import { CommonModule } from '@angular/common';
 
 import { DragDropUploadService } from './drag-drop-upload.service';
-import { AppService } from '../app.service';
+import { NavbarService } from '../navbar/navbar.service';
 
 @Component({
   selector: 'app-drag-drop-upload',
@@ -15,7 +15,7 @@ import { AppService } from '../app.service';
 
 export class DragDropUploadComponent implements AfterViewInit {
 
-  private appService = inject(AppService);
+  private navService = inject(NavbarService);
   private dragDropUploadService = inject(DragDropUploadService);
   imageUrls = this.dragDropUploadService.images;
   files = this.dragDropUploadService.files;
@@ -27,9 +27,9 @@ export class DragDropUploadComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    if (this.appService.isAddImage && this.openFileSelectorFn) {
+    if (this.navService.isAddImage && this.openFileSelectorFn) {
       this.openFileSelectorFn();
-      this.appService.isAddImage = false;
+      this.navService.isAddImage = false;
     }
   }
 

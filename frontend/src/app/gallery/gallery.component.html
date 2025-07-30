@@ -9,9 +9,9 @@
                 [ngClass]="galleryHighlightSrcs().includes(i.src) ? 'image-selected' : 'image-unselected' ">
             @if(last){
             <p class="image-number">Number of images: {{imagesLength()}}</p>
-            <button (click)="onRemoveImage()">Delete</button>
-            <button (click)="onSelectForDevice()">Select for Device</button>
-            <button (click)="onUploadAllImages()">Upload all images</button>
+            <button class="btn btn-danger" (click)="onRemoveImage()">Delete</button>
+            <button class="btn btn-primary" (click)="onSelectForDevice()">Select for Device</button>
+            <button class="btn btn-primary" (click)="onUploadAllImages()">Upload all images</button>
             }
             }
 

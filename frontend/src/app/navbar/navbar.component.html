@@ -1,0 +1,19 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+    <div class="dropdown">
+        <button class="btn dropdown-toggle btn-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{getSelectedViewLabel()}}
+        </button>
+        <ul class="dropdown-menu" aria-label="Differnt ways of viewing the website.">
+            <li><a class="dropdown-item" (click)="onAllView()" routerLink="/viewAll">View All</a></li>
+            <li><a class="dropdown-item" (click)="onPicturesView()" routerLink="/gallery">View Pictures</a></li>
+            <li><a class="dropdown-item" (click)="onDragDropView()" routerLink="/dragDrop">View Drag Drop</a></li>
+            <!--	<li><a class="dropdown-item" (click)="onDeviceSettingsView()" routerLink="/deviceSettings">View Device Settings</a></li> -->
+        </ul>
+    </div>
+
+    <button class="btn btn-secondary" (click)="onDeviceSettingsView()" routerLink="/deviceSettings">Device Settings</button>
+    <button class="btn btn-secondary" (click)="onIsAddImage()" [routerLink]="'/dragDrop'">Add image</button>
+    <button class="btn btn-secondary" (click)="onLogin()">Login</button>
+
+</nav>
