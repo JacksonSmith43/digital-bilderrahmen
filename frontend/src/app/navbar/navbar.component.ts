@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from "@angular/router";
 
 import { NavbarService } from './navbar.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -12,6 +13,9 @@ import { NavbarService } from './navbar.service';
 
 export class NavbarComponent {
   private navService = inject(NavbarService);
+  private authService = inject(AuthService);
+
+  isLoggedIn = this.authService.isLoggedIn;
 
   onAllView() {
     return this.navService.getAllView();
@@ -39,8 +43,11 @@ export class NavbarComponent {
   }
 
   onLogin() {
-
+    this.authService.isLoggedIn.set(true);
   }
 
+  onLogout() {
+    this.authService.isLoggedIn.set(false);
+  }
 
 }

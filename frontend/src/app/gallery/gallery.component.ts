@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { GalleryService } from './gallery.service';
 import { GalleryStorageService } from '../gallery/gallery-storage.service';
 import { DragDropUploadService } from '../drag-drop-upload/drag-drop-upload.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-gallery',
@@ -16,6 +17,9 @@ export class GalleryComponent implements OnInit {
   private galleryService = inject(GalleryService);
   private galleryStorageService = inject(GalleryStorageService);
   dragDropUploadService = inject(DragDropUploadService);
+
+  private authService = inject(AuthService);
+  isLoggedIn = this.authService.isLoggedIn;
 
 
   allImages = this.galleryService.allImages;

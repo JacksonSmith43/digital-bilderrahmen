@@ -1,5 +1,6 @@
 <div class="row drag-and-drop-upload-container">
 
+    @if(isLoggedIn()){
     <div class="center">
 
         <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)" (onFileOver)="fileOver($event)"
@@ -31,4 +32,7 @@
             </table>
         </div>
     </div>
+    }@else {
+    <p class="not-logged-in">You are not logged in. Please login to be able to do anything.</p>
+    }
 </div>

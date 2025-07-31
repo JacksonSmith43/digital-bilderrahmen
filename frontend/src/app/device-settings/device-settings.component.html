@@ -1,3 +1,5 @@
+@if(isLoggedIn()){
+
 <h3>Device Settings</h3>
 <p>Version: </p>
 <p>Switch device off</p>
@@ -19,18 +21,22 @@
                 <div class="interval-time">
 
                     <form (ngSubmit)="onSetTime(intervalTime.value)" [formGroup]="intervalForm">
-                        
+
                         <div class="input-group">
                             <label for="interval-time-input" class="form-label">Interval time (in ms):</label>
                             <div class="input-row">
-                                <input type="number" class="form-control" id="interval-time-input" placeholder="1000" #intervalTime formControlName="intervalTimeInput">
-                                <button type="submit" class="btn btn-primary interval-time-button" [disabled]="intervalTimeFormControl.invalid">Set Time</button>
+                                <input type="number" class="form-control" id="interval-time-input" placeholder="1000"
+                                    #intervalTime formControlName="intervalTimeInput">
+                                <button type="submit" class="btn btn-primary interval-time-button"
+                                    [disabled]="intervalTimeFormControl.invalid">Set Time</button>
                             </div>
                         </div>
 
                     </form>
-                    @if(intervalTimeFormControl.invalid && (intervalTimeFormControl.dirty || intervalTimeFormControl.touched)){
-                    <p class="error-message">{{intervalFormErrorMessages || '\u00A0' }}</p> <!-- \u00A0 is used to add a non-breaking space. Non-breaking spaces are used to prevent the error message from being shifted to the right. -->
+                    @if(intervalTimeFormControl.invalid && (intervalTimeFormControl.dirty ||
+                    intervalTimeFormControl.touched)){
+                    <p class="error-message">{{intervalFormErrorMessages || '\u00A0' }}</p>
+                    <!-- \u00A0 is used to add a non-breaking space. Non-breaking spaces are used to prevent the error message from being shifted to the right. -->
                     }
 
                 </div>
@@ -79,3 +85,7 @@
         </div>
     </div>
 </div>
+
+}@else {
+<p class="not-logged-in">You are not logged in. Please login to be able to do anything.</p>
+}

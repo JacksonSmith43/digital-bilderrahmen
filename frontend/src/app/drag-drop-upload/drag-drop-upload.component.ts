@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 
 import { DragDropUploadService } from './drag-drop-upload.service';
 import { NavbarService } from '../navbar/navbar.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-drag-drop-upload',
@@ -17,8 +18,11 @@ export class DragDropUploadComponent implements AfterViewInit {
 
   private navService = inject(NavbarService);
   private dragDropUploadService = inject(DragDropUploadService);
+  private authService = inject(AuthService);
+
   imageUrls = this.dragDropUploadService.images;
   files = this.dragDropUploadService.files;
+  isLoggedIn = this.authService.isLoggedIn;
 
   private openFileSelectorFn?: () => void; // Stores a function that opens the file selector dialog (provided by ngx-file-drop). 
 

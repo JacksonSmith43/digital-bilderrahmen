@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import { DragDropUploadComponent } from "../drag-drop-upload/drag-drop-upload.component";
 import { GalleryComponent } from "../gallery/gallery.component";
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-view-all',
@@ -11,5 +12,7 @@ import { GalleryComponent } from "../gallery/gallery.component";
 })
 
 export class ViewAllComponent {
+  private authService = inject(AuthService);
+  isLoggedIn = this.authService.isLoggedIn;
 
 }

@@ -1,6 +1,10 @@
 <main>
+    @if(isLoggedIn()){
 
     <app-gallery></app-gallery>
     <app-drag-drop-upload></app-drag-drop-upload>
 
+    }@else {
+    <p class="not-logged-in">You are not logged in. Please login to be able to do anything.</p>
+    }
 </main>
