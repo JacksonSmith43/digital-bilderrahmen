@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { GalleryService } from './gallery.service';
@@ -17,24 +17,28 @@ export class GalleryComponent implements OnInit {
   private galleryService = inject(GalleryService);
   private galleryStorageService = inject(GalleryStorageService);
   dragDropUploadService = inject(DragDropUploadService);
-
   private authService = inject(AuthService);
-  isLoggedIn = this.authService.isLoggedIn;
 
+  isLoggedIn = this.authService.isLoggedIn;
 
   allImages = this.galleryService.allImages;
   galleryHighlightSrcs = this.galleryService.galleryHighlightSrcs;
-  notDeletedImagesArray = this.galleryService.notDeletedImagesArray;
-  imagesLength = this.galleryService.imagesLength;
-  files = this.dragDropUploadService.files;
-  images = this.dragDropUploadService.images;
-
   action = this.galleryStorageService.action;
 
   ngOnInit() {
-    this.galleryService.notDeletedImages();
+    //  this.galleryService.notDeletedImages();
+    // this.galleryStorageService.downloadAndDisplayImages(); // In order to have the images load after every reload. 
   }
 
+  getGalleryImages() {
+    console.log("getGalleryImages().");
+    return this.galleryStorageService.galleryImages();
+  }
+
+  getGalleryImagesLength() {
+    console.log("getGalleryImagesLength():");
+    return this.galleryStorageService.galleryImages().length;
+  }
 
   onHighlightImageSelection(src: string) {
     console.log("onHighlightImageSelection().");
@@ -131,5 +135,12 @@ export class GalleryComponent implements OnInit {
     console.log("getImageFileName()_imageName: ", imageName);
     return imageName;
   }
+
+  async onDownloadAllImages() {
+    console.log("onDownloadAllImages().");
+    await this.galleryStorageService.downloadAllImages();
+    await this.galleryStorageService.downloadAndDisplayImages();
+  }
+
 
 }

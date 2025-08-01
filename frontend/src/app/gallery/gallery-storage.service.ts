@@ -1,14 +1,19 @@
-import { inject, Injectable } from '@angular/core';
-import { doc, Firestore, setDoc } from '@angular/fire/firestore';
-import { ref, Storage, uploadBytesResumable, UploadTask } from '@angular/fire/storage';
+import { inject, Injectable, signal } from '@angular/core';
+import { Firestore } from '@angular/fire/firestore';
+import { getDownloadURL, listAll, ref, Storage, uploadBytesResumable, UploadTask } from '@angular/fire/storage';
+import { GalleryService } from './gallery.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GalleryStorageService {
-  action: "selectForDevice" | "uploadAllImages" | undefined = undefined;
   firestore = inject(Firestore);
   firebaseStorage = inject(Storage);
+  galleryService = inject(GalleryService);
+
+  galleryImages = signal<{ src: string; alt: string; relativePath: string }[]>([]);
+
+  action: "selectForDevice" | "uploadAllImages" | undefined = undefined;
 
   uploadSingleImage(imageName: string, image: Blob, action: string | undefined): UploadTask {
     console.log("uploadSingleImage().");
@@ -20,7 +25,7 @@ export class GalleryStorageService {
     console.log("uploadSingleImage()_action: ", action);
 
     if (action === "uploadAllImages") {
-      const storageRef = ref(this.firebaseStorage, `uploadedImages/${imageName}`); // This will create a reference to the images folder in the storage bucket. 
+      const storageRef = ref(this.firebaseStorage, `uploadedAllImages/${imageName}`); // This will create a reference to the images folder in the storage bucket. 
       return uploadBytesResumable(storageRef, image); // This will upload the image to the storage bucket. 
 
     } else if (action === "selectForDevice") {
@@ -83,4 +88,45 @@ export class GalleryStorageService {
     return blobs;
   }
 
+  async downloadAllImages() {
+    console.log("downloadAllImages().");
+
+    const listRef = ref(this.firebaseStorage, `uploadedAllImages`);
+    const listResult = await listAll(listRef); // This will list all the images in the storage bucket. 
+    const downloadUrls: string[] = [];
+
+    console.log("downloadAllImages()_listResult: ", listResult);
+
+    for (let item of listResult.items) { // This will loop through all the images in the storage bucket.
+      console.log("downloadAllImages()_item: ", item);
+      try {
+        const url = await getDownloadURL(item); // This will get the download URL of the image meaning that it will download the image from the storage bucket. 
+        downloadUrls.push(url);
+
+        console.log("downloadAllImages()_url: ", url);
+
+      } catch (error) {
+        console.log(`downloadAllImages()_error: ${error} for item: ${item.name}`);
+      }
+    }
+    return downloadUrls;
+  }
+
+
+  async downloadAndDisplayImages() {
+    try {
+      const downloadUrls = await this.downloadAllImages();
+
+      const images = downloadUrls.map((url, index) => ({ // This will loop through all the images and add them to the images array. 
+        src: url,
+        alt: `Image ${index + 1}`,
+        relativePath: url.split('/').pop() || `image_${index + 1}` // This will either get the last part of the URL or "image_1" if the URL is empty.
+      }));
+
+      this.galleryImages.set(images);
+
+    } catch (error) {
+      console.error("downloadAndDisplayImages(): An error has occured whilst loading images from Firebase:", error);
+    }
+  }
 }
