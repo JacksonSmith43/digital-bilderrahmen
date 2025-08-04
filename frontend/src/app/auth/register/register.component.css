@@ -1,0 +1,48 @@
+.register-container {
+    font-family: sans-serif;
+    font-weight: bold;
+    text-align: center;
+    border: 0.025rem solid gray;
+
+    width: 100%;
+    max-width: 30rem;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+
+.form-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 0.025rem solid gray;
+}
+
+.error-message {
+    color: red;
+}
+
+.success-message {
+    color: green;
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin: 1rem auto;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
