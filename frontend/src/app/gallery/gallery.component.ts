@@ -17,13 +17,12 @@ export class GalleryComponent implements OnInit {
   private galleryService = inject(GalleryService);
   private galleryStorageService = inject(GalleryStorageService);
   dragDropUploadService = inject(DragDropUploadService);
-  private authService = inject(AuthService);
-
-  isLoggedIn = this.authService.isLoggedIn;
+  authService = inject(AuthService);
 
   allImages = this.galleryService.allImages;
   galleryHighlightSrcs = this.galleryService.galleryHighlightSrcs;
   action = this.galleryStorageService.action;
+
 
   ngOnInit() {
     //  this.galleryService.notDeletedImages();

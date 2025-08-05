@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, Validators, FormControl, FormGroup } from '@angular/forms';
 
 import { GalleryService } from '../gallery/gallery.service';
-import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-device-settings',
@@ -15,9 +14,7 @@ import { AuthService } from '../auth/auth.service';
 
 export class DeviceSettingsComponent implements OnInit, AfterViewInit {
   private galleryService = inject(GalleryService);
-  private authService = inject(AuthService);
 
-  isLoggedIn = this.authService.isLoggedIn;
   imagesLength = 0;
   currentImageIndex = 0;
   interval: any;

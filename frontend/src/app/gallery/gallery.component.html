@@ -1,6 +1,6 @@
 <div class="container images-container">
 
-    @if(isLoggedIn()){
+    @if(this.authService.currentUser() !== undefined){
 
     <p>Filter</p>
 

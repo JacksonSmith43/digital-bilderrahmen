@@ -1,6 +1,6 @@
 <div class="row drag-and-drop-upload-container">
 
-    @if(isLoggedIn()){
+    @if(this.authService.currentUser() !== undefined){
     <div class="center">
 
         <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)" (onFileOver)="fileOver($event)"

@@ -1,1 +1,52 @@
-<p>login works!</p>
+<div class="login-container row">
+    <h3>Login</h3>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit(emailInput.value, passwordInput.value)">
+
+        <div class="username-container form-group col">
+            <label for="username">Email</label>
+            <input type="text" id="email" placeholder="johnsmith@gmx.at" formControlName="email" #emailInput>
+
+            @if(emailControl.invalid && (emailControl.dirty || emailControl.touched)){
+            @if(emailControl.hasError('required')){
+            <p class="error-message">Email address required.</p>
+            }
+            @if(emailControl.hasError("email")){
+            <p class="error-message">Invalid email address.</p>
+            }
+            }
+        </div>
+
+        <div class="password-container form-group col">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="password123" formControlName="password" #passwordInput>
+
+            @if(passwordControl.invalid && (passwordControl.dirty || passwordControl.touched)){
+            @if(passwordControl.hasError('required')){
+            <p class="error-message">Password is required.</p>
+            }
+
+            @if(passwordControl.hasError("minlength")){
+            <p class="error-message">A minimum of 6 characters is required.</p>
+            }
+
+            @if(passwordControl.hasError("maxlength")){
+            <p class="error-message">A maximum of 20 characters is allowed.</p>
+            }
+            }
+        </div>
+
+        <div class="button-container">
+            <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">Login</button>
+        </div>
+
+        @if(isLoginSuccessful && errorMessage() === undefined){
+        <p class="success-message">Successful login.</p>
+
+        }@else if(errorMessage() ){
+        <p class="error-message">{{errorMessage()}}</p>
+        }
+
+
+    </form>
+</div>

@@ -12,7 +12,5 @@ import { AuthService } from '../auth/auth.service';
 })
 
 export class ViewAllComponent {
-  private authService = inject(AuthService);
-  isLoggedIn = this.authService.isLoggedIn;
-
+  authService = inject(AuthService);
 }
