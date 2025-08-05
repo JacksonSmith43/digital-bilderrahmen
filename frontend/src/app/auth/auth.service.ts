@@ -1,5 +1,5 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, user } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, user } from '@angular/fire/auth';
 import { from, Observable } from 'rxjs';
 import { User } from './login/login.model';
 
@@ -10,8 +10,6 @@ import { User } from './login/login.model';
 export class AuthService {
   firebaseAuth = inject(Auth);
   currentUser = signal<User | undefined>(undefined);
-  isLoggedIn = signal<boolean>(false);
-
   user$ = user(this.firebaseAuth); // $ is used to indicate that this is an Observable. Which is used to listen to the changes in the user's authentication state.
 
   register(email: string, password: string): Observable<void> {
@@ -30,6 +28,11 @@ export class AuthService {
 
         } as User;
       });
+    return from(authPromise);
+  }
+
+  logout(): Observable<void> {
+    const authPromise = signOut(this.firebaseAuth);
     return from(authPromise);
   }
 }

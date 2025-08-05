@@ -16,10 +16,10 @@
     <button class="btn btn-secondary" (click)="onDeviceSettingsView()" routerLink="/deviceSettings">Device
         Settings</button>
     <button class="btn btn-secondary" (click)="onIsAddImage()" [routerLink]="'/dragDrop'">Add image</button>
-    <button class="btn btn-secondary" (click)="onLogout()">Logout</button>
+    <button class="btn btn-secondary" [routerLink]="'/logout'">Logout</button>
 
     }@else {
-    <button class="btn btn-secondary" [routerLink]="'/login'" (click)="onLogin()">Login</button>
+    <button class="btn btn-secondary" [routerLink]="'/login'">Login</button>
     <button class="btn btn-secondary" [routerLink]="'/register'">Register</button>
     }
 

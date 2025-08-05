@@ -56,12 +56,4 @@ export class NavbarComponent {
     return this.navService.getIsAddImage();
   }
 
-  onLogin() {
-    this.authService.isLoggedIn.set(true);
-  }
-
-  onLogout() {
-    this.authService.isLoggedIn.set(false);
-  }
-
 }
