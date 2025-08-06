@@ -48,14 +48,7 @@ export class GalleryComponent implements OnInit {
     console.log("onRemoveImage().");
 
     const srcsToDelete = this.galleryService.galleryHighlightSrcs();
-    this.galleryService.getRemoveImage(srcsToDelete);
-
-    console.log("onRemoveImage()_s", this.galleryService.notDeletedImagesArray());
-
-    this.galleryService.galleryHighlightSrcs.set([]);
-    this.galleryService.notDeletedImages();
-
-    console.log("onRemoveImage()_a", this.galleryService.notDeletedImagesArray());
+    this.galleryStorageService.deleteImageFromFirebase(srcsToDelete);
   }
 
   onSelectForDevice() {

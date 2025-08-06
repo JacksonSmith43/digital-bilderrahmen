@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { Firestore } from '@angular/fire/firestore';
-import { getDownloadURL, listAll, ref, Storage, uploadBytesResumable, UploadTask } from '@angular/fire/storage';
+import { deleteObject, getDownloadURL, listAll, ref, Storage, uploadBytesResumable, UploadTask } from '@angular/fire/storage';
 import { GalleryService } from './gallery.service';
 
 @Injectable({
@@ -12,7 +12,6 @@ export class GalleryStorageService {
   galleryService = inject(GalleryService);
 
   galleryImages = signal<{ src: string; alt: string; relativePath: string }[]>([]);
-
   action: "selectForDevice" | "uploadAllImages" | undefined = undefined;
 
   uploadSingleImage(imageName: string, image: Blob, action: string | undefined): UploadTask {
@@ -129,4 +128,62 @@ export class GalleryStorageService {
       console.error("downloadAndDisplayImages(): An error has occured whilst loading images from Firebase:", error);
     }
   }
+
+  deleteImageFromFirebase(selectedImages: string[]) {
+    console.log("deleteImageFromFirebase().");
+    console.log("deleteImageFromFirebase()_selectedImages: ", selectedImages);
+
+    if (selectedImages.length === 0) {
+      console.log("deleteImageFromFirebase()_No image has been selected for deletion.");
+      return;
+    }
+
+    selectedImages.forEach(async (imageUrl) => {
+      try {
+        const fileName = this.extractFileNameFromUrl(imageUrl);
+
+        if (!fileName) {
+          console.log("deleteImageFromFirebase()_Could not extract file name from URL: ", imageUrl);
+          return;
+        }
+
+        const imageRef = ref(this.firebaseStorage, `uploadedAllImages/${fileName}`);
+        await deleteObject(imageRef);
+        console.log("deleteImageFromFirebase()_Image has successfully been deleted from Firebase.");
+
+        this.downloadAndDisplayImages();
+
+      } catch (error) {
+        console.error("An error has occured while trying to delete the image from Firebase:", error);
+      }
+    })
+    this.galleryService.galleryHighlightSrcs.set([]);
+  }
+
+  extractFileNameFromUrl(url: string): string | null {
+    try {
+
+      if (url.includes("firebasestorage.googleapis.com")) { // Checks if the URL is from Firebase Storage. 
+        const urlObj = new URL(url); // Creates a URL object from the string URL to easily access its parts. 
+        const pathParam = urlObj.pathname.split('/o/')[1]; // Extract the 'o' parameter from the URL which contains the path to the image. Splits the pathname at '/o/' and takes everything after it. 
+
+        if (pathParam) { // Checks if the path parameter exists. 
+          const decodedPath = decodeURIComponent(pathParam); // Decodes URL-encoded characters like %20 (space) or %2F (slash). %2F will be decoded to /. 
+          return decodedPath.split('/').pop() || null; // Takes everything after the last slash (which is the filename). Returns null if there's no filename. 
+
+        } else {
+          return null;
+        }
+
+      } else {
+        return url.split('/').pop() || null; // For local paths, returns the last segment after the final slash.  
+      }
+
+
+    } catch (error) {
+      console.error("extractFileNameFromUrl()_error: ", error);
+      return null;
+    }
+  }
+
 }

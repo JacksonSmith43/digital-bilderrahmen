@@ -33,64 +33,6 @@ export class GalleryService {
         return [...this.images(), ...(Array.isArray(uploadedImages) ? uploadedImages : [])]; // This will return an array of the images that are in the images array and the uploadedImages array.
     });
 
-
-    notDeletedImages() {
-        console.log("notDeletedImages().");
-
-        const deletedImagesSrcs = localStorage.getItem("deletedSrcArr");
-        this.deletedSrcArr.set(deletedImagesSrcs ? JSON.parse(deletedImagesSrcs) : []);
-
-        console.log("notDeletedImages()_deletedImagesSrcs", deletedImagesSrcs);
-        console.log("notDeletedImages()_deletedSrcArr", this.deletedSrcArr());
-
-        this.notDeletedImagesArray.set(this.allImages().filter(img => !this.deletedSrcArr().includes(img.src))); // If the src of the image is not in the deletedSrcArr, then it is not deleted. 
-        this.imagesLength.set(this.notDeletedImagesArray().length);
-
-        console.log("this.notDeletedImagesArray(): ", this.notDeletedImagesArray());
-        localStorage.setItem("notDeletedImagesArray", JSON.stringify(this.notDeletedImagesArray()));
-
-        localStorage.setItem("deletedSrcArr", JSON.stringify(this.deletedSrcArr()));
-        return this.notDeletedImagesArray();
-    }
-
-    getRemoveImage(srcsToDelete: string[]) {
-        console.log("getRemoveImage().");
-        console.log("getRemoveImage()_srcsToDelete: ", srcsToDelete);
-
-        this.deletedSrcArr.set([...this.deletedSrcArr(), ...srcsToDelete]);
-
-        for (let src of srcsToDelete) {
-            console.log("getRemoveImage()_src: ", src);
-
-            const imageIndex = this.images().findIndex(img => img.src === src); // This will loop through the images array and for each image it will check if the src of the image is the same as the src of the image that is being deleted.
-            console.log("getRemoveImage()_imageIndex: ", imageIndex);
-
-            if (imageIndex !== -1) { // Removes the hardcoded images. // 3 < 5 = Removes the image at the 3 index, so Hamsterviel. -1 = Checks if the image has been found. 
-
-                this.images.update((imageArray) => {
-                    imageArray.splice(imageIndex, 1);
-                    console.log("getRemoveImage()_imageArray: ", imageArray);
-                    return [...imageArray];
-                })
-                continue;
-            }
-
-            const uploadIndex = this.addedImages().findIndex(img => img.src === src); // 3 - 5.  
-            if (uploadIndex !== -1) { // Removes the uploaded images.
-
-                this.addedImages.update((imageArray) => {
-                    imageArray.splice(uploadIndex, 1);
-                    return [...imageArray];
-                });
-            }
-        }
-        console.log("getRemoveImage()_this.deletedSrcArr(): ", this.deletedSrcArr());
-
-        localStorage.setItem("deletedSrcArr", JSON.stringify(this.deletedSrcArr()));
-        this.galleryHighlightSrcs.set([]); // This resets the selected images after deletion.
-
-    }
-
     getHighlightImageSelection(src: string) {
         console.log("getHighlightImageSelection().");
 

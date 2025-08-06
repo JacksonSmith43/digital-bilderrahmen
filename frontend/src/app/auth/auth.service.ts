@@ -35,4 +35,5 @@ export class AuthService {
     const authPromise = signOut(this.firebaseAuth);
     return from(authPromise);
   }
+
 }
