@@ -1,9 +1,10 @@
-import { AfterViewInit, Component, inject, input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, inject, signal, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, Validators, FormControl, FormGroup } from '@angular/forms';
 
 import { GalleryService } from '../gallery/gallery.service';
+import { GalleryStorageService } from '../gallery/gallery-storage.service';
 
 @Component({
   selector: 'app-device-settings',
@@ -14,6 +15,9 @@ import { GalleryService } from '../gallery/gallery.service';
 
 export class DeviceSettingsComponent implements OnInit, AfterViewInit {
   private galleryService = inject(GalleryService);
+  private galleryStorageService = inject(GalleryStorageService);
+
+  selectedImages = signal<any[]>([]);
 
   imagesLength = 0;
   currentImageIndex = 0;
@@ -24,7 +28,7 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
     intervalTimeInput: new FormControl("", [Validators.required, Validators.min(300), Validators.max(100000)])
   });
 
-  ngOnInit(): void {
+  ngOnInit() {
     console.log("DeviceSettingsComponent INIT.");
 
     const chosenImagesRaw = localStorage.getItem("chosenImagesSrcs");
@@ -48,17 +52,36 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
     this.galleryService.galleryHighlightSrcs.set([]);
   }
 
+  async loadSelectedImages() {
+    console.log("loadSelectedImages().");
+
+    try {
+      const downloadUrls = await this.galleryStorageService.downloadSelectedImages();
+
+      const images = downloadUrls.map((url, index) => ({
+        src: url,
+        alt: `Selected Image ${index + 1}`,
+        relativePath: url.split('/').pop() || `image_${index + 1}`
+      }));
+
+      this.selectedImages.set(images);
+      this.imagesLength = images.length;
+
+    } catch (error) {
+      console.error("An error has occured while trying to load the selected images: ", error);
+    }
+  }
+
   getChosenImages() {
     console.log("getChosenImages().");
+    return this.selectedImages();
+  }
 
-    const deviceSrcsRaw = localStorage.getItem("chosenImagesSrcs");
-    const deviceSrcs = deviceSrcsRaw ? JSON.parse(deviceSrcsRaw) : [];
-    const all = this.galleryService.allImages();
-    const chosenImages = all.filter(img => deviceSrcs.includes(img.src)); // Only returns the images that are in the deviceSrcs array.
 
-    console.log("getChosenImages()_chosenImages: ", chosenImages);
-
-    return chosenImages; // Only returns the images that are in the deviceSrcs array. src is required because index caused the images to be out of order. 
+  onDownloadSelectedImages() {
+    console.log("onDownloadSelectedImages().");
+    this.galleryStorageService.action = "selectForDevice";
+    this.loadSelectedImages();
   }
 
 
@@ -73,7 +96,7 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
 
   imageInterval(time: number) {
     console.log("imageInterval().");
-    const chosenImages = this.getChosenImages();
+    const chosenImages = this.selectedImages();
 
     if (chosenImages.length > 0) {
       this.currentImageIndex = 0;

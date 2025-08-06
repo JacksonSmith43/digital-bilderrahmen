@@ -114,7 +114,17 @@ export class GalleryStorageService {
 
   async downloadAndDisplayImages() {
     try {
-      const downloadUrls = await this.downloadAllImages();
+      let downloadUrls: string[] = [];
+
+      if (this.action === "uploadAllImages") {
+        downloadUrls = await this.downloadAllImages();
+
+      } else if (this.action === "selectForDevice") {
+        downloadUrls = await this.downloadSelectedImages();
+
+      } else {
+        throw new Error('Invalid action for downloadAndDisplayImages.');
+      }
 
       const images = downloadUrls.map((url, index) => ({ // This will loop through all the images and add them to the images array. 
         src: url,
@@ -184,6 +194,31 @@ export class GalleryStorageService {
       console.error("extractFileNameFromUrl()_error: ", error);
       return null;
     }
+  }
+
+
+  async downloadSelectedImages() {
+    console.log("downloadSelectedImages().");
+
+    const listRef = ref(this.firebaseStorage, `selectForDevice`);
+    const listResult = await listAll(listRef); // This will list all the images in the storage bucket. 
+    const downloadUrls: string[] = [];
+
+    console.log("downloadSelectedImages()_listResult: ", listResult);
+
+    for (let item of listResult.items) { // This will loop through all the images in the storage bucket.
+      console.log("downloadSelectedImages()_item: ", item);
+      try {
+        const url = await getDownloadURL(item); // This will get the download URL of the image meaning that it will download the image from the storage bucket. 
+        downloadUrls.push(url);
+
+        console.log("downloadSelectedImages()_url: ", url);
+
+      } catch (error) {
+        console.log(`downloadSelectedImages()_error: ${error} for item: ${item.name}`);
+      }
+    }
+    return downloadUrls;
   }
 
 }

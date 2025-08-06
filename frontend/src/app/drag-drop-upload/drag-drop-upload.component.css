@@ -1,3 +1,10 @@
+img {
+    object-fit: contain;
+    width: 8rem;
+    height: 8rem;
+    margin: 0.5rem;
+}
+
 .drag-and-drop-upload-container {
     text-align: center;
     display: flex;
@@ -16,11 +23,5 @@
 
 .browse-files-button {
     margin-left: 1rem;
-}
-
-img {
-    object-fit: contain;
-    width: 8rem;
-    height: 8rem;
-    margin: 0.5rem;
+    font-weight: 600;
 }
