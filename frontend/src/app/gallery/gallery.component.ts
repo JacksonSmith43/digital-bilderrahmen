@@ -23,7 +23,6 @@ export class GalleryComponent implements OnInit {
   galleryHighlightSrcs = this.galleryService.galleryHighlightSrcs;
   action = this.galleryStorageService.action;
 
-
   ngOnInit() {
     //  this.galleryService.notDeletedImages();
     // this.galleryStorageService.downloadAndDisplayImages(); // In order to have the images load after every reload. 
@@ -39,6 +38,10 @@ export class GalleryComponent implements OnInit {
     return this.galleryStorageService.galleryImages().length;
   }
 
+  getCurrentUser() {
+    return this.authService.currentUser();
+  }
+
   onHighlightImageSelection(src: string) {
     console.log("onHighlightImageSelection().");
     this.galleryService.getHighlightImageSelection(src);
@@ -51,43 +54,31 @@ export class GalleryComponent implements OnInit {
     this.galleryStorageService.deleteImageFromFirebase(srcsToDelete);
   }
 
-  onSelectForDevice() {
+  async onSelectForDevice() {
     console.log("onSelectForDevice().");
+
     this.action = "selectForDevice";
+    const selectedUrl = this.galleryHighlightSrcs();
 
-    const selectedSrcs = this.galleryService.galleryHighlightSrcs();
-    const existingRaw = localStorage.getItem("chosenImagesSrcs");
-    const existingSrcs = existingRaw ? JSON.parse(existingRaw) : [];
-    const deletedSrcs = this.galleryService.deletedSrcArr();
+    if (selectedUrl.length === 0) {
+      console.log("onSelectForDevice()_No image has been selected for upload.");
+      return;
+    }
 
-    const combinedSrcs = [...new Set([...existingSrcs, ...selectedSrcs])]; // This will remove duplicates from the array.
-    const availableImageSrcs = this.galleryService.notDeletedImagesArray().map(img => img.src); // This will return an array of the srcs of the images that are not deleted. 
-    const filteredSrcs = combinedSrcs.filter(src => !deletedSrcs.includes(src) && availableImageSrcs.includes(src)); // This will filter out the deleted images and the images that are not available.
+    for (let url of selectedUrl) {
+      try {
 
-    const images = this.galleryService.allImages();
+        const imageName = this.galleryStorageService.extractFileNameFromUrl(url) || "";
+        console.log("onSelectForDevice()_imageName: ", imageName);
 
-    localStorage.setItem("chosenImagesSrcs", JSON.stringify(filteredSrcs));
-    console.log("onSelectForDevice()_combinedSrcs: ", combinedSrcs);
-    console.log("onSelectForDevice()_filteredSrcs: ", filteredSrcs);
-    console.log("onSelectForDevice()_typeoffilteredSrcs: ", typeof filteredSrcs);
+        if (!imageName) { // Incase the image name is null then it will be skipped. 
+          continue;
+        }
 
-    if (filteredSrcs.length > 0) { // Checks if the filteredSrcs array is empty. 
-      for (let img of filteredSrcs) {
+        await this.galleryStorageService.copyImageBetweenFolders("uploadedAllImages", "selectForDevice", imageName);
 
-        const imageObj = images.find(imge => imge.src === img);
-        const alt = imageObj ? imageObj.alt : '';
-        const relativePath = imageObj ? imageObj.relativePath : '';
-        console.log("onSelectForDevice()_alt: ", alt);
-
-        const imageName = this.getImageFileName(alt, relativePath, filteredSrcs.indexOf(img));
-        console.log("onSelectForDevice()_imageName_1: ", imageName);
-
-        this.galleryStorageService.convertToBlobs([img]) // [filteredSrcs[0]] creates an array with the first element of the filteredSrcs array because this methode requires an array. 
-          .then((blobs: Blob[]) => { // The result of the convertToBlobs method is stored in the blobs variable which is an array of Blobs.
-            console.log("onSelectForDevice()_imageName_2: ", imageName);
-            this.galleryStorageService.uploadSingleImage(alt === "" ? imageName : alt, blobs[0], this.action);
-            console.log("onSelectForDevice()_blobs: ", blobs);
-          });
+      } catch (error) {
+        console.error("onSelectForDevice()_error: ", error);
       }
     }
     this.galleryService.galleryHighlightSrcs.set([]);
@@ -130,6 +121,7 @@ export class GalleryComponent implements OnInit {
 
   async onDownloadAllImages() {
     console.log("onDownloadAllImages().");
+    this.galleryStorageService.action = "uploadAllImages";
     await this.galleryStorageService.downloadAllImages();
     await this.galleryStorageService.downloadAndDisplayImages();
   }

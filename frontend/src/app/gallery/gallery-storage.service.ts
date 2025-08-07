@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { Firestore } from '@angular/fire/firestore';
-import { deleteObject, getDownloadURL, listAll, ref, Storage, uploadBytesResumable, UploadTask } from '@angular/fire/storage';
+import { deleteObject, getBytes, getDownloadURL, listAll, ref, Storage, uploadBytes, uploadBytesResumable, UploadTask } from '@angular/fire/storage';
 import { GalleryService } from './gallery.service';
 
 @Injectable({
@@ -219,6 +219,26 @@ export class GalleryStorageService {
       }
     }
     return downloadUrls;
+  }
+
+  async copyImageBetweenFolders(sourceFolder: string, targetFolder: string, imageName: string): Promise<void> {
+    console.log("copyImageBetweenFolders().");
+
+    try {
+      const sourceRef = ref(this.firebaseStorage, `${sourceFolder}/${imageName}`);
+      const targetRef = ref(this.firebaseStorage, `${targetFolder}/${imageName}`);
+
+      const url = await getDownloadURL(sourceRef);
+      const response = await fetch(url);
+      const blob = await response.blob();
+
+      await uploadBytes(targetRef, blob);
+
+      console.log(`copyImageBetweenFolders()_"${imageName}" has been copied from "${sourceFolder}" to "${targetFolder}".`);
+
+    } catch (error) {
+      console.error("copyImageBetweenFolders()_error: ", error);
+    }
   }
 
 }
