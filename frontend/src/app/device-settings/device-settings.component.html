@@ -72,14 +72,17 @@
 
             <div class="accordion-body">
                 @for(i of getChosenImages(); track i.src){
-                <img [src]="i.src" [alt]="i.alt">
+                <img [src]="i.src" [alt]="i.alt" (click)="onHighlightImageSelection(i.src)"
+                    [ngClass]="galleryHighlightSrcs().includes(i.src) ? 'image-selected' : 'image-unselected' ">
                 }
             </div>
+            <button class="delete-images-button btn btn-danger" (click)="onRemoveImage()">Delete</button>
 
             }
             @else {
             <p>No images to display.</p>
-            <button class="download-selected-images-buttton btn btn-primary" (click)="onDownloadSelectedImages()">Download selected images</button>
+            <button class="download-selected-images-buttton btn btn-primary"
+                (click)="onDownloadSelectedImages()">Download selected images</button>
             }
         </div>
     </div>

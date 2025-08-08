@@ -40,3 +40,8 @@ button {
     margin: auto 1rem;
     font-weight: 600;
 }
+
+.download-all-images-button {
+    margin: 1rem auto;
+    display: flex;
+}

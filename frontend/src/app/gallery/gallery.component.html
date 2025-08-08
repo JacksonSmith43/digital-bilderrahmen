@@ -14,9 +14,9 @@
             }
             }
             @if(getGalleryImagesLength() === 0){
-            <div class="download-all-images-button">
-                <button class="btn btn-primary" (click)="onDownloadAllImages()">Download all images</button>
-            </div>
+            <button class="download-all-images-button btn btn-primary" (click)="onDownloadAllImages()">Download all
+                images</button>
+
             }@else {
             <button class="btn btn-danger" (click)="onRemoveImage()">Delete</button>
             <button class="btn btn-primary" (click)="onSelectForDevice()">Select for Device</button>

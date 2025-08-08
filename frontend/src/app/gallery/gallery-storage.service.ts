@@ -12,6 +12,7 @@ export class GalleryStorageService {
   galleryService = inject(GalleryService);
 
   galleryImages = signal<{ src: string; alt: string; relativePath: string }[]>([]);
+  deviceImages = signal<{ src: string; alt: string; relativePath: string }[]>([]);
   action: "selectForDevice" | "uploadAllImages" | undefined = undefined;
 
   uploadSingleImage(imageName: string, image: Blob, action: string | undefined): UploadTask {
@@ -132,14 +133,19 @@ export class GalleryStorageService {
         relativePath: url.split('/').pop() || `image_${index + 1}` // This will either get the last part of the URL or "image_1" if the URL is empty.
       }));
 
-      this.galleryImages.set(images);
+      if (this.action === "selectForDevice") {
+        this.deviceImages.set(images);
+
+      } else if (this.action === "uploadAllImages") {
+        this.galleryImages.set(images);
+      }
 
     } catch (error) {
       console.error("downloadAndDisplayImages(): An error has occured whilst loading images from Firebase:", error);
     }
   }
 
-  deleteImageFromFirebase(selectedImages: string[]) {
+  deleteImageFromFirebase(selectedImages: string[], action: string) {
     console.log("deleteImageFromFirebase().");
     console.log("deleteImageFromFirebase()_selectedImages: ", selectedImages);
 
@@ -151,15 +157,26 @@ export class GalleryStorageService {
     selectedImages.forEach(async (imageUrl) => {
       try {
         const fileName = this.extractFileNameFromUrl(imageUrl);
+        let imageRef: any;
 
         if (!fileName) {
           console.log("deleteImageFromFirebase()_Could not extract file name from URL: ", imageUrl);
           return;
         }
 
-        const imageRef = ref(this.firebaseStorage, `uploadedAllImages/${fileName}`);
-        await deleteObject(imageRef);
-        console.log("deleteImageFromFirebase()_Image has successfully been deleted from Firebase.");
+        if (action === "uploadAllImages") {
+          imageRef = ref(this.firebaseStorage, `uploadedAllImages/${fileName}`);
+          await deleteObject(imageRef);
+
+        } else if (action === "selectForDevice") {
+          imageRef = ref(this.firebaseStorage, `selectForDevice/${fileName}`);
+          await deleteObject(imageRef);
+
+        } else {
+          console.log("deleteImageFromFirebase()_Invalid action for deleteImageFromFirebase: ", action);
+        }
+
+        console.log(`deleteImageFromFirebase()_${fileName} has successfully been deleted from Firebase.`);
 
         this.downloadAndDisplayImages();
 

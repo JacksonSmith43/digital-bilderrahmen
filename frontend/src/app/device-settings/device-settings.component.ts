@@ -17,7 +17,8 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
   private galleryService = inject(GalleryService);
   private galleryStorageService = inject(GalleryStorageService);
 
-  selectedImages = signal<any[]>([]);
+  deviceImages = this.galleryStorageService.deviceImages;
+  galleryHighlightSrcs = this.galleryService.galleryHighlightSrcs;
 
   imagesLength = 0;
   currentImageIndex = 0;
@@ -64,7 +65,7 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
         relativePath: url.split('/').pop() || `image_${index + 1}`
       }));
 
-      this.selectedImages.set(images);
+      this.deviceImages.set(images);
       this.imagesLength = images.length;
 
     } catch (error) {
@@ -74,7 +75,8 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
 
   getChosenImages() {
     console.log("getChosenImages().");
-    return this.selectedImages();
+    return this.deviceImages();
+
   }
 
 
@@ -96,7 +98,7 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
 
   imageInterval(time: number) {
     console.log("imageInterval().");
-    const chosenImages = this.selectedImages();
+    const chosenImages = this.deviceImages();
 
     if (chosenImages.length > 0) {
       this.currentImageIndex = 0;
@@ -138,4 +140,17 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
     }
   }
 
+
+  onRemoveImage() {
+    console.log("onRemoveImage().");
+    const action = "selectForDevice";
+
+    const srcsToDelete = this.galleryService.galleryHighlightSrcs();
+    this.galleryStorageService.deleteImageFromFirebase(srcsToDelete, action);
+  }
+
+  onHighlightImageSelection(src: string) {
+    console.log("onHighlightImageSelection().");
+    this.galleryService.getHighlightImageSelection(src);
+  }
 }

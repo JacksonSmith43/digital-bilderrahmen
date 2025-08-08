@@ -20,6 +20,11 @@ button {
     font-weight: 600;
 }
 
+.delete-images-button {
+    margin: 1rem auto;
+    display: flex;
+}
+
 .not-logged-in {
     text-align: center;
     font-weight: bold;
@@ -84,4 +89,16 @@ button {
 .download-selected-images-buttton {
     display: flex;
     margin: 1rem auto;
+}
+
+.image-selected {
+    border: 0.14rem solid blue;
+}
+
+.image-unselected {
+    border: 0.14rem solid black;
+}
+
+.image-delete-selected {
+    border: 0.14rem solid red;
 }
