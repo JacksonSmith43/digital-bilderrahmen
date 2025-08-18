@@ -4,18 +4,20 @@
 
     <p>Filter</p>
 
-    <div class="row images">
+    <div class="images">
         <div class="col-auto text-center">
-            @for(i of getGalleryImages(); track i.src; let index = $index; let last = $last){
+            @if(isImageLoaded()){
+            @for(i of galleryImages(); track i.src; let index = $index; let last = $last){
             <img [src]="i.src" [alt]="i.alt ? i.alt : i.relativePath" (click)="onHighlightImageSelection(i.src)"
                 [ngClass]="galleryHighlightSrcs().includes(i.src) ? 'image-selected' : 'image-unselected' ">
             @if(last){
-            <p class="image-number">Number of images: {{getGalleryImagesLength()}}</p>
+            <p class="image-number">Number of images: {{galleryImageLength()}}</p>
             }
             }
-            @if(getGalleryImagesLength() === 0){
-            <button class="download-all-images-button btn btn-primary" (click)="onDownloadAllImages()">Download all
-                images</button>
+
+            @if(galleryImageLength() == 0){
+            <p>No images to display</p>
+            <button class="btn btn-primary" (click)="onDownloadAllImages()">Download all images</button>
 
             }@else {
             <button class="btn btn-danger" (click)="onRemoveImage()">Delete</button>
@@ -23,10 +25,12 @@
             <button class="btn btn-primary" (click)="onUploadAllImages()">Upload all images</button>
             <button class="btn btn-primary" (click)="onDownloadAllImages()">Download all images</button>
             }
-
+            }@else {
+            <p>Images are loading ....</p>
+            }
         </div>
     </div>
     }@else {
-    <p class="not-logged-in">You are not logged in. Please login to be able to do anything.</p>
+    <p class="not-logged-in">You are not logged in. Please login to be able to do anything_Gallery_View.</p>
     }
 </div>

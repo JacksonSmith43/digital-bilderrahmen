@@ -1,41 +1,50 @@
-import { Injectable, signal } from "@angular/core";
+import { inject, Injectable, signal } from "@angular/core";
 import { NgxFileDropEntry } from "ngx-file-drop";
+import { SharedGalleryService } from "../gallery/shared-gallery.service";
 
 @Injectable({ providedIn: "root" })
 export class DragDropUploadService {
-    images = signal<{ src: string, alt: string, relativePath: string }[]>([]);
+    sharedGalleryService = inject(SharedGalleryService);
     files = signal<NgxFileDropEntry[]>([]);
+    images = this.sharedGalleryService.images;
 
     constructor() {
         console.log("DragDropUploadService INIT.");
 
-        const savedImages = localStorage.getItem("addedImages");
+        const savedImages = this.sharedGalleryService.getImages('addedImages');
 
-        if (savedImages) {
-            this.images.set(JSON.parse(savedImages));
+        if (savedImages.length > 0) {
+            this.images.set(savedImages);
         }
     }
 
 
     addImage(image: { src: string, alt: string, relativePath: string }) {
+        console.log("addImage().");
 
         this.images.update(imgs => { // This updates the images array.
             const currentImgs = Array.isArray(imgs) ? imgs : []; // This makes sure that imgs is an array.
             return [...currentImgs, image];
         });
-        this.saveToLocalStorage();
+        this.sharedGalleryService.saveToLocalStorage("addedImages", this.images());
     }
 
-    saveToLocalStorage() {
-        localStorage.setItem("addedImages", JSON.stringify(this.images()));
-    }
+    removeGalleryImages(srcsToRemove: string[]) {
+        console.log("removeGalleryImages().");
+        console.log("removeGalleryImages()_srcsToRemove: ", srcsToRemove);
 
-    getImages() {
-        return this.images;
-    }
+        const updatedImages = this.sharedGalleryService.removeImages("addedImages", srcsToRemove);
+        this.images.set(updatedImages);
 
+        this.sharedGalleryService.syncImageStores();
+        // localStorage.setItem("addedImages", JSON.stringify(updatedImages));
+        console.log("removeGalleryImages()_updatedImages: ", updatedImages);
+        return updatedImages;
+    }
 
     getDropped(files: NgxFileDropEntry[]) {
+        console.log("getDropped().");
+
         this.files.set(files);
         for (const droppedFile of files) {
 
@@ -54,10 +63,12 @@ export class DragDropUploadService {
                 console.log("getDropped()_droppedFile.relativePath, fileEntry: ", droppedFile.relativePath, fileEntry);
             }
         }
-        this.saveToLocalStorage();
+        this.sharedGalleryService.saveToLocalStorage("addedImages", this.files());
     }
 
     getHandleFile(file: File, relativePath: string) {
+        console.log("getHandleFile().");
+
         const reader = new FileReader(); // This is used to read the file as a data URL. 
         reader.onload = (e: any) => { // This event is triggered when the file is read successfully. 
             this.addImage({ // This adds the image to the images array. 

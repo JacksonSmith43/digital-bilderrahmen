@@ -1,10 +1,12 @@
-import { AfterViewInit, Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, Validators, FormControl, FormGroup } from '@angular/forms';
 
 import { GalleryService } from '../gallery/gallery.service';
 import { GalleryStorageService } from '../gallery/gallery-storage.service';
+import { SharedGalleryService } from '../gallery/shared-gallery.service';
+import { DragDropUploadService } from '../drag-drop-upload/drag-drop-upload.service';
 
 @Component({
   selector: 'app-device-settings',
@@ -13,9 +15,11 @@ import { GalleryStorageService } from '../gallery/gallery-storage.service';
   styleUrl: './device-settings.component.css'
 })
 
-export class DeviceSettingsComponent implements OnInit, AfterViewInit {
+export class DeviceSettingsComponent implements OnInit {
   private galleryService = inject(GalleryService);
   private galleryStorageService = inject(GalleryStorageService);
+  private dragDropUploadService = inject(DragDropUploadService);
+  private sharedGalleryService = inject(SharedGalleryService);
 
   deviceImages = this.galleryStorageService.deviceImages;
   galleryHighlightSrcs = this.galleryService.galleryHighlightSrcs;
@@ -23,7 +27,6 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
   imagesLength = 0;
   currentImageIndex = 0;
   interval: any;
-
 
   intervalForm = new FormGroup({
     intervalTimeInput: new FormControl("", [Validators.required, Validators.min(300), Validators.max(100000)])
@@ -42,16 +45,14 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
         const filtersDeletedSrcs = (chosenSrcs).filter((src: string) => !deletedSrcs.includes(src)); // This filters out the deleted images.
         this.imagesLength = filtersDeletedSrcs.length;
         localStorage.setItem("chosenImagesSrcs", JSON.stringify(filtersDeletedSrcs));
-
+        this.getChosenImages();
       } catch (e) {
         console.error("DeviceSettingsComponent: An error has occured while trying to get the chosen images.", e);
       }
     }
   }
 
-  ngAfterViewInit(): void {
-    this.galleryService.galleryHighlightSrcs.set([]);
-  }
+
 
   async loadSelectedImages() {
     console.log("loadSelectedImages().");
@@ -82,7 +83,7 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
 
   onDownloadSelectedImages() {
     console.log("onDownloadSelectedImages().");
-    this.galleryStorageService.action = "selectForDevice";
+    this.galleryStorageService.action.set("selectForDevice");
     this.loadSelectedImages();
   }
 
@@ -142,15 +143,46 @@ export class DeviceSettingsComponent implements OnInit, AfterViewInit {
 
 
   onRemoveImage() {
-    console.log("onRemoveImage().");
-    const action = "selectForDevice";
+    console.log("onRemoveImage()_DeviceSettingsComponent.");
 
-    const srcsToDelete = this.galleryService.galleryHighlightSrcs();
-    this.galleryStorageService.deleteImageFromFirebase(srcsToDelete, action);
+    const srcsToDelete = this.galleryHighlightSrcs();
+    const localImages: string[] = [];
+    const firebaseImages: string[] = [];
+
+    if (srcsToDelete.length === 0) {
+      console.log("onRemoveImage()_No image has been selected for deletion.");
+      return;
+    }
+
+    for (let image of srcsToDelete) {
+      console.log("onRemoveImage()_image: ", image);
+
+      if (image.startsWith("data:") || !image.includes("firebasestorage.googleapis.com")) { // Checks if the image is a local image (either a Base64 data URL or a local path).
+        localImages.push(image);
+
+      } else {
+        this.galleryStorageService.deleteImageFromFirebase(srcsToDelete);
+        firebaseImages.push(image);
+        localImages.push(image);
+      }
+    }
+
+    if (localImages.length > 0) {  // Removes local images. 
+      this.dragDropUploadService.removeGalleryImages(localImages);
+      console.log(`${localImages.length} local images have been removed.`);
+    }
+
+    if (firebaseImages.length > 0) {
+      this.galleryStorageService.deleteImageFromFirebase(firebaseImages);
+      console.log(`${firebaseImages.length} firebase images have been removed.`);
+    }
+
+    this.galleryService.galleryHighlightSrcs.set([]);
+    return srcsToDelete.length;
   }
 
   onHighlightImageSelection(src: string) {
     console.log("onHighlightImageSelection().");
-    this.galleryService.getHighlightImageSelection(src);
+    this.sharedGalleryService.getHighlightImageSelection(src);
   }
 }
