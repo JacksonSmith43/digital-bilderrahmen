@@ -10,11 +10,8 @@ import { FirebaseContextService } from './firebase-context.service';
 })
 export class GalleryStorageService {
   sharedGalleryService = inject(SharedGalleryService);
-  firebaseContextService = inject(FirebaseContextService);
 
-  galleryImages = signal<ImageType[]>([]);
-  deviceImages = signal<ImageType[]>([]);
-  action = signal<"selectForDevice" | "uploadAllImages" | undefined>(undefined);
+  action = this.sharedGalleryService.action;
 
   uploadSingleImage(imageName: string, image: Blob): UploadTask {
     console.log("uploadSingleImage().");
@@ -26,87 +23,18 @@ export class GalleryStorageService {
     console.log("uploadSingleImage()_action: ", this.action());
 
     if (this.action() === "uploadAllImages") {
-      const storageRef = this.firebaseContextService.getReference(`uploadedAllImages/${imageName}`); // This will create a reference to the images folder in the storage bucket. 
-      return this.firebaseContextService.uploadBytesResumable(storageRef, image); // This will upload the image to the storage bucket. 
+      const storageRef = this.sharedGalleryService.firebaseContextService.getReference(`uploadedAllImages/${imageName}`); // This will create a reference to the images folder in the storage bucket. 
+      return this.sharedGalleryService.firebaseContextService.uploadBytesResumable(storageRef, image); // This will upload the image to the storage bucket. 
 
     } else if (this.action() === "selectForDevice") {
-      const storageRef = this.firebaseContextService.getReference(`selectForDevice/${imageName}`);
-      return this.firebaseContextService.uploadBytesResumable(storageRef, image);
+      const storageRef = this.sharedGalleryService.firebaseContextService.getReference(`selectForDevice/${imageName}`);
+      return this.sharedGalleryService.firebaseContextService.uploadBytesResumable(storageRef, image);
 
     } else {
       throw new Error('Invalid action for uploadSingleImage.');
     }
   }
 
-  async downloadAllImages() {
-    console.log("downloadAllImages().");
-
-    const listRef = this.firebaseContextService.getReference(`uploadedAllImages`);
-    const listResult = await this.firebaseContextService.listAll(listRef); // This will list all the images in the storage bucket. 
-    const downloadUrls: string[] = [];
-    const images: ImageType[] = [];
-
-    console.log("downloadAllImages()_listResult: ", listResult);
-
-    for (let item of listResult.items) { // This will loop through all the images in the storage bucket.
-      console.log("downloadAllImages()_item: ", item);
-      try {
-        const url = await this.firebaseContextService.getDownloadURL(item); // This will get the download URL of the image meaning that it will download the image from the storage bucket. 
-        downloadUrls.push(url);
-
-        images.push({
-          src: url,
-          alt: item.name,
-          relativePath: item.name
-        });
-
-        console.log("downloadAllImages()_url: ", url);
-        this.galleryImages.set(images);
-
-      } catch (error) {
-        console.log(`downloadAllImages()_error: ${error} for item: ${item.name}`);
-      }
-    }
-    return downloadUrls;
-  }
-
-
-  async downloadAndDisplayImages() {
-    console.log("downloadAndDisplayImages().");
-
-    try {
-      let downloadUrls: string[] = [];
-      console.log("downloadAndDisplayImages()_action: ", this.action());
-
-      if (this.action() === "uploadAllImages") {
-        downloadUrls = await this.downloadAllImages();
-        console.log("downloadAndDisplayImages()_this.downloadAllImages(): ");
-
-      } else if (this.action() === "selectForDevice") {
-        downloadUrls = await this.downloadSelectedImages();
-
-      } else {
-        throw new Error('downloadAndDisplayImages.');
-      }
-
-      const images = downloadUrls.map((url, index) => ({ // This will loop through all the images and add them to the images array. 
-        src: url,
-        alt: `Image ${index + 1}`,
-        relativePath: url.split('/').pop() || `image_${index + 1}` // This will either get the last part of the URL or "image_1" if the URL is empty.
-      }));
-
-      if (this.action() === "selectForDevice") {
-        this.deviceImages.set(images);
-
-      } else if (this.action() === "uploadAllImages") {
-        this.galleryImages.set(images);
-        console.log("downloadAndDisplayImages()_images: ", images);
-      }
-
-    } catch (error) {
-      console.error("downloadAndDisplayImages(): An error has occured whilst loading images from Firebase:", error);
-    }
-  }
 
   async deleteImageFromFirebase(selectedImages: string[]) {
     console.log("deleteImageFromFirebase().");
@@ -129,9 +57,9 @@ export class GalleryStorageService {
           return;
         }
 
-        imageRef = this.firebaseContextService.getReference(`uploadedAllImages/${fileName}`);
+        imageRef = this.sharedGalleryService.firebaseContextService.getReference(`uploadedAllImages/${fileName}`);
         console.log("deleteImageFromFirebase()_selectedImages_2: ", selectedImages);
-        await this.firebaseContextService.deleteObject(imageRef);
+        await this.sharedGalleryService.firebaseContextService.deleteObject(imageRef);
 
         console.log(`deleteImageFromFirebase()_${fileName} has successfully been deleted from Firebase.`);
         deletedImages.push(imageUrl);
@@ -142,38 +70,13 @@ export class GalleryStorageService {
     }));
 
     if (deletedImages.length > 0) {
-      const currentImages = this.galleryImages();
+      const currentImages = this.sharedGalleryService.galleryImages();
       const updatedImages = currentImages.filter(img => !deletedImages.includes(img.src));
-      this.galleryImages.set(updatedImages);
+      this.sharedGalleryService.galleryImages.set(updatedImages);
       console.log("deleteImageFromFirebase()_updatedImages: ", updatedImages);
     }
 
     this.sharedGalleryService.galleryHighlightSrcs.set([]);
-    return this.downloadAndDisplayImages();
-  }
-
-  async downloadSelectedImages() {
-    console.log("downloadSelectedImages().");
-
-    const listRef = this.firebaseContextService.getReference(`selectForDevice`);
-    const listResult = await this.firebaseContextService.listAll(listRef);
-    const downloadUrls: string[] = [];
-
-    console.log("downloadSelectedImages()_listResult: ", listResult);
-
-    for (let item of listResult.items) {
-      console.log("downloadSelectedImages()_item: ", item);
-      try {
-        const url = await this.firebaseContextService.getDownloadURL(item); // This will get the download URL of the image meaning that it will download the image from the storage bucket. 
-        downloadUrls.push(url);
-
-        console.log("downloadSelectedImages()_url: ", url);
-
-      } catch (error) {
-        console.log(`downloadSelectedImages()_error: ${error} for item: ${item.name}`);
-      }
-    }
-    return downloadUrls;
   }
 
   extractFileNameFromUrl(url: string): string | null {
@@ -253,8 +156,8 @@ export class GalleryStorageService {
     }
 
     try { // Checks whether the image exists in the uploadedAllImages folder. 
-      const sourceRef = this.firebaseContextService.getReference(`uploadedAllImages/${imageName}`);
-      await this.firebaseContextService.getDownloadURL(sourceRef); // This wil throw an error if the image does not exist. 
+      const sourceRef = this.sharedGalleryService.firebaseContextService.getReference(`uploadedAllImages/${imageName}`);
+      await this.sharedGalleryService.firebaseContextService.getDownloadURL(sourceRef); // This wil throw an error if the image does not exist. 
       return true;
 
     } catch (error) {
@@ -293,24 +196,24 @@ export class GalleryStorageService {
     try {
 
       try { // Checks if the destination folder exists. 
-        const testRef = this.firebaseContextService.getReference(`${destinationFolder}/`);
-        await this.firebaseContextService.listAll(testRef); // Tries to list the files in the destination folder. 
+        const testRef = this.sharedGalleryService.firebaseContextService.getReference(`${destinationFolder}/`);
+        await this.sharedGalleryService.firebaseContextService.listAll(testRef); // Tries to list the files in the destination folder. 
 
       } catch (error) { // If the destination folder does not exist it will be created. 
         console.log(`copyImageBetweenFolders()_DestinationFolder "${destinationFolder}" does not exist. It will be created.`);
         const emptyBlob = new Blob([''], { type: 'text/plain' });
-        const placeholderRef = this.firebaseContextService.getReference(`${destinationFolder}/.placeholder`);
-        await this.firebaseContextService.uploadBytes(placeholderRef, emptyBlob);
+        const placeholderRef = this.sharedGalleryService.firebaseContextService.getReference(`${destinationFolder}/.placeholder`);
+        await this.sharedGalleryService.firebaseContextService.uploadBytes(placeholderRef, emptyBlob);
       }
 
-      const sourceRef = this.firebaseContextService.getReference(`${sourceFolder}/${imageName}`);
-      const destinationRef = this.firebaseContextService.getReference(`${destinationFolder}/${imageName}`);
+      const sourceRef = this.sharedGalleryService.firebaseContextService.getReference(`${sourceFolder}/${imageName}`);
+      const destinationRef = this.sharedGalleryService.firebaseContextService.getReference(`${destinationFolder}/${imageName}`);
 
-      const url = await this.firebaseContextService.getDownloadURL(sourceRef);
+      const url = await this.sharedGalleryService.firebaseContextService.getDownloadURL(sourceRef);
       const response = await fetch(url);
       const blob = await response.blob();
 
-      await this.firebaseContextService.uploadBytes(destinationRef, blob);
+      await this.sharedGalleryService.firebaseContextService.uploadBytes(destinationRef, blob);
 
       console.log(`copyImageBetweenFolders()_"${imageName}" has been copied from "${sourceFolder}" to "${destinationRef}".`);
 

@@ -21,12 +21,14 @@ export class DeviceSettingsComponent implements OnInit {
   private dragDropUploadService = inject(DragDropUploadService);
   private sharedGalleryService = inject(SharedGalleryService);
 
-  deviceImages = this.galleryStorageService.deviceImages;
+  deviceImages = this.sharedGalleryService.deviceImages;
+  deviceImageLength = this.sharedGalleryService.deviceImageLength;
   galleryHighlightSrcs = this.galleryService.galleryHighlightSrcs;
 
   imagesLength = 0;
   currentImageIndex = 0;
   interval: any;
+  private cachedImages: any[] | null = null;
 
   intervalForm = new FormGroup({
     intervalTimeInput: new FormControl("", [Validators.required, Validators.min(300), Validators.max(100000)])
@@ -53,12 +55,11 @@ export class DeviceSettingsComponent implements OnInit {
   }
 
 
-
   async loadSelectedImages() {
     console.log("loadSelectedImages().");
 
     try {
-      const downloadUrls = await this.galleryStorageService.downloadSelectedImages();
+      const downloadUrls = await this.sharedGalleryService.downloadSelectedImages();
 
       const images = downloadUrls.map((url, index) => ({
         src: url,
@@ -74,7 +75,7 @@ export class DeviceSettingsComponent implements OnInit {
     }
   }
 
-  getChosenImages() {
+   getChosenImages() {
     console.log("getChosenImages().");
     return this.deviceImages();
 
@@ -142,8 +143,8 @@ export class DeviceSettingsComponent implements OnInit {
   }
 
 
-  onRemoveImage() {
-    console.log("onRemoveImage()_DeviceSettingsComponent.");
+  async onRemoveImage() { // TODO: Put this in a service, without causing a circular dependency problem. Seing as it is also used in DeviceSettingsComponent. 
+    console.log("onRemoveImage()_GalleryComponent.");
 
     const srcsToDelete = this.galleryHighlightSrcs();
     const localImages: string[] = [];
@@ -155,28 +156,60 @@ export class DeviceSettingsComponent implements OnInit {
     }
 
     for (let image of srcsToDelete) {
-      console.log("onRemoveImage()_image: ", image);
+      console.log("onRemoveImage()_Processing image:", image);
 
-      if (image.startsWith("data:") || !image.includes("firebasestorage.googleapis.com")) { // Checks if the image is a local image (either a Base64 data URL or a local path).
+      if (image.startsWith("data:")) { // Base64-images (locale images). 
         localImages.push(image);
+        console.log("onRemoveImage()_Local Base64 image.");
 
-      } else {
-        this.galleryStorageService.deleteImageFromFirebase(srcsToDelete);
+        const imageName = this.galleryStorageService.extractFileNameFromUrl(image);
+        if (imageName) {
+          try {
+            const exists = await this.galleryStorageService.checkExistenceOfImage(imageName);
+
+            if (exists) {
+              console.log(`onRemoveImage()_Base64 image exists in Firebase as ${imageName}`);
+              firebaseImages.push(`uploadedAllImages/${imageName}`);
+            }
+          } catch (error) {
+            console.error("Error checking image existence:", error);
+          }
+        }
+
+      } else if (!image.includes("firebasestorage.googleapis.com")) { // Other local images. 
+        localImages.push(image);
+        console.log("onRemoveImage()_Local image.");
+
+      } else { // Firebase Storage URLs
         firebaseImages.push(image);
         localImages.push(image);
+        console.log("onRemoveImage()_locaImages:", localImages);
+        console.log("onRemoveImage()_Firebase image.");
       }
     }
+    console.log("onRemoveImage()_localImages.length: ", localImages.length);
+    console.log("onRemoveImage()_firebaseImages.length: ", firebaseImages.length);
 
     if (localImages.length > 0) {  // Removes local images. 
       this.dragDropUploadService.removeGalleryImages(localImages);
-      console.log(`${localImages.length} local images have been removed.`);
+      console.log(`onRemoveImage()_${localImages.length} local images have been removed.`);
     }
 
     if (firebaseImages.length > 0) {
-      this.galleryStorageService.deleteImageFromFirebase(firebaseImages);
-      console.log(`${firebaseImages.length} firebase images have been removed.`);
+      await this.galleryStorageService.deleteImageFromFirebase(firebaseImages);
+      console.log(`onRemoveImage()_${firebaseImages.length} firebase images have been removed.`);
     }
 
+    this.cachedImages = null;
+    localStorage.removeItem("galleryImages");
+
+    const remainingImages = await this.getChosenImages();
+    this.deviceImages.set(remainingImages);
+    this.deviceImageLength.set(remainingImages.length);
+
+    localStorage.setItem("galleryImages", JSON.stringify(remainingImages));
+
+    console.log("onRemoveImage()_remainingImages.length: ", remainingImages.length);
     this.galleryService.galleryHighlightSrcs.set([]);
     return srcsToDelete.length;
   }

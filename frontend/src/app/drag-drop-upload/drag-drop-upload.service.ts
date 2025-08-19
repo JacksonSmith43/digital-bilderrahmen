@@ -34,12 +34,14 @@ export class DragDropUploadService {
         console.log("removeGalleryImages()_srcsToRemove: ", srcsToRemove);
 
         const updatedImages = this.sharedGalleryService.removeImages("addedImages", srcsToRemove);
-        this.images.set(updatedImages);
 
-        this.sharedGalleryService.syncImageStores();
-        // localStorage.setItem("addedImages", JSON.stringify(updatedImages));
-        console.log("removeGalleryImages()_updatedImages: ", updatedImages);
-        return updatedImages;
+        this.images.set(updatedImages);
+        console.log("removeGalleryImages()_images(): ", this.images());
+
+        const allUpdatedImages = this.sharedGalleryService.syncImageStores();
+        console.log("removeGalleryImages()_allUpdatedImages: ", allUpdatedImages);
+
+        return allUpdatedImages;
     }
 
     getDropped(files: NgxFileDropEntry[]) {

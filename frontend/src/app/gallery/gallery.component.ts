@@ -22,17 +22,51 @@ export class GalleryComponent implements OnInit {
   authService = inject(AuthService);
   sharedGalleryService = inject(SharedGalleryService);
 
-  galleryImages = signal<ImageType[]>([]);
-  galleryImageLength = signal<number>(0);
   isImageLoaded = signal<boolean>(false);
 
   galleryHighlightSrcs = this.galleryService.galleryHighlightSrcs;
-  action = this.galleryStorageService.action;
+  action = this.sharedGalleryService.action;
+  galleryImages = this.sharedGalleryService.galleryImages;
+  galleryImageLength = this.sharedGalleryService.galleryImageLength;
   private cachedImages: any[] | null = null;
 
   async ngOnInit() {
     console.log("GalleryComponent INIT.");
     await this.loadImages();
+  }
+
+
+  async getGalleryImages(): Promise<ImageType[]> {
+    //console.log("getGalleryImages().");
+
+    try {
+
+      if (this.cachedImages) {
+        return this.cachedImages;
+      }
+
+      const addedImagesSignal = this.sharedGalleryService.getImages("addedImages");
+      const addedImages = addedImagesSignal;
+      const storageImages = this.sharedGalleryService.galleryImages();
+      const cachedImagesJson = localStorage.getItem("galleryImages");
+
+      let allImages: any[] = [];
+
+      this.cachedImages = this.sharedGalleryService.checkCachedImages(cachedImagesJson, addedImages, storageImages, allImages);
+      console.log("getGalleryImages()_this.cachedImages: ", this.cachedImages);
+
+      return this.sharedGalleryService.removeDuplicates(this.cachedImages);
+
+    } catch (error) {
+      console.error("getGalleryImages()_Error: ", error);
+      return [];
+    }
+  }
+
+
+  onHighlightImageSelection(src: string) {
+    console.log("onHighlightImageSelection().");
+    this.sharedGalleryService.getHighlightImageSelection(src);
   }
 
   async loadImages() {
@@ -43,8 +77,8 @@ export class GalleryComponent implements OnInit {
       if (!this.action()) {
         this.action.set("uploadAllImages");
       }
-      await this.galleryStorageService.downloadAllImages();
-      await this.galleryStorageService.downloadAndDisplayImages();
+      await this.sharedGalleryService.downloadAllImages();
+      await this.sharedGalleryService.downloadAndDisplayImages();
 
       this.cachedImages = null;
 
@@ -53,7 +87,7 @@ export class GalleryComponent implements OnInit {
       console.log("loadImages()_images: ", images);
 
       if (images.length === 0) {
-        const storageImages = this.galleryStorageService.galleryImages();
+        const storageImages = this.galleryImages();
         console.log("loadImages()_direct storage images:", storageImages);
 
         if (storageImages.length > 0) {
@@ -71,98 +105,6 @@ export class GalleryComponent implements OnInit {
     } catch (error) {
       console.error("loadImages()_Error: ", error);
     }
-  }
-
-  async getGalleryImages(): Promise<ImageType[]> {
-    //console.log("getGalleryImages().");
-
-    try {
-
-      if (this.cachedImages) {
-        return this.cachedImages;
-      }
-
-      const addedImagesSignal = this.sharedGalleryService.getImages("addedImages");
-      const addedImages = addedImagesSignal;
-      const storageImages = this.galleryStorageService.galleryImages();
-      const cachedImagesJson = localStorage.getItem("galleryImages");
-
-      let allImages: any[] = [];
-
-
-      this.cachedImages = this.checkCachedImages(cachedImagesJson, addedImages, storageImages, allImages);
-      console.log("getGalleryImages()_this.cachedImages: ", this.cachedImages);
-
-      return this.removeDuplicates(this.cachedImages);
-
-    } catch (error) {
-      console.error("getGalleryImages()_Error: ", error);
-      return [];
-    }
-  }
-
-
-  checkCachedImages(cachedImagesJson: string | null, addedImages: ImageType[], storageImages: ImageType[], allImages: ImageType[]) {
-    console.log("checkCachedImages().");
-
-    let parsedCachedImages: any[] = [];
-
-    if (cachedImagesJson) {
-      try {
-        parsedCachedImages = JSON.parse(cachedImagesJson);
-        console.log("checkCachedImages()_Gets the cached images:", parsedCachedImages.length);
-
-      } catch (error) {
-        console.error("checkCachedImages()_Error while parsing the JSON string: ", error);
-      }
-    }
-
-
-
-    if (addedImages.length > 0) {
-      if (parsedCachedImages.length > 0 || storageImages.length > 0) {
-        allImages = this.removeDuplicates([...addedImages, ...storageImages, ...parsedCachedImages]);
-        console.log("checkCachedImages()_Combined added, storage and cached images:", allImages.length);
-
-      } else {
-        allImages = addedImages;
-        console.log("checkCachedImages()_Only added images:", allImages.length);
-      }
-
-    } else if (storageImages.length > 0) {
-      if (parsedCachedImages.length > 0) {
-        allImages = this.removeDuplicates([...storageImages, ...parsedCachedImages]);
-        console.log("checkCachedImages()_Storage and cached images:", allImages.length);
-
-      } else {
-        allImages = storageImages;
-        console.log("checkCachedImages()_Only storage images:", allImages.length);
-      }
-
-    } else if (parsedCachedImages.length > 0) {
-      allImages = parsedCachedImages;
-      console.log("checkCachedImages()_Only cached images:", allImages.length);
-    }
-
-    if (allImages.length > 0) {
-      localStorage.removeItem("galleryImages");
-      localStorage.setItem("galleryImages", JSON.stringify(allImages));
-      console.log("checkCachedImages()_All images: ", allImages);
-    }
-
-    return allImages;
-  }
-
-
-  removeDuplicates(images: any[]): any[] {
-    return images.filter((item, index, array) =>
-      item.src && index === array.findIndex((item2) => item2.src === item.src)
-    );
-  }
-
-  onHighlightImageSelection(src: string) {
-    console.log("onHighlightImageSelection().");
-    this.sharedGalleryService.getHighlightImageSelection(src);
   }
 
   async onRemoveImage() { // TODO: Put this in a service, without causing a circular dependency problem. Seing as it is also used in DeviceSettingsComponent. 
@@ -223,18 +165,17 @@ export class GalleryComponent implements OnInit {
     }
 
     this.cachedImages = null;
-    localStorage.removeItem("galleryImages");
+    await this.sharedGalleryService.syncAllImageStores();
 
     const remainingImages = await this.getGalleryImages();
-    this.galleryImages.set(remainingImages);
-    this.galleryImageLength.set(remainingImages.length);
-
-    localStorage.setItem("galleryImages", JSON.stringify(remainingImages));
+    this.sharedGalleryService.galleryImages.set(remainingImages);
+    this.sharedGalleryService.galleryImageLength.set(remainingImages.length);
 
     console.log("onRemoveImage()_remainingImages.length: ", remainingImages.length);
     this.galleryService.galleryHighlightSrcs.set([]);
     return srcsToDelete.length;
   }
+
 
   async onSelectForDevice() {
     console.log("onSelectForDevice().");
@@ -303,7 +244,7 @@ export class GalleryComponent implements OnInit {
 
     this.cachedImages = null;
 
-    this.galleryStorageService.action.set("uploadAllImages");
+    this.sharedGalleryService.action.set("uploadAllImages");
     console.log("onDownloadAllImages()_this.galleryStorageService.action(): ", this.galleryStorageService.action());
 
     await this.loadImages();

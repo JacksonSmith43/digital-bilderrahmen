@@ -15,7 +15,7 @@
             data-bs-parent="#device-settings-interval-accordion">
             <div class="accordion-body interval-container">
 
-                @if(getChosenImages().length > 0){
+                @if(deviceImageLength() > 0){
                 <div class="interval-time">
 
                     <form (ngSubmit)="onSetTime(intervalTime.value)" [formGroup]="intervalForm">
