@@ -36,7 +36,7 @@ export class GalleryStorageService {
   }
 
 
-  async deleteImageFromFirebase(selectedImages: string[]) {
+  async deleteImageFromFirebase(selectedImages: string[], isDeviceSettings: boolean) {
     console.log("deleteImageFromFirebase().");
     console.log("deleteImageFromFirebase()_selectedImages: ", selectedImages);
 
@@ -57,9 +57,17 @@ export class GalleryStorageService {
           return;
         }
 
-        imageRef = this.sharedGalleryService.firebaseContextService.getReference(`uploadedAllImages/${fileName}`);
-        console.log("deleteImageFromFirebase()_selectedImages_2: ", selectedImages);
-        await this.sharedGalleryService.firebaseContextService.deleteObject(imageRef);
+        if (isDeviceSettings) {
+          imageRef = this.sharedGalleryService.firebaseContextService.getReference(`selectForDevice/${fileName}`);
+          console.log("deleteImageFromFirebase()_selectedImages_1: ", selectedImages);
+          await this.sharedGalleryService.firebaseContextService.deleteObject(imageRef);
+
+
+        } else {
+          imageRef = this.sharedGalleryService.firebaseContextService.getReference(`uploadedAllImages/${fileName}`);
+          console.log("deleteImageFromFirebase()_selectedImages_2: ", selectedImages);
+          await this.sharedGalleryService.firebaseContextService.deleteObject(imageRef);
+        }
 
         console.log(`deleteImageFromFirebase()_${fileName} has successfully been deleted from Firebase.`);
         deletedImages.push(imageUrl);
@@ -70,9 +78,19 @@ export class GalleryStorageService {
     }));
 
     if (deletedImages.length > 0) {
-      const currentImages = this.sharedGalleryService.galleryImages();
-      const updatedImages = currentImages.filter(img => !deletedImages.includes(img.src));
-      this.sharedGalleryService.galleryImages.set(updatedImages);
+      let currentImages: ImageType[] = [];
+      let updatedImages: ImageType[] = [];
+
+      if (isDeviceSettings) {
+        currentImages = this.sharedGalleryService.deviceImages();
+        updatedImages = currentImages.filter(img => !deletedImages.includes(img.src));
+        this.sharedGalleryService.deviceImages.set(updatedImages);
+
+      } else {
+        currentImages = this.sharedGalleryService.galleryImages();
+        updatedImages = currentImages.filter(img => !deletedImages.includes(img.src));
+        this.sharedGalleryService.galleryImages.set(updatedImages);
+      }
       console.log("deleteImageFromFirebase()_updatedImages: ", updatedImages);
     }
 

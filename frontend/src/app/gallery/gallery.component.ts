@@ -113,6 +113,7 @@ export class GalleryComponent implements OnInit {
     const srcsToDelete = this.galleryHighlightSrcs();
     const localImages: string[] = [];
     const firebaseImages: string[] = [];
+    const isDeviceSettings: boolean = false;
 
     if (srcsToDelete.length === 0) {
       console.log("onRemoveImage()_No image has been selected for deletion.");
@@ -160,7 +161,7 @@ export class GalleryComponent implements OnInit {
     }
 
     if (firebaseImages.length > 0) {
-      await this.galleryStorageService.deleteImageFromFirebase(firebaseImages);
+      await this.galleryStorageService.deleteImageFromFirebase(firebaseImages, isDeviceSettings);
       console.log(`onRemoveImage()_${firebaseImages.length} firebase images have been removed.`);
     }
 

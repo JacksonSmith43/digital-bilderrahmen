@@ -41,8 +41,9 @@
                 <br>
 
                 <div class="interval-images">
-                    <img [src]="getChosenImages()[currentImageIndex].src"
+                    <img *ngIf="getChosenImages()[currentImageIndex]" [src]="getChosenImages()[currentImageIndex].src"
                         [alt]="getChosenImages()[currentImageIndex].alt">
+
                     <button type="button" class="btn btn-primary stop-diashow-button" (click)="stopDiashow()">Stop
                         diashow</button>
                 </div>
@@ -68,7 +69,7 @@
         <div id="collapseDisplayedImages" class="accordion-collapse collapse show"
             data-bs-parent="#device-settings-gallery-accordion">
 
-            @if(imagesLength > 0){
+            @if(deviceImageLength() > 0){
 
             <div class="accordion-body">
                 @for(i of getChosenImages(); track i.src){
@@ -84,7 +85,7 @@
             <button class="download-selected-images-buttton btn btn-primary"
                 (click)="onDownloadSelectedImages()">Download selected images</button>
             }
-            <p>Number of images: {{imagesLength}}</p>
+            <p>Number of images: {{deviceImageLength()}}</p>
         </div>
     </div>
 </div>
