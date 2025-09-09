@@ -36,7 +36,8 @@ export class DeviceSettingsComponent implements OnInit {
     const chosenImagesRaw = localStorage.getItem("chosenImagesSrcs");
     const deletedImagesRaw = localStorage.getItem("deletedSrcArr");
     const deletedSrcs = deletedImagesRaw ? JSON.parse(deletedImagesRaw) : [];
-
+    this.loadSelectedImages();
+    
     if (chosenImagesRaw) {
       try {
         const chosenSrcs = JSON.parse(chosenImagesRaw);

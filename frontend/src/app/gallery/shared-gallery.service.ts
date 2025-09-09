@@ -157,6 +157,11 @@ export class SharedGalleryService {
 
     console.log("downloadSelectedImages()_listResult: ", listResult);
 
+    if (listResult.items.length === 0) {
+      console.log("downloadSelectedImages()_No images found in 'selectForDevice' folder.");
+      return downloadUrls;
+    }
+
     for (let item of listResult.items) {
       console.log("downloadSelectedImages()_item: ", item);
       try {

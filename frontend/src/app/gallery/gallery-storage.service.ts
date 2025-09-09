@@ -3,7 +3,6 @@ import { UploadTask } from '@angular/fire/storage';
 
 import { SharedGalleryService } from './shared-gallery.service';
 import { ImageType } from './gallery-model';
-import { FirebaseContextService } from './firebase-context.service';
 
 @Injectable({
   providedIn: 'root'
