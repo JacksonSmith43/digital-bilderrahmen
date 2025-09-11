@@ -22,6 +22,7 @@ export class DeviceSettingsComponent implements OnInit {
   deviceImages = this.sharedGalleryService.deviceImages;
   deviceImageLength = this.sharedGalleryService.deviceImageLength;
   galleryHighlightSrcs = this.galleryService.galleryHighlightSrcs;
+  galleryImages = this.sharedGalleryService.galleryImages;
 
   currentImageIndex = 0;
   interval: any;
@@ -37,7 +38,7 @@ export class DeviceSettingsComponent implements OnInit {
     const deletedImagesRaw = localStorage.getItem("deletedSrcArr");
     const deletedSrcs = deletedImagesRaw ? JSON.parse(deletedImagesRaw) : [];
     this.loadSelectedImages();
-    
+
     if (chosenImagesRaw) {
       try {
         const chosenSrcs = JSON.parse(chosenImagesRaw);

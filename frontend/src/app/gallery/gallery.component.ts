@@ -7,6 +7,7 @@ import { DragDropUploadService } from '../drag-drop-upload/drag-drop-upload.serv
 import { AuthService } from '../auth/auth.service';
 import { SharedGalleryService } from './shared-gallery.service';
 import { ImageType } from './gallery-model';
+import { ImageHashService } from '../shared/image-hash.service';
 
 @Component({
   selector: 'app-gallery',
@@ -21,6 +22,7 @@ export class GalleryComponent implements OnInit {
   dragDropUploadService = inject(DragDropUploadService);
   authService = inject(AuthService);
   sharedGalleryService = inject(SharedGalleryService);
+  private imageHashService = inject(ImageHashService);
 
   isImageLoaded = signal<boolean>(false);
 
@@ -47,7 +49,7 @@ export class GalleryComponent implements OnInit {
 
       const addedImagesSignal = this.sharedGalleryService.getImages("addedImages");
       const addedImages = addedImagesSignal;
-      const storageImages = this.sharedGalleryService.galleryImages();
+      const storageImages = this.galleryImages();
       const cachedImagesJson = localStorage.getItem("galleryImages");
 
       let allImages: any[] = [];
@@ -169,11 +171,25 @@ export class GalleryComponent implements OnInit {
     await this.sharedGalleryService.syncAllImageStores();
 
     const remainingImages = await this.getGalleryImages();
-    this.sharedGalleryService.galleryImages.set(remainingImages);
-    this.sharedGalleryService.galleryImageLength.set(remainingImages.length);
+    localStorage.setItem("deletedSrcArr", JSON.stringify(srcsToDelete));
+    this.galleryImages.set(remainingImages);
+    this.galleryImageLength.set(remainingImages.length);
 
+    let matchingImages = await this.imageHashService.findMatchingImages(this.galleryImages(), this.sharedGalleryService.deviceImages());
+    let deviceImagesToDelete = this.sharedGalleryService.deviceImages().filter(img => !matchingImages.includes(img)); // Only keeps images that are not in the matchingImages array, so images that have been deleted from the gallery. 
+
+    this.sharedGalleryService.deviceImages.set(deviceImagesToDelete);
+    this.sharedGalleryService.deviceImageLength.set(deviceImagesToDelete.length);
+
+    console.log("onRemoveImage()_matchingImages: ", matchingImages);
+    console.log("onRemoveImage()_deviceImagesToDelete: ", deviceImagesToDelete);
     console.log("onRemoveImage()_remainingImages.length: ", remainingImages.length);
+
+    localStorage.setItem("chosenImagesSrcs", JSON.stringify(matchingImages));
+
+    this.galleryStorageService.deleteImageFromFirebase(deviceImagesToDelete.map(img => img.src), true);
     this.galleryService.galleryHighlightSrcs.set([]);
+
     return srcsToDelete.length;
   }
 
