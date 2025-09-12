@@ -198,13 +198,13 @@ export class SharedGalleryService {
       }
     }
 
-    const uniqueImages = this.removeDuplicates(allImages);
+    const uniqueImages = this.removeDuplicatesByName(allImages);
     console.log("checkCachedImages()_All unique images:", uniqueImages.length);
     return uniqueImages;
   }
 
 
-  removeDuplicates(images: any[]): any[] {
+  removeDuplicatesByName(images: any[]): any[] {
     console.log("removeDuplicates().");
 
     return images.filter((item, index, array) =>

@@ -57,7 +57,9 @@ export class GalleryComponent implements OnInit {
       this.cachedImages = this.sharedGalleryService.checkCachedImages(cachedImagesJson, addedImages, storageImages, allImages);
       console.log("getGalleryImages()_this.cachedImages: ", this.cachedImages);
 
-      return this.sharedGalleryService.removeDuplicates(this.cachedImages);
+      let removedDuplicates = await this.removeDuplicatesThroughHash(this.cachedImages);
+
+      return removedDuplicates;
 
     } catch (error) {
       console.error("getGalleryImages()_Error: ", error);
@@ -236,6 +238,34 @@ export class GalleryComponent implements OnInit {
     }
     this.galleryService.galleryHighlightSrcs.set([]);
   }
+
+  async removeDuplicatesThroughHash(images: ImageType[]): Promise<ImageType[]> {
+    console.log("removeDuplicatesThroughHash().");
+
+    const seenHashes: string[] = [];
+    const uniqueImages: ImageType[] = [];
+
+    for (const img of images) {
+      const blob = await this.galleryStorageService.urlToBlob(img.src);
+      const hash = await this.imageHashService.getImageHash(blob);
+      console.log("removeDuplicatesThroughHash()_hash: ", hash);
+
+      if (!seenHashes.includes(hash)) {
+        seenHashes.push(hash);
+        uniqueImages.push(img);
+        console.log("removeDuplicatesThroughHash()_img: ", img);
+        console.log("removeDuplicatesThroughHash()_seenHashes: ", seenHashes);
+
+      } else { // If the hash has already been seen, it is a duplicate. 
+        console.log("removeDuplicatesThroughHash()_Duplicate.");
+        this.galleryStorageService.deleteImageFromFirebase([img.src], false);
+      }
+    }
+    console.log("removeDuplicatesThroughHash()_uniqueImages: ", uniqueImages);
+    this.galleryImages.set(uniqueImages);
+    return uniqueImages;
+  }
+
 
   async onUploadAllImages() {
     console.log("onUploadAllImages().");
