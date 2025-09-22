@@ -81,8 +81,8 @@ export class GalleryComponent implements OnInit {
       if (!this.action()) {
         this.action.set("uploadAllImages");
       }
-      await this.sharedGalleryService.fetchAllImages();
-      await this.sharedGalleryService.fetchAndDisplayImages();
+      await this.sharedGalleryService.downloadAllImages();
+      await this.sharedGalleryService.downloadAndDisplayImages();
 
       this.cachedImages = null;
 
@@ -286,8 +286,8 @@ export class GalleryComponent implements OnInit {
     this.galleryService.galleryHighlightSrcs.set([]); // Incase any images are selected. 
   }
 
-  async onFetchAllImages() {
-    console.log("onFetchAllImages().");
+  async onDownloadAllImages() {
+    console.log("onDownloadAllImages().");
 
     this.cachedImages = null;
 

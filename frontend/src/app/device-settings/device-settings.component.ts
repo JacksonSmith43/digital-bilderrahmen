@@ -58,9 +58,9 @@ export class DeviceSettingsComponent implements OnInit {
     console.log("loadSelectedImages().");
 
     try {
-      const fetchUrls = await this.sharedGalleryService.fetchSelectedImages();
+      const downloadUrls = await this.sharedGalleryService.downloadSelectedImages();
 
-      const images = fetchUrls.map((url, index) => ({
+      const images = downloadUrls.map((url, index) => ({
         src: url,
         alt: `Selected Image ${index + 1}`,
         relativePath: url.split('/').pop() || `image_${index + 1}`
@@ -81,8 +81,8 @@ export class DeviceSettingsComponent implements OnInit {
   }
 
 
-  onFetchSelectedImages() {
-    console.log("onFetchSelectedImages().");
+  onDownloadSelectedImages() {
+    console.log("onDownloadSelectedImages().");
     this.galleryStorageService.action.set("selectForDevice");
     this.loadSelectedImages();
   }

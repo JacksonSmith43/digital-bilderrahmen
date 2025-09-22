@@ -86,7 +86,7 @@ button {
     padding: 0;
 }
 
-.fetch-selected-images-buttton {
+.download-selected-images-buttton {
     display: flex;
     margin: 1rem auto;
 }
