@@ -101,7 +101,7 @@ export class DeviceSettingsComponent implements OnInit {
     console.log("imageInterval().");
     const chosenImages = this.deviceImages();
 
-    if (chosenImages.length > 1) {
+    if (chosenImages.length > 0) {
       this.currentImageIndex = 0;
 
       if (this.interval) {
@@ -113,7 +113,7 @@ export class DeviceSettingsComponent implements OnInit {
       }, time);
 
     } else {
-      console.log("No images found or at least only one.");
+      console.log("No images found.");
     }
   }
 

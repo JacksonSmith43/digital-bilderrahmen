@@ -15,7 +15,7 @@
             data-bs-parent="#device-settings-interval-accordion">
             <div class="accordion-body interval-container">
 
-                @if(deviceImageLength() > 1){
+                @if(deviceImageLength() > 0){
                 <div class="interval-time">
 
                     <form (ngSubmit)="onSetTime(intervalTime.value)" [formGroup]="intervalForm">
@@ -49,7 +49,7 @@
                 </div>
                 }
                 @else {
-                <p>No images to display or only one making a diashow unecessary.</p>
+                <p>No images to display.</p>
                 }
             </div>
         </div>
