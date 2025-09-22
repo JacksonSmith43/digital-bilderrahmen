@@ -259,7 +259,7 @@ export class GalleryStorageService {
     console.log("urlToBlob().");
 
     const response = await fetch(url); // This will fetch the image from the URL. This requests the image data from the server and loads it into memory. 
-    return await response.blob(); // Only once the image has been downloaded/fetched, will it be converted to a blob.
+    return await response.blob(); // Only once the image has been downloaded, will it be converted to a blob.
   }
 
   async convertSrcToBlob(src: string): Promise<Blob> {

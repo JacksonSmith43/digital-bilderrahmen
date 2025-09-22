@@ -17,13 +17,13 @@
 
             @if(galleryImageLength() == 0){
             <p>No images to display</p>
-            <button class="btn btn-primary" (click)="onFetchAllImages()">Fetch all images</button>
+            <button class="btn btn-primary" (click)="onDownloadAllImages()">Download all images</button>
 
             }@else {
             <button class="btn btn-danger" (click)="onRemoveImage()">Delete</button>
             <button class="btn btn-primary" (click)="onSelectForDevice()">Select for Device</button>
             <button class="btn btn-primary" (click)="onUploadAllImages()">Upload all images</button>
-            <button class="btn btn-primary" (click)="onFetchAllImages()">Fetch all images</button>
+            <button class="btn btn-primary" (click)="onDownloadAllImages()">Download all images</button>
             }
             }@else {
             <p>Images are loading ....</p>
