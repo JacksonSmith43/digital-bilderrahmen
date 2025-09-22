@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
 import { NgxFileDropEntry } from 'ngx-file-drop';
 import { NgxFileDropModule } from 'ngx-file-drop';
 import { CommonModule } from '@angular/common';
@@ -14,9 +14,9 @@ import { AuthService } from '../auth/auth.service';
   styleUrl: './drag-drop-upload.component.css'
 })
 
-export class DragDropUploadComponent implements AfterViewInit {
+export class DragDropUploadComponent implements AfterViewInit, OnInit {
 
-  private navService = inject(NavbarService);
+  navService = inject(NavbarService);
   private dragDropUploadService = inject(DragDropUploadService);
   authService = inject(AuthService);
 
@@ -29,7 +29,13 @@ export class DragDropUploadComponent implements AfterViewInit {
     this.openFileSelectorFn = fn; // The value of the function is saved in the openFileSelectorFn variable. 
   }
 
+
+  ngOnInit(): void {
+    this.files.set([]);
+  }
+
   ngAfterViewInit() {
+
     if (this.navService.isAddImage && this.openFileSelectorFn) {
       this.openFileSelectorFn();
       this.navService.isAddImage = false;

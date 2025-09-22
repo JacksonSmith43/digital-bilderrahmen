@@ -51,9 +51,4 @@ export class NavbarComponent {
     return this.navService.getSelectedViewLabel();
   }
 
-  onIsAddImage() {
-    console.log(this.navService.getIsAddImage());
-    return this.navService.getIsAddImage();
-  }
-
 }

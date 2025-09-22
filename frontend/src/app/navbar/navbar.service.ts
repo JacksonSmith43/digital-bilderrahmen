@@ -9,7 +9,6 @@ export class NavbarService {
   isAddImage = false;
   selectedView: "viewAll" | "viewPictures" | "viewDragDrop" | "deviceSettings" = "viewAll";
 
-
   getSelectedViewLabel() {
     switch (this.selectedView) {
       case "viewAll":
@@ -39,12 +38,6 @@ export class NavbarService {
 
   getAllView() {
     this.selectedView = "viewAll";
-  }
-
-  getIsAddImage() {
-    this.isAddImage = true;
-    this.selectedView = "viewDragDrop";
-    return this.isAddImage;
   }
 
   getDeviceSettingsView() {
