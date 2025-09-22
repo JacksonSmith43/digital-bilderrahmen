@@ -101,7 +101,7 @@ export class DeviceSettingsComponent implements OnInit {
     console.log("imageInterval().");
     const chosenImages = this.deviceImages();
 
-    if (chosenImages.length > 0) {
+    if (chosenImages.length > 1) {
       this.currentImageIndex = 0;
 
       if (this.interval) {
@@ -113,7 +113,7 @@ export class DeviceSettingsComponent implements OnInit {
       }, time);
 
     } else {
-      console.log("No images found.");
+      console.log("No images found or at least only one.");
     }
   }
 
@@ -175,6 +175,7 @@ export class DeviceSettingsComponent implements OnInit {
     this.deviceImageLength.set(remainingImages.length);
 
     console.log("onRemoveImage()_remainingImages.length: ", remainingImages.length);
+    clearInterval(this.interval);
     this.galleryService.galleryHighlightSrcs.set([]);
     return srcsToDelete.length;
   }
