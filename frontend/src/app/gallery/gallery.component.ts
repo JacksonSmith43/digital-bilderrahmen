@@ -81,8 +81,8 @@ export class GalleryComponent implements OnInit {
       if (!this.action()) {
         this.action.set("uploadAllImages");
       }
-      await this.sharedGalleryService.downloadAllImages();
-      await this.sharedGalleryService.downloadAndDisplayImages();
+      await this.sharedGalleryService.fetchAllImages();
+      await this.sharedGalleryService.fetchAndDisplayImages();
 
       this.cachedImages = null;
 
@@ -286,16 +286,16 @@ export class GalleryComponent implements OnInit {
     this.galleryService.galleryHighlightSrcs.set([]); // Incase any images are selected. 
   }
 
-  async onDownloadAllImages() {
-    console.log("onDownloadAllImages().");
+  async onFetchAllImages() {
+    console.log("onFetchAllImages().");
 
     this.cachedImages = null;
 
     this.sharedGalleryService.action.set("uploadAllImages");
-    console.log("onDownloadAllImages()_this.galleryStorageService.action(): ", this.galleryStorageService.action());
+    console.log("onFetchAllImages()_this.galleryStorageService.action(): ", this.galleryStorageService.action());
 
     await this.loadImages();
-    console.log("onDownloadAllImages()_this.loadImages(): ", this.loadImages());
+    console.log("onFetchAllImages()_this.loadImages(): ", this.loadImages());
   }
 
   getImageFileName(alt: string, relativePath: string) {

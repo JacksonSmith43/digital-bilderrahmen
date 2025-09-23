@@ -79,21 +79,21 @@ export class SharedGalleryService {
   }
 
 
-  async downloadAllImages() {
-    console.log("downloadAllImages().");
+  async fetchAllImages() {
+    console.log("fetchAllImages().");
 
     const listRef = this.firebaseContextService.getReference(`uploadedAllImages`);
     const listResult = await this.firebaseContextService.listAll(listRef); // This will list all the images in the storage bucket. 
-    const downloadUrls: string[] = [];
+    const fetchUrls: string[] = [];
     const images: ImageType[] = [];
 
-    console.log("downloadAllImages()_listResult: ", listResult);
+    console.log("fetchAllImages()_listResult: ", listResult);
 
     for (let item of listResult.items) { // This will loop through all the images in the storage bucket.
-      console.log("downloadAllImages()_item: ", item);
+      console.log("fetchAllImages()_item: ", item);
       try {
-        const url = await this.firebaseContextService.getDownloadURL(item); // This will get the download URL of the image meaning that it will download the image from the storage bucket. 
-        downloadUrls.push(url);
+        const url = await this.firebaseContextService.getDownloadURL(item); // This will get the download URL of the image meaning that it will download/fetch the image from the storage bucket. 
+        fetchUrls.push(url);
 
         images.push({
           src: url,
@@ -101,36 +101,36 @@ export class SharedGalleryService {
           relativePath: item.name
         });
 
-        console.log("downloadAllImages()_url: ", url);
+        console.log("fetchAllImages()_url: ", url);
         this.galleryImages.set(images);
 
       } catch (error) {
-        console.log(`downloadAllImages()_error: ${error} for item: ${item.name}`);
+        console.log(`fetchAllImages()_error: ${error} for item: ${item.name}`);
       }
     }
-    return downloadUrls;
+    return fetchUrls;
   }
 
 
-  async downloadAndDisplayImages() {
-    console.log("downloadAndDisplayImages().");
+  async fetchAndDisplayImages() {
+    console.log("fetchAndDisplayImages().");
 
     try {
-      let downloadUrls: string[] = [];
-      console.log("downloadAndDisplayImages()_action: ", this.action());
+      let fetchUrls: string[] = [];
+      console.log("fetchAndDisplayImages()_action: ", this.action());
 
       if (this.action() === "uploadAllImages") {
-        downloadUrls = await this.downloadAllImages();
-        console.log("downloadAndDisplayImages()_this.downloadAllImages(): ");
+        fetchUrls = await this.fetchAllImages();
+        console.log("fetchAndDisplayImages()_this.fetchAllImages(): ");
 
       } else if (this.action() === "selectForDevice") {
-        downloadUrls = await this.downloadSelectedImages();
+        fetchUrls = await this.fetchSelectedImages();
 
       } else {
-        throw new Error('downloadAndDisplayImages.');
+        throw new Error('fetchAndDisplayImages.');
       }
 
-      const images = downloadUrls.map((url, index) => ({ // This will loop through all the images and add them to the images array. 
+      const images = fetchUrls.map((url, index) => ({ // This will loop through all the images and add them to the images array. 
         src: url,
         alt: `Image ${index + 1}`,
         relativePath: url.split('/').pop() || `image_${index + 1}` // This will either get the last part of the URL or "image_1" if the URL is empty.
@@ -141,41 +141,41 @@ export class SharedGalleryService {
 
       } else if (this.action() === "uploadAllImages") {
         this.galleryImages.set(images);
-        console.log("downloadAndDisplayImages()_images: ", images);
+        console.log("fetchAndDisplayImages()_images: ", images);
       }
 
     } catch (error) {
-      console.error("downloadAndDisplayImages(): An error has occured whilst loading images from Firebase:", error);
+      console.error("fetchAndDisplayImages(): An error has occured whilst loading images from Firebase:", error);
     }
   }
 
-  async downloadSelectedImages() {
-    console.log("downloadSelectedImages().");
+  async fetchSelectedImages() {
+    console.log("fetchSelectedImages().");
 
     const listRef = this.firebaseContextService.getReference(`selectForDevice`);
     const listResult = await this.firebaseContextService.listAll(listRef);
-    const downloadUrls: string[] = [];
+    const fetchUrls: string[] = [];
 
-    console.log("downloadSelectedImages()_listResult: ", listResult);
+    console.log("fetchSelectedImages()_listResult: ", listResult);
 
     if (listResult.items.length === 0) {
-      console.log("downloadSelectedImages()_No images found in 'selectForDevice' folder.");
-      return downloadUrls;
+      console.log("fetchSelectedImages()_No images found in 'selectForDevice' folder.");
+      return fetchUrls;
     }
 
     for (let item of listResult.items) {
-      console.log("downloadSelectedImages()_item: ", item);
+      console.log("fetchSelectedImages()_item: ", item);
       try {
-        const url = await this.firebaseContextService.getDownloadURL(item); // This will get the download URL of the image meaning that it will download the image from the storage bucket. 
-        downloadUrls.push(url);
+        const url = await this.firebaseContextService.getDownloadURL(item); // This will get the download URL of the image meaning that it will download/fetch the image from the storage bucket. 
+        fetchUrls.push(url);
 
-        console.log("downloadSelectedImages()_url: ", url);
+        console.log("fetchSelectedImages()_url: ", url);
 
       } catch (error) {
-        console.log(`downloadSelectedImages()_error: ${error} for item: ${item.name}`);
+        console.log(`fetchSelectedImages()_error: ${error} for item: ${item.name}`);
       }
     }
-    return downloadUrls;
+    return fetchUrls;
   }
 
   checkCachedImages(cachedImagesJson: string | null, addedImages: ImageType[], storageImages: ImageType[], allImages: ImageType[]) {
@@ -218,7 +218,7 @@ export class SharedGalleryService {
     localStorage.removeItem("galleryImages");
     localStorage.removeItem("addedImages");
 
-    await this.downloadAllImages();
+    await this.fetchAllImages();
     const storageImages = this.galleryImages();
 
     localStorage.setItem("galleryImages", JSON.stringify(storageImages));

@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { AuthService } from '../auth.service';
 @Component({
@@ -11,6 +12,8 @@ import { AuthService } from '../auth.service';
 
 export class RegisterComponent {
   private authService = inject(AuthService)
+  private router = inject(Router);
+
   isRegistrationSuccessful = false;
   errorMessage = signal<string | undefined>(undefined);
 
@@ -48,6 +51,8 @@ export class RegisterComponent {
           setTimeout((() => {
             this.isRegistrationSuccessful = false;
             this.registerForm.reset();
+            this.router.navigateByUrl("/login");
+
           }), 2000)
         },
         error: (error) => {
