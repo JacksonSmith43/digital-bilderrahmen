@@ -25,6 +25,12 @@
                     @for(item of files(); track item.relativePath; let i = $index){
                     <tr>
                         <td><strong>{{ item.relativePath }}</strong></td>
+
+                        @for(image of this.dragDropUploadService.images(); track image){
+                        @if(item.relativePath === image.relativePath){
+                        <td><img class="preview-image" [src]="image.src" [alt]="image.relativePath" /></td>
+                        }
+                        }
                     </tr>
                     }
 

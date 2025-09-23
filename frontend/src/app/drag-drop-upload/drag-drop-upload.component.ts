@@ -17,7 +17,7 @@ import { AuthService } from '../auth/auth.service';
 export class DragDropUploadComponent implements AfterViewInit, OnInit {
 
   navService = inject(NavbarService);
-  private dragDropUploadService = inject(DragDropUploadService);
+  dragDropUploadService = inject(DragDropUploadService);
   authService = inject(AuthService);
 
   imageUrls = this.dragDropUploadService.images;
