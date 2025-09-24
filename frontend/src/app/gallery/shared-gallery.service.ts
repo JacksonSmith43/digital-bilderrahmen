@@ -218,7 +218,7 @@ export class SharedGalleryService {
     localStorage.removeItem("galleryImages");
     localStorage.removeItem("addedImages");
 
-    await this.fetchAllImages();
+    await this.fetchAndDisplayImages();
     const storageImages = this.galleryImages();
 
     localStorage.setItem("galleryImages", JSON.stringify(storageImages));
