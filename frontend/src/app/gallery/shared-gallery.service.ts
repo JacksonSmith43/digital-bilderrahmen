@@ -87,28 +87,110 @@ export class SharedGalleryService {
     const fetchUrls: string[] = [];
     const images: ImageType[] = [];
 
+    const fetchedImagesArray = listResult.items.map(item => item.name);
     console.log("fetchAllImages()_listResult: ", listResult);
+    console.log("fetchAllImages()_fetchedImagesArray", fetchedImagesArray);
 
-    for (let item of listResult.items) { // This will loop through all the images in the storage bucket.
-      console.log("fetchAllImages()_item: ", item);
-      try {
-        const url = await this.firebaseContextService.getDownloadURL(item); // This will get the download URL of the image meaning that it will download/fetch the image from the storage bucket. 
-        fetchUrls.push(url);
+    const normaliseFileName = (name: string): string => { // This makes it so that the comparison is case insensitive and ignores underscores, hyphens, spaces, and file extensions. 
+      return name
+        .toLowerCase()
+        .replace(/^.*%2f/i, '') // Removes URL-encoded paths (%2f = /). 
+        .replace(/^.*\//i, '') // Removes everything before the last slash. 
+        .replace(/[_\-\s]+/g, '') // Removes underscores, hyphens, spaces. 
+        .replace(/\.[^/.]+$/, '') // Removes file extension. 
+        .replace(/%20/g, ''); // Removes URL-encoded spaces. 
+    };
 
-        images.push({
-          src: url,
-          alt: item.name,
-          relativePath: item.name
+    const galleryImageNames = this.galleryImages().map(img => {
+      const fileName = img.relativePath || img.src.split('/').pop() || '';
+      return normaliseFileName(fileName);
+    });
+    console.log("fetchAllImages()_galleryImageNames", galleryImageNames);
+
+
+    const normalisedFetchedImages = fetchedImagesArray.map(fileName => normaliseFileName(fileName));
+    console.log("fetchAllImages()_normalisedFetchedImages", normalisedFetchedImages);
+
+
+    const someImagesAlreadyLoaded = normalisedFetchedImages.some(fetchedName =>
+      galleryImageNames.includes(fetchedName)
+    );
+    console.log("fetchAllImages()_someImagesAlreadyLoaded", someImagesAlreadyLoaded);
+
+    if (someImagesAlreadyLoaded) {
+      console.log("fetchAllImages()_Some fetched images are already in gallery, checking for new ones.");
+
+      const notFetched = normalisedFetchedImages.filter(name => !galleryImageNames.includes(name));
+
+      if (notFetched.length > 0) { // Only fetches new images if there are any that are not already in the gallery. 
+        console.log("fetchAllImages()_notFetched: ", notFetched);
+
+        const unFetchedItems = listResult.items.filter(item => { // Filters the items to only those that are not already in the gallery. This is a Firebase StorageReference object array. 
+          const normalisedItemName = normaliseFileName(item.name);
+          return notFetched.includes(normalisedItemName);
         });
 
-        console.log("fetchAllImages()_url: ", url);
-        this.galleryImages.set(images);
+        console.log("fetchAllImages()_unFetchedItems: ", unFetchedItems);
 
-      } catch (error) {
-        console.log(`fetchAllImages()_error: ${error} for item: ${item.name}`);
+        const currentImages = [...this.galleryImages()];
+        console.log("fetchAllImages()_currentImages: ", currentImages);
+
+        for (let item of unFetchedItems) {
+          console.log("fetchAllImages()_Loading new item: ", item);
+
+          try {
+            const url = await this.firebaseContextService.getDownloadURL(item);
+
+            fetchUrls.push(url);
+            currentImages.push({
+              src: url,
+              alt: item.name,
+              relativePath: item.name
+            });
+
+            console.log("fetchAllImages()_New url loaded: ", url);
+
+          } catch (error) {
+            console.log(`fetchAllImages()_Error loading ${item.name}: ${error}`);
+          }
+        }
+
+        this.galleryImages.set(currentImages);
+        return currentImages.map(img => img.src);
+
+      } else { // Incase no new images are to be loaded. Already existing images will be used. 
+        console.log("fetchAllImages()_No new images to fetch, using existing gallery.");
+        return this.galleryImages().map(img => img.src);
       }
+
+
+    } else { // Load all images. 
+      console.log("fetchAllImages()_No images in gallery yet, loading all images from Firebase.");
+
+      for (let item of listResult.items) { // This will loop through all the images in the storage bucket.
+        console.log("fetchAllImages()_item: ", item);
+
+        try {
+          const url = await this.firebaseContextService.getDownloadURL(item); // This will get the download URL of the image meaning that it will download/fetch the image from the storage bucket. 
+
+          fetchUrls.push(url);
+          images.push({
+            src: url,
+            alt: item.name,
+            relativePath: item.name
+          });
+
+          console.log("fetchAllImages()_url: ", url);
+          this.galleryImages.set(images);
+
+        } catch (error) {
+          console.log(`fetchAllImages()_error: ${error} for item: ${item.name}`);
+        }
+      }
+      console.log("fetchAllImages()_fetchUrls: ", fetchUrls);
+      return fetchUrls;
     }
-    return fetchUrls;
+
   }
 
 

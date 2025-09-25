@@ -58,6 +58,7 @@ export class GalleryComponent implements OnInit {
       console.log("getGalleryImages()_this.cachedImages: ", this.cachedImages);
 
       let removedDuplicates = await this.removeDuplicatesThroughHash(this.cachedImages);
+      localStorage.setItem("galleryImages", JSON.stringify(removedDuplicates));
 
       return removedDuplicates;
 
