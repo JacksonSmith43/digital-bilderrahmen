@@ -86,11 +86,13 @@ export class SharedGalleryService {
     const listResult = await this.firebaseContextService.listAll(listRef); // This will list all the images in the storage bucket. 
     const fetchUrls: string[] = [];
     const images: ImageType[] = [];
-
+    const galleryStorageRaw = localStorage.getItem("galleryImages");
+    const galleryStorage: ImageType[] = galleryStorageRaw ? JSON.parse(galleryStorageRaw) : [];
     const fetchedImagesArray = listResult.items.map(item => item.name);
+
     console.log("fetchAllImages()_listResult: ", listResult);
     console.log("fetchAllImages()_fetchedImagesArray", fetchedImagesArray);
-
+    console.log("fetchAllImages()_galleryStorage: ", galleryStorage);
     const normaliseFileName = (name: string): string => { // This makes it so that the comparison is case insensitive and ignores underscores, hyphens, spaces, and file extensions. 
       return name
         .toLowerCase()
@@ -101,12 +103,11 @@ export class SharedGalleryService {
         .replace(/%20/g, ''); // Removes URL-encoded spaces. 
     };
 
-    const galleryImageNames = this.galleryImages().map(img => {
+    const galleryImageNames = galleryStorage.map(img => {
       const fileName = img.relativePath || img.src.split('/').pop() || '';
       return normaliseFileName(fileName);
     });
     console.log("fetchAllImages()_galleryImageNames", galleryImageNames);
-
 
     const normalisedFetchedImages = fetchedImagesArray.map(fileName => normaliseFileName(fileName));
     console.log("fetchAllImages()_normalisedFetchedImages", normalisedFetchedImages);
@@ -117,7 +118,7 @@ export class SharedGalleryService {
     );
     console.log("fetchAllImages()_someImagesAlreadyLoaded", someImagesAlreadyLoaded);
 
-    if (someImagesAlreadyLoaded) {
+    if (someImagesAlreadyLoaded || galleryStorage.length > 0) {
       console.log("fetchAllImages()_Some fetched images are already in gallery, checking for new ones.");
 
       const notFetched = normalisedFetchedImages.filter(name => !galleryImageNames.includes(name));
