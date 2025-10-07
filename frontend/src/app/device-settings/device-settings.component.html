@@ -41,8 +41,8 @@
                 <br>
 
                 <div class="interval-images">
-                    <img *ngIf="getChosenImages()[currentImageIndex]" [src]="getChosenImages()[currentImageIndex].src"
-                        [alt]="getChosenImages()[currentImageIndex].alt">
+                    <img *ngIf="chosenImages()[currentImageIndex]" [src]="chosenImages()[currentImageIndex].src"
+                        [alt]="chosenImages()[currentImageIndex].alt">
 
                     <button type="button" class="btn btn-primary stop-diashow-button" (click)="stopDiashow()">Stop
                         diashow</button>
@@ -72,7 +72,7 @@
             @if(deviceImageLength() > 0){
 
             <div class="accordion-body">
-                @for(i of getChosenImages(); track i.src){
+                @for(i of chosenImages(); track i.src){
                 <img [src]="i.src" [alt]="i.alt" (click)="onHighlightImageSelection(i.src)"
                     [ngClass]="galleryHighlightSrcs().includes(i.src) ? 'image-selected' : 'image-unselected' ">
                 }
