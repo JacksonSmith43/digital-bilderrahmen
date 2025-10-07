@@ -202,7 +202,7 @@ export class GalleryComponent implements OnInit {
     this.action.set("selectForDevice");
 
     const selectedUrl = this.galleryHighlightSrcs();
-    localStorage.setItem("chosenImagesSrcs", JSON.stringify(selectedUrl));
+    console.log("onSelectForDevice()_selectedUrl", selectedUrl);
 
     if (selectedUrl.length === 0) {
       console.log("onSelectForDevice()_No image has been selected for upload.");
@@ -228,6 +228,11 @@ export class GalleryComponent implements OnInit {
         if (imageExists) {
           await this.galleryStorageService.copyImageBetweenFolders("uploadedAllImages", "selectForDevice", imageName);
           console.log(`onSelectForDevice()_${imageName} has been copied.`);
+
+          const imageSrc: ImageType[] = selectedUrl.map(url => ({ src: url, alt: imageName, relativePath: imageName }));
+          console.log("onSelectForDevice()_imageSrc: ", imageSrc);
+          localStorage.setItem("chosenImagesSrcs", JSON.stringify(imageSrc));
+
 
         } else {
           console.log(`onSelectForDevice()${imageName} does not exist in source folder.`);
