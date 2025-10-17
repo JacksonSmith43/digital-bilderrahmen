@@ -1,91 +1,153 @@
 <h3>Device Settings</h3>
-<p>Version: </p>
+<p>Version:</p>
 <p>Switch device off</p>
 
 <div class="accordion" id="device-settings-interval-accordion">
-    <div class="accordion-item">
-        <h2 class="accordion-header">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                data-bs-target="#collapseDisplayedImagesInterval" aria-expanded="true"
-                aria-controls="collapseDisplayedImagesInterval">
-                Interval settings
-            </button>
-        </h2>
-        <div id="collapseDisplayedImagesInterval" class="accordion-collapse collapse show"
-            data-bs-parent="#device-settings-interval-accordion">
-            <div class="accordion-body interval-container">
-
-                @if(deviceImageLength() > 1){
-                <div class="interval-time">
-
-                    <form (ngSubmit)="onSetTime(intervalTime.value)" [formGroup]="intervalForm">
-
-                        <div class="input-group">
-                            <label for="interval-time-input" class="form-label">Interval time (in ms):</label>
-                            <div class="input-row">
-                                <input type="number" class="form-control" id="interval-time-input" placeholder="1000"
-                                    #intervalTime formControlName="intervalTimeInput">
-                                <button type="submit" class="btn btn-primary interval-time-button"
-                                    [disabled]="intervalTimeFormControl.invalid">Set Time</button>
-                            </div>
-                        </div>
-
-                    </form>
-                    @if(intervalTimeFormControl.invalid && (intervalTimeFormControl.dirty ||
-                    intervalTimeFormControl.touched)){
-                    <p class="error-message">{{intervalFormErrorMessages || '\u00A0' }}</p>
-                    <!-- \u00A0 is used to add a non-breaking space. Non-breaking spaces are used to prevent the error message from being shifted to the right. -->
-                    }
-
-                </div>
-                <br>
-
-                <div class="interval-images">
-                    <img *ngIf="chosenImages()[currentImageIndex]" [src]="chosenImages()[currentImageIndex].src"
-                        [alt]="chosenImages()[currentImageIndex].alt">
-
-                    <button type="button" class="btn btn-primary stop-diashow-button" (click)="stopDiashow()">Stop
-                        diashow</button>
-                </div>
-                }
-                @else {
-                <p>No images to display or only one making a diashow unecessary.</p>
-                }
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button
+        class="accordion-button"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseDisplayedImagesInterval"
+        aria-expanded="true"
+        aria-controls="collapseDisplayedImagesInterval"
+      >
+        Interval settings
+      </button>
+    </h2>
+    <div
+      id="collapseDisplayedImagesInterval"
+      class="accordion-collapse collapse show"
+      data-bs-parent="#device-settings-interval-accordion"
+    >
+      <div class="accordion-body interval-container">
+        @if(deviceImageLength() > 1){
+        <div class="interval-time">
+          <form
+            (ngSubmit)="onSetTime(intervalTime.value)"
+            [formGroup]="intervalForm"
+          >
+            <div class="input-group">
+              <label for="interval-time-input" class="form-label"
+                >Interval time (in ms):</label
+              >
+              <div class="input-row">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="interval-time-input"
+                  placeholder="1000"
+                  #intervalTime
+                  formControlName="intervalTimeInput"
+                />
+                <button
+                  type="submit"
+                  class="btn btn-primary interval-time-button"
+                  [disabled]="intervalTimeFormControl.invalid"
+                >
+                  Set Time
+                </button>
+              </div>
             </div>
+          </form>
+          @if(intervalTimeFormControl.invalid && (intervalTimeFormControl.dirty
+          || intervalTimeFormControl.touched)){
+          <p class="error-message">
+            {{ intervalFormErrorMessages || "\u00A0" }}
+          </p>
+          <!-- \u00A0 is used to add a non-breaking space. Non-breaking spaces are used to prevent the error message from being shifted to the right. -->
+          }
         </div>
+        <br />
+
+        <div class="interval-images">
+          <img
+            *ngIf="chosenImages()[currentImageIndex]"
+            [src]="chosenImages()[currentImageIndex].src"
+            [alt]="chosenImages()[currentImageIndex].alt"
+            tabindex="0"
+            role="button"
+          />
+
+          <button
+            type="button"
+            class="btn btn-primary stop-diashow-button"
+            (click)="stopDiashow()"
+          >
+            Stop diashow
+          </button>
+        </div>
+        } @else {
+        <p>No images to display or only one making a diashow unecessary.</p>
+        }
+      </div>
     </div>
+  </div>
 </div>
 
-
 <div class="accordion" id="device-settings-gallery-accordion">
-    <div class="accordion-item">
-        <h2 class="accordion-header">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                data-bs-target="#collapseDisplayedImages" aria-expanded="true" aria-controls="collapseDisplayedImages">
-                Chosen displayed images
-            </button>
-        </h2>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button
+        class="accordion-button"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseDisplayedImages"
+        aria-expanded="true"
+        aria-controls="collapseDisplayedImages"
+      >
+        Chosen displayed images
+      </button>
+    </h2>
 
-        <div id="collapseDisplayedImages" class="accordion-collapse collapse show"
-            data-bs-parent="#device-settings-gallery-accordion">
+    <div
+      id="collapseDisplayedImages"
+      class="accordion-collapse collapse show"
+      data-bs-parent="#device-settings-gallery-accordion"
+    >
+      @if(deviceImageLength() > 0){
 
-            @if(deviceImageLength() > 0){
+      <div class="accordion-body">
+        @for(i of chosenImages(); track i.src){
+        <img
+          [src]="i.src"
+          [alt]="i.alt"
+          (click)="onHighlightImageSelection(i.src)"
+          [ngClass]="
+            galleryHighlightSrcs().includes(i.src)
+              ? 'image-selected'
+              : 'image-unselected'
+          "
+          (keydown.enter)="
+            onHighlightImageSelection(i.src); $event.preventDefault()
+          "
+          (keydown.space)="
+            onHighlightImageSelection(i.src); $event.preventDefault()
+          "
+          [attr.aria-pressed]="galleryHighlightSrcs().includes(i.src)"
+          tabindex="0"
+          role="button"
+        />
+        }
+      </div>
+      <button
+        class="delete-images-button btn btn-danger"
+        (click)="onRemoveImage()"
+      >
+        Delete
+      </button>
 
-            <div class="accordion-body">
-                @for(i of chosenImages(); track i.src){
-                <img [src]="i.src" [alt]="i.alt" (click)="onHighlightImageSelection(i.src)"
-                    [ngClass]="galleryHighlightSrcs().includes(i.src) ? 'image-selected' : 'image-unselected' ">
-                }
-            </div>
-            <button class="delete-images-button btn btn-danger" (click)="onRemoveImage()">Delete</button>
-
-            }
-            @else {
-            <p>No images to display.</p>
-            <button class="fetch-selected-images-buttton btn btn-primary" (click)="onFetchSelectedImages()">Fetch
-                selected images</button>
-            }
-            <p>Number of images: {{deviceImageLength()}}</p>
-        </div>
+      } @else {
+      <p tabindex="0">No images to display.</p>
+      <button
+        class="fetch-selected-images-buttton btn btn-primary"
+        (click)="onFetchSelectedImages()"
+      >
+        Fetch selected images
+      </button>
+      }
+      <p tabindex="0">Number of images: {{ deviceImageLength() }}</p>
     </div>
+  </div>
 </div>

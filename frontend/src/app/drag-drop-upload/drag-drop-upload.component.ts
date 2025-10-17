@@ -35,6 +35,7 @@ export class DragDropUploadComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit() {
+    console.log("DragDropUploadComponent_ngAfterViewInit().");
 
     if (this.navService.isAddImage && this.openFileSelectorFn) {
       this.openFileSelectorFn();
@@ -44,6 +45,7 @@ export class DragDropUploadComponent implements AfterViewInit, OnInit {
 
 
   public dropped(files: NgxFileDropEntry[]) {
+    console.log("dropped: ", files);
     this.dragDropUploadService.getDropped(files);
   }
 

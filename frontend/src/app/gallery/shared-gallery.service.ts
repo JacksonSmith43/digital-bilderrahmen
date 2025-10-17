@@ -5,7 +5,6 @@ import { FirebaseContextService } from './firebase-context.service';
 
 @Injectable({ providedIn: 'root' })
 export class SharedGalleryService {
-
   firebaseContextService = inject(FirebaseContextService);
 
   images = signal<ImageType[]>([]);
@@ -14,33 +13,37 @@ export class SharedGalleryService {
   galleryImageLength = signal<number>(0);
   deviceImages = signal<ImageType[]>([]);
   deviceImageLength = signal<number>(0);
-  action = signal<"selectForDevice" | "uploadAllImages" | undefined>(undefined);
+  action = signal<'selectForDevice' | 'uploadAllImages' | undefined>(undefined);
 
-  localStorageTrigger = signal<number>(0);   // Trigger signal for localStorage changes (for computed signal (chosenImages) reactivity). 
+  localStorageTrigger = signal<number>(0); // Trigger signal for localStorage changes (for computed signal (chosenImages) reactivity).
 
   getHighlightImageSelection(src: string) {
-    console.log("getHighlightImageSelection().");
+    console.log('getHighlightImageSelection().');
 
     const selectedSrcs = this.galleryHighlightSrcs();
 
-    if (selectedSrcs.includes(src)) { // Checks if the image is already selected.
-      this.galleryHighlightSrcs.set(selectedSrcs.filter(i => i !== src)); // Removes the image from the selection if it is already selected. i => i !== index is a filter function that returns all elements that are not equal to the index of the clicked image.
+    if (selectedSrcs.includes(src)) {
+      // Checks if the image is already selected.
+      this.galleryHighlightSrcs.set(selectedSrcs.filter((i) => i !== src)); // Removes the image from the selection if it is already selected. i => i !== index is a filter function that returns all elements that are not equal to the index of the clicked image.
+    } else {
+      // Adds the image to the selection if it has not already been selected.
 
-    } else { // Adds the image to the selection if it has not already been selected. 
       this.galleryHighlightSrcs.set([...selectedSrcs, src]);
     }
-    console.log("getHighlightImageSelection()_this.galleryHighlightSrcs(): ", this.galleryHighlightSrcs());
+    console.log(
+      'getHighlightImageSelection()_this.galleryHighlightSrcs(): ',
+      this.galleryHighlightSrcs()
+    );
   }
 
-  getImages(key: "galleryImages" | "addedImages") {
-    console.log("getImages().");
+  getImages(key: 'galleryImages' | 'addedImages') {
+    console.log('getImages().');
 
     const savedImages = localStorage.getItem(key);
     if (savedImages) {
       try {
-        console.log("getImages()_savedImages: ", savedImages);
+        console.log('getImages()_savedImages: ', savedImages);
         return JSON.parse(savedImages);
-
       } catch (error) {
         console.error(`getImages()_Error parsing ${key}:`, error);
       }
@@ -48,99 +51,139 @@ export class SharedGalleryService {
     return [];
   }
 
-  saveToLocalStorage(key: "galleryImages" | "addedImages" | "chosenImagesSrcs", images: any[]) {
-    console.log("saveToLocalStorage().");
+  saveToLocalStorage(
+    key: 'galleryImages' | 'addedImages' | 'chosenImagesSrcs' | 'deletedSrcArr',
+    images: any[]
+  ) {
+    console.log('saveToLocalStorage().');
     localStorage.setItem(key, JSON.stringify(images));
   }
 
+  async savingSizeCheck(key: string, images: string[], imagesSrc: ImageType[]) {
+    const jsonString = JSON.stringify(imagesSrc);
+    const sizeInKB = (new Blob([jsonString]).size / 1024).toFixed(2);
+    console.log(`savingSizeCheck()_deletedSrcArr size: ${sizeInKB} KB`);
+
+    try {
+      localStorage.setItem(key, jsonString);
+      console.log('savingSizeCheck()_Saved successfully.');
+    } catch (error: any) {
+      if (error.name === 'QuotaExceededError') {
+        console.warn(
+          'savingSizeCheck()_Storage quota exceeded, saving minimal data.'
+        );
+
+        const minimalData = images.map((image) => ({
+          type: image.startsWith('data:') ? 'BASE64' : 'URL',
+          name: this.normaliseFileName(image).substring(0, 30),
+          timestamp: Date.now(),
+        }));
+
+        localStorage.setItem(key, JSON.stringify(minimalData));
+      } else {
+        console.error('savingSizeCheck()_Error saving :', key, error);
+      }
+    }
+  }
 
   removeImages(key: 'galleryImages' | 'addedImages', srcsToRemove: string[]) {
     const currentImages = this.getImages(key);
-    const updatedImages = currentImages.filter((img: ImageTypeSrc) => !srcsToRemove.includes(img.src));
+    const updatedImages = currentImages.filter(
+      (img: ImageTypeSrc) => !srcsToRemove.includes(img.src)
+    );
     this.saveToLocalStorage(key, updatedImages);
-    console.log("removeImages()_updatedImages: ", updatedImages);
+    console.log('removeImages()_updatedImages: ', updatedImages);
     return updatedImages;
   }
 
   syncImageStores() {
-    console.log("syncImageStores().");
+    console.log('syncImageStores().');
 
-    const addedImages = this.getImages("addedImages");
-    const galleryImages = this.getImages("galleryImages");
+    const addedImages = this.getImages('addedImages');
+    const galleryImages = this.getImages('galleryImages');
 
-    const addedImageSrc: string[] = addedImages.map((img: ImageTypeSrc) => img.src);
+    const addedImageSrc: string[] = addedImages.map(
+      (img: ImageTypeSrc) => img.src
+    );
 
     const updatedGalleryImages = galleryImages.filter((img: ImageTypeSrc) => {
-      return !img.src.startsWith("data") || addedImageSrc.includes(img.src) // Keeps all images that are not Base64 encoded or that are still in the addedImages array. So this deletes all Base64 encoded images that are not in the addedImages array.
+      return !img.src.startsWith('data') || addedImageSrc.includes(img.src); // Keeps all images that are not Base64 encoded or that are still in the addedImages array. So this deletes all Base64 encoded images that are not in the addedImages array.
     });
 
-    this.saveToLocalStorage("galleryImages", updatedGalleryImages);
-    console.log("syncImageStores()_updatedGalleryImages: ", updatedGalleryImages);
+    this.saveToLocalStorage('galleryImages', updatedGalleryImages);
+    console.log(
+      'syncImageStores()_updatedGalleryImages: ',
+      updatedGalleryImages
+    );
     return updatedGalleryImages;
   }
 
-
   async fetchAllImages() {
-    console.log("fetchAllImages().");
+    console.log('fetchAllImages().');
 
-    const listRef = this.firebaseContextService.getReference(`uploadedAllImages`);
-    const listResult = await this.firebaseContextService.listAll(listRef); // This will list all the images in the storage bucket. 
+    const listRef =
+      this.firebaseContextService.getReference(`uploadedAllImages`);
+    const listResult = await this.firebaseContextService.listAll(listRef); // This will list all the images in the storage bucket.
     const fetchUrls: string[] = [];
     const images: ImageType[] = [];
-    const galleryStorageRaw = localStorage.getItem("galleryImages");
-    const galleryStorage: ImageType[] = galleryStorageRaw ? JSON.parse(galleryStorageRaw) : [];
-    const fetchedImagesArray = listResult.items.map(item => item.name);
+    const galleryStorageRaw = localStorage.getItem('galleryImages');
+    const galleryStorage: ImageType[] = galleryStorageRaw
+      ? JSON.parse(galleryStorageRaw)
+      : [];
 
-    console.log("fetchAllImages()_listResult: ", listResult);
-    console.log("fetchAllImages()_fetchedImagesArray", fetchedImagesArray);
-    console.log("fetchAllImages()_galleryStorage: ", galleryStorage);
+    console.log('fetchAllImages()_listResult: ', listResult);
+    console.log('fetchAllImages()_galleryStorage: ', galleryStorage);
 
-    const normaliseFileName = (name: string): string => { // This makes it so that the comparison is case insensitive and ignores underscores, hyphens, spaces, and file extensions. 
-      return name
-        .toLowerCase()
-        .replace(/^.*%2f/i, '') // Removes URL-encoded paths (%2f = /). 
-        .replace(/^.*\//i, '') // Removes everything before the last slash. 
-        .replace(/[_\-\s]+/g, '') // Removes underscores, hyphens, spaces. 
-        .replace(/\.[^/.]+$/, '') // Removes file extension. 
-        .replace(/%20/g, ''); // Removes URL-encoded spaces. 
-    };
-
-    const galleryImageNames = galleryStorage.map(img => {
-      const fileName = img.relativePath || img.src.split('/').pop() || '';
-      return normaliseFileName(fileName);
+    const galleryImageNames = galleryStorage.map((img) => {
+      return img.relativePath;
     });
-    console.log("fetchAllImages()_galleryImageNames", galleryImageNames);
+    console.log('fetchAllImages()_galleryImageNames', galleryImageNames);
 
-    const normalisedFetchedImages = fetchedImagesArray.map(fileName => normaliseFileName(fileName));
-    console.log("fetchAllImages()_normalisedFetchedImages", normalisedFetchedImages);
-
-
-    const someImagesAlreadyLoaded = normalisedFetchedImages.some(fetchedName =>
-      galleryImageNames.includes(fetchedName)
+    const firebaseImageNames = listResult.items.map((item) =>
+      this.normaliseFileName(item.name)
     );
-    console.log("fetchAllImages()_someImagesAlreadyLoaded", someImagesAlreadyLoaded);
+    console.log('fetchAllImages()_firebaseImageNames', firebaseImageNames);
 
-    if (someImagesAlreadyLoaded || galleryStorage.length > 0) {
-      console.log("fetchAllImages()_Some fetched images are already in gallery, checking for new ones.");
+    const someImagesAlreadyLoaded = firebaseImageNames.some((firebaseName) =>
+      galleryImageNames.includes(firebaseName)
+    );
+    console.log(
+      'fetchAllImages()_someImagesAlreadyLoaded',
+      someImagesAlreadyLoaded
+    );
 
-      const notFetched = normalisedFetchedImages.filter(name => !galleryImageNames.includes(name));
+    console.log(
+      'fetchAllImages()_galleryStorage.length',
+      galleryStorage.length
+    );
 
-      if (notFetched.length > 0) { // Only fetches new images if there are any that are not already in the gallery. 
-        console.log("fetchAllImages()_notFetched: ", notFetched);
+    if (someImagesAlreadyLoaded && galleryStorage.length > 0) {
+      console.log(
+        'fetchAllImages()_Some fetched images are already in gallery, checking for new ones.'
+      );
+      console.log('fetchAllImages()_firebaseImageNames_2', firebaseImageNames);
 
-        const unFetchedItems = listResult.items.filter(item => { // Filters the items to only those that are not already in the gallery. This is a Firebase StorageReference object array. 
-          const normalisedItemName = normaliseFileName(item.name);
+      const notFetched = firebaseImageNames.filter(
+        (name) => !galleryImageNames.includes(name)
+      );
+      console.log('fetchAllImages()_notFetched', notFetched);
+
+      if (notFetched.length > 0) {
+        // Only fetches new images if there are any that are not already in the gallery.
+        console.log('fetchAllImages()_notFetched: ', notFetched);
+
+        const unFetchedItems = listResult.items.filter((item) => {
+          // Filters the items to only those that are not already in the gallery. This is a Firebase StorageReference object array.
+          const normalisedItemName = this.normaliseFileName(item.name);
           return notFetched.includes(normalisedItemName);
         });
 
-        console.log("fetchAllImages()_unFetchedItems: ", unFetchedItems);
+        console.log('fetchAllImages()_unFetchedItems: ', unFetchedItems);
 
-        const currentImages = [...this.galleryImages()];
-        console.log("fetchAllImages()_currentImages: ", currentImages);
+        const currentImages = [...galleryStorage];
+        console.log('fetchAllImages()_currentImages: ', currentImages);
 
         for (let item of unFetchedItems) {
-          console.log("fetchAllImages()_Loading new item: ", item);
-
           try {
             const url = await this.firebaseContextService.getDownloadURL(item);
 
@@ -148,158 +191,199 @@ export class SharedGalleryService {
             currentImages.push({
               src: url,
               alt: item.name,
-              relativePath: item.name
+              relativePath: item.name,
             });
 
-            console.log("fetchAllImages()_New url loaded: ", url);
-
+            console.log('fetchAllImages()_New image loaded: ', url);
           } catch (error) {
-            console.log(`fetchAllImages()_Error loading ${item.name}: ${error}`);
+            console.log(
+              `fetchAllImages()_Error loading ${item.name}: ${error}`
+            );
           }
         }
 
         this.galleryImages.set(currentImages);
-        return currentImages.map(img => img.src);
+        this.galleryImageLength.set(currentImages.length);
+        this.saveToLocalStorage('galleryImages', currentImages);
 
-      } else { // Incase no new images are to be loaded. Already existing images will be used. 
-        console.log("fetchAllImages()_No new images to fetch, using existing gallery.");
-        return this.galleryImages().map(img => img.src);
+        return currentImages.map((img) => img.src);
+      } else {
+        // Incase no new images are to be loaded. Already existing images will be used.
+        console.log(
+          'fetchAllImages()_No new images to fetch, using existing gallery.'
+        );
+
+        if (galleryStorage.length === 0 && galleryStorage.length > 0) {
+          console.log(
+            'fetchAllImages()_Restoring galleryImages signal from localStorage.'
+          );
+          this.galleryImages.set(galleryStorage);
+          this.galleryImageLength.set(galleryStorage.length);
+          return galleryStorage.map((img) => img.src);
+        }
+
+        console.log(
+          'fetchAllImages()_currentGalleryImages.map(img => img.src)',
+          galleryStorage.map((img) => img.src)
+        );
+        console.log(
+          'fetchAllImages()_currentGalleryImages.map(img => img.alt)',
+          galleryStorage.map((img) => img.alt)
+        );
+        return galleryStorage.map((img) => img.src);
+      }
+    } else {
+      // Load all images.
+      console.log(
+        'fetchAllImages()_No images in gallery yet, loading all images from Firebase.'
+      );
+
+      if (listResult.items.length === 0) {
+        console.warn('fetchAllImages()_No images found in Firebase Storage.');
+        this.galleryImages.set([]);
+        this.galleryImageLength.set(0);
+        return [];
       }
 
-
-    } else { // Load all images. 
-      console.log("fetchAllImages()_No images in gallery yet, loading all images from Firebase.");
-
-      for (let item of listResult.items) { // This will loop through all the images in the storage bucket.
-        console.log("fetchAllImages()_item: ", item);
+      for (let item of listResult.items) {
+        // This will loop through all the images in the storage bucket.
+        console.log('fetchAllImages()_item: ', item);
 
         try {
-          const url = await this.firebaseContextService.getDownloadURL(item); // This will get the download URL of the image meaning that it will download/fetch the image from the storage bucket. 
+          const url = await this.firebaseContextService.getDownloadURL(item); // This will get the download URL of the image meaning that it will download/fetch the image from the storage bucket.
 
           fetchUrls.push(url);
           images.push({
             src: url,
             alt: item.name,
-            relativePath: item.name
+            relativePath: item.name,
           });
 
-          console.log("fetchAllImages()_url: ", url);
+          console.log('fetchAllImages()_url: ', url);
           this.galleryImages.set(images);
-
         } catch (error) {
-          console.log(`fetchAllImages()_error: ${error} for item: ${item.name}`);
+          console.log(
+            `fetchAllImages()_error: ${error} for item: ${item.name}`
+          );
         }
       }
-      console.log("fetchAllImages()_fetchUrls: ", fetchUrls);
+      this.saveToLocalStorage('galleryImages', images);
+
+      console.log('fetchAllImages()_fetchUrls: ', fetchUrls);
       return fetchUrls;
     }
-
   }
 
-
   async fetchAndDisplayImages() {
-    console.log("fetchAndDisplayImages().");
+    console.log('fetchAndDisplayImages().');
 
     try {
       let fetchUrls: string[] = [];
-      console.log("fetchAndDisplayImages()_action: ", this.action());
+      console.log('fetchAndDisplayImages()_action: ', this.action());
 
-      if (this.action() === "uploadAllImages") {
+      if (this.action() === 'uploadAllImages') {
         fetchUrls = await this.fetchAllImages();
-        console.log("fetchAndDisplayImages()_this.fetchAllImages(): ");
-
-      } else if (this.action() === "selectForDevice") {
+        console.log('fetchAndDisplayImages()_this.fetchAllImages(): ');
+      } else if (this.action() === 'selectForDevice') {
         fetchUrls = await this.fetchSelectedImages();
-
       } else {
         throw new Error('fetchAndDisplayImages.');
       }
 
-      const images = fetchUrls.map((url, index) => ({ // This will loop through all the images and add them to the images array. 
+      const images = fetchUrls.map((url, index) => ({
+        // This will loop through all the images and add them to the images array.
         src: url,
-        alt: `Image ${index + 1}`,
-        relativePath: url.split('/').pop() || `image_${index + 1}` // This will either get the last part of the URL or "image_1" if the URL is empty.
+        alt: this.normaliseFileName(url),
+        relativePath: this.normaliseFileName(url),
       }));
 
-      if (this.action() === "selectForDevice") {
+      if (this.action() === 'selectForDevice') {
         this.deviceImages.set(images);
-
-      } else if (this.action() === "uploadAllImages") {
+      } else if (this.action() === 'uploadAllImages') {
         this.galleryImages.set(images);
-        console.log("fetchAndDisplayImages()_images: ", images);
+        console.log('fetchAndDisplayImages()_images: ', images);
       }
-
     } catch (error) {
-      console.error("fetchAndDisplayImages(): An error has occured whilst loading images from Firebase:", error);
+      console.error(
+        'fetchAndDisplayImages(): An error has occured whilst loading images from Firebase:',
+        error
+      );
     }
   }
 
   async fetchSelectedImages() {
-    console.log("fetchSelectedImages().");
+    console.log('fetchSelectedImages().');
 
     const listRef = this.firebaseContextService.getReference(`selectForDevice`);
     const listResult = await this.firebaseContextService.listAll(listRef);
     const fetchUrls: string[] = [];
-    const fetchedImagesArray = listResult.items.map(item => item.name);
 
     const images: ImageType[] = [];
-    const chosenImagesRaw = localStorage.getItem("chosenImagesSrcs");
-    const chosenSrcs: string[] = chosenImagesRaw ? JSON.parse(chosenImagesRaw) : [];
+    const chosenImagesRaw = localStorage.getItem('chosenImagesSrcs');
+    const chosenSrcs: ImageType[] = chosenImagesRaw
+      ? JSON.parse(chosenImagesRaw)
+      : [];
 
-    console.log("fetchSelectedImages()_listResult: ", listResult);
-    console.log("fetchSelectedImages()_fetchedImagesArray", fetchedImagesArray);
-    console.log("fetchSelectedImages()_chosenSrcs: ", chosenSrcs);
+    console.log('fetchSelectedImages()_listResult: ', listResult);
+    console.log('fetchSelectedImages()_chosenSrcs: ', chosenSrcs);
 
-    const normaliseFileName = (name: string): string => { // This makes it so that the comparison is case insensitive and ignores underscores, hyphens, spaces, and file extensions. 
-      return name
-        .toLowerCase()
-        .replace(/^.*%2f/i, '') // Removes URL-encoded paths (%2f = /). 
-        .replace(/^.*\//i, '') // Removes everything before the last slash. 
-        .replace(/[_\-\s]+/g, '') // Removes underscores, hyphens, spaces. 
-        .replace(/\.[^/.]+$/, '') // Removes file extension. 
-        .replace(/%20/g, ''); // Removes URL-encoded spaces. 
-    };
+    const deviceImageNames = chosenSrcs.map((imageObj) => {
+      console.log(
+        'fetchSelectedImages()_processing imageObj:',
+        imageObj,
+        'type:',
+        typeof imageObj
+      );
 
-
-    const deviceImageNames = chosenSrcs.map((imageObj: any) => {
-      console.log("fetchSelectedImages()_processing imageObj:", imageObj, "type:", typeof imageObj);
-
-      const fileName = imageObj.src.split('/').pop() || imageObj.src;
-      return normaliseFileName(fileName);
+      const fileName =
+        imageObj.relativePath || imageObj.src.split('/').pop() || '';
+      return this.normaliseFileName(fileName);
     });
-    console.log("fetchSelectedImages()_deviceImageNames", deviceImageNames);
+    console.log('fetchSelectedImages()_deviceImageNames', deviceImageNames);
 
-
-    const normalisedFetchedImages = fetchedImagesArray.map(fileName => normaliseFileName(fileName));
-    console.log("fetchSelectedImages()_normalisedFetchedImages", normalisedFetchedImages);
-
-
-    const someImagesAlreadyLoaded = normalisedFetchedImages.some(fetchedName =>
-      deviceImageNames.includes(fetchedName)
+    const normalisedFetchedImages = deviceImageNames.map((fileName) =>
+      this.normaliseFileName(fileName)
     );
-    console.log("fetchSelectedImages()_someImagesAlreadyLoaded", someImagesAlreadyLoaded);
+    console.log(
+      'fetchSelectedImages()_normalisedFetchedImages',
+      normalisedFetchedImages
+    );
+
+    const someImagesAlreadyLoaded = normalisedFetchedImages.some(
+      (fetchedName) => deviceImageNames.includes(fetchedName)
+    );
+    console.log(
+      'fetchSelectedImages()_someImagesAlreadyLoaded',
+      someImagesAlreadyLoaded
+    );
 
     if (someImagesAlreadyLoaded || deviceImageNames.length > 0) {
-      console.log("fetchSelectedImages()_Some fetched images are already in gallery, checking for new ones.");
+      console.log(
+        'fetchSelectedImages()_Some fetched images are already in gallery, checking for new ones.'
+      );
 
-      const notFetched = normalisedFetchedImages.filter(name => !deviceImageNames.includes(name));
+      const notFetched = normalisedFetchedImages.filter(
+        (name) => !deviceImageNames.includes(name)
+      );
 
-      if (notFetched.length > 0) { // Only fetches new images if there are any that are not already in the gallery. 
-        console.log("fetchSelectedImages()_notFetched: ", notFetched);
-        console.log("fetchSelectedImages()_chosenSrcs: ", chosenSrcs);
+      if (notFetched.length > 0) {
+        // Only fetches new images if there are any that are not already in the gallery.
+        console.log('fetchSelectedImages()_notFetched: ', notFetched);
+        console.log('fetchSelectedImages()_chosenSrcs: ', chosenSrcs);
 
-        const unFetchedItems = listResult.items.filter(item => { // Filters the items to only those that are not already in the gallery. This is a Firebase StorageReference object array. 
-          const normalisedItemName = normaliseFileName(item.name);
+        const unFetchedItems = listResult.items.filter((item) => {
+          // Filters the items to only those that are not already in the gallery. This is a Firebase StorageReference object array.
+          const normalisedItemName = this.normaliseFileName(item.name);
           return notFetched.includes(normalisedItemName);
         });
 
-        console.log("fetchSelectedImages()_unFetchedItems: ", unFetchedItems);
+        console.log('fetchSelectedImages()_unFetchedItems: ', unFetchedItems);
 
         const currentImages = [...this.deviceImages()];
-        console.log("fetchSelectedImages()_currentImages: ", currentImages);
+        console.log('fetchSelectedImages()_currentImages: ', currentImages);
 
         for (let item of unFetchedItems) {
-          console.log("fetchSelectedImages()_Loading new item: ", item);
+          console.log('fetchSelectedImages()_Loading new item: ', item);
 
           try {
             const url = await this.firebaseContextService.getDownloadURL(item);
@@ -308,41 +392,52 @@ export class SharedGalleryService {
             currentImages.push({
               src: url,
               alt: item.name,
-              relativePath: item.name
+              relativePath: item.name,
             });
 
-            console.log("fetchSelectedImages()_New url loaded: ", url);
-            console.log("fetchSelectedImages()_currentImages: ", currentImages);
-
+            console.log('fetchSelectedImages()_New url loaded: ', url);
+            console.log('fetchSelectedImages()_currentImages: ', currentImages);
           } catch (error) {
-            console.log(`fetchSelectedImages()_Error loading ${item.name}: ${error}`);
+            console.log(
+              `fetchSelectedImages()_Error loading ${item.name}: ${error}`
+            );
           }
         }
-        localStorage.setItem("chosenImagesSrcs", JSON.stringify(currentImages));
-        this.localStorageTrigger.set(this.localStorageTrigger() + 1); // Trigger for computed signals. 
-        return currentImages.map(img => img.src);
-
-      } else { // Incase no new images are to be loaded. Already existing images will be used. 
-        console.log("fetchSelectedImages()_No new images to fetch, using existing device images.");
-        return this.deviceImages().map(img => img.src);
+        localStorage.setItem('chosenImagesSrcs', JSON.stringify(currentImages));
+        this.localStorageTrigger.set(this.localStorageTrigger() + 1); // Trigger for computed signals.
+        return currentImages.map((img) => img.src);
+      } else {
+        // Incase no new images are to be loaded. Already existing images will be used.
+        console.log(
+          'fetchSelectedImages()_No new images to fetch, using existing device images.'
+        );
+        return this.deviceImages().map((img) => img.src);
       }
+    } else {
+      // Loading for the first time. No images are in storage and no local images.
+      console.log(
+        'fetchSelectedImages()_No images in storage and no chosen images, loading all from Firebase.'
+      );
 
-    } else { // Loading for the first time. No images are in storage and no local images.
-      console.log("fetchSelectedImages()_No images in storage and no chosen images, loading all from Firebase.");
-
-      if (listResult.items.length === 0) { // Checks if Firebase Storage is empty. 
-        console.warn("fetchSelectedImages()_No images found in Firebase Storage 'selectForDevice' folder.");
-        localStorage.setItem("chosenImagesSrcs", JSON.stringify([]));
-        this.localStorageTrigger.set(this.localStorageTrigger() + 1); // Trigger for computed signals. 
+      if (listResult.items.length === 0) {
+        // Checks if Firebase Storage is empty.
+        console.warn(
+          "fetchSelectedImages()_No images found in Firebase Storage 'selectForDevice' folder."
+        );
+        localStorage.setItem('chosenImagesSrcs', JSON.stringify([]));
+        this.localStorageTrigger.set(this.localStorageTrigger() + 1); // Trigger for computed signals.
         this.deviceImages.set([]);
         this.deviceImageLength.set(0);
         return [];
       }
 
-      console.log("fetchSelectedImages()_Loading all available images from Firebase Storage:", listResult.items.length);
+      console.log(
+        'fetchSelectedImages()_Loading all available images from Firebase Storage:',
+        listResult.items.length
+      );
 
       for (let item of listResult.items) {
-        console.log("fetchSelectedImages()_item: ", item);
+        console.log('fetchSelectedImages()_item: ', item);
         try {
           const url = await this.firebaseContextService.getDownloadURL(item);
 
@@ -350,31 +445,60 @@ export class SharedGalleryService {
           images.push({
             src: url,
             alt: item.name,
-            relativePath: item.name
+            relativePath: item.name,
           });
-          console.log("fetchSelectedImages()_url: ", url);
-
+          console.log('fetchSelectedImages()_url: ', url);
         } catch (error) {
-          console.log(`fetchSelectedImages()_error: ${error} for item: ${item.name}`);
+          console.log(
+            `fetchSelectedImages()_error: ${error} for item: ${item.name}`
+          );
         }
       }
 
-      console.log("fetchSelectedImages()_Loaded all images from Firebase:", images.length);
-      console.log("fetchSelectedImages()_fetchUrls: ", fetchUrls);
+      console.log(
+        'fetchSelectedImages()_Loaded all images from Firebase:',
+        images.length
+      );
+      console.log('fetchSelectedImages()_fetchUrls: ', fetchUrls);
 
-      localStorage.setItem("chosenImagesSrcs", JSON.stringify(images));
-      this.localStorageTrigger.set(this.localStorageTrigger() + 1); // Trigger for computed signals. 
+      localStorage.setItem('chosenImagesSrcs', JSON.stringify(images));
+      this.localStorageTrigger.set(this.localStorageTrigger() + 1); // Trigger for computed signals.
       this.deviceImages.set(images);
       this.deviceImageLength.set(images.length);
 
-      console.log("fetchSelectedImages()_Updated deviceImages signal with:", images.length, "images");
+      console.log(
+        'fetchSelectedImages()_Updated deviceImages signal with:',
+        images.length,
+        'images'
+      );
       return fetchUrls;
     }
   }
 
+  normaliseFileName(name: string): string {
+    // This makes it so that the comparison is case insensitive and ignores underscores, hyphens, spaces, and file extensions.
+    const nameWithoutQuery = name.split('?')[0];
+    const nameWithoutExtension = nameWithoutQuery.replace(/\.[^/.]+$/, ''); // Removes everything after the last dot (file extension).
+    const extension = nameWithoutQuery.split('.').pop();
 
-  checkCachedImages(cachedImagesJson: string | null, addedImages: ImageType[], storageImages: ImageType[], allImages: ImageType[]) {
-    console.log("checkCachedImages().");
+    const normalised = nameWithoutExtension
+      .replace(/^.*%2f/i, '') // Removes URL-encoded paths (%2f = /).
+      .replace(/^.*\//i, '') // Removes everything before the last slash.
+      .replace(/%20/g, ' ') // Removes URL-encoded spaces to add underscores.
+      //.replace(/\s+/g, '_')  // Replaces spaces with underscores.
+      .replace(/\.[^/.]+$/, ''); // Removes file extension.
+    //  .toLowerCase();
+
+    return extension ? `${normalised}.${extension}` : normalised;
+  }
+
+  checkCachedImages(
+    cachedImagesJson: string | null,
+    addedImages: ImageType[],
+    storageImages: ImageType[],
+    allImages: ImageType[]
+  ) {
+    console.log('checkCachedImages().');
 
     allImages = [...storageImages];
 
@@ -385,42 +509,53 @@ export class SharedGalleryService {
     if (allImages.length === 0 && cachedImagesJson) {
       try {
         const parsedCachedImages = JSON.parse(cachedImagesJson);
-        console.log("checkCachedImages()_Using cached images as fallback:", parsedCachedImages.length);
+        console.log(
+          'checkCachedImages()_Using cached images as fallback:',
+          parsedCachedImages.length
+        );
         allImages = parsedCachedImages;
-
       } catch (error) {
-        console.error("checkCachedImages()_Error parsing cachedImagesJson:", error);
+        console.error(
+          'checkCachedImages()_Error parsing cachedImagesJson:',
+          error
+        );
       }
     }
 
     const uniqueImages = this.removeDuplicatesByName(allImages);
-    console.log("checkCachedImages()_All unique images:", uniqueImages.length);
+    console.log('checkCachedImages()_All unique images:', uniqueImages.length);
     return uniqueImages;
   }
 
-
   removeDuplicatesByName(images: any[]): any[] {
-    console.log("removeDuplicates().");
+    console.log('removeDuplicates().');
 
-    return images.filter((item, index, array) =>
-      item.src && index === array.findIndex((item2) => item2.src === item.src)
+    return images.filter(
+      (item, index, array) =>
+        item.src && index === array.findIndex((item2) => item2.src === item.src)
     );
   }
 
   async syncAllImageStores() {
-    console.log("syncAllImageStores().");
+    console.log('syncAllImageStores().');
 
-    localStorage.removeItem("galleryImages");
-    localStorage.removeItem("addedImages");
+    localStorage.removeItem('galleryImages');
+    localStorage.removeItem('addedImages');
 
     await this.fetchAndDisplayImages();
     const storageImages = this.galleryImages();
 
-    localStorage.setItem("galleryImages", JSON.stringify(storageImages));
-    localStorage.setItem("addedImages", JSON.stringify(this.images()));
+    localStorage.setItem('galleryImages', JSON.stringify(storageImages));
+    localStorage.setItem('addedImages', JSON.stringify(this.images()));
 
-    console.log("syncAllImageStores()_storageImages.length: ", storageImages.length);
-    console.log("syncAllImageStores()_this.images().length: ", this.images().length);
+    console.log(
+      'syncAllImageStores()_storageImages.length: ',
+      storageImages.length
+    );
+    console.log(
+      'syncAllImageStores()_this.images().length: ',
+      this.images().length
+    );
     return storageImages;
   }
 }

@@ -25,19 +25,31 @@ img {
 }
 
 .image-selected {
-    border: 0.14rem solid blue;
+    outline: 0.23rem solid green;
 }
 
 .image-unselected {
-    border: 0.14rem solid black;
+    outline: 0.23rem solid black;
 }
 
 .image-delete-selected {
-    border: 0.14rem solid red;
+    outline: 0.23rem solid red;
+}
+
+button {
+    margin: 1rem 1rem;
+    font-weight: 600;
 }
 
 
-button {
-    margin: auto 1rem;
-    font-weight: 600;
+img:focus,
+button:focus,
+p:focus {
+    outline: 0.23rem solid blue;
+    outline-offset: 0.20rem;
+}
+
+img[role="button"]:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
 }

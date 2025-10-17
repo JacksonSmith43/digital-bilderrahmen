@@ -4,7 +4,13 @@ nav {
 }
 
 button {
-    margin-left: 0.25rem;
-    margin-right: 1rem;
+    margin: 1rem 1rem 0rem 0.25rem;
     font-weight: 600;
+}
+
+
+button:focus {
+    outline: 0.20rem solid blue;
+    outline-offset: 0.20rem;
+    box-shadow: 0 0 0.30rem rgba(0, 123, 255, 0.6);
 }

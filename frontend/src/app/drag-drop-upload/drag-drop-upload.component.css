@@ -25,3 +25,9 @@ img {
     margin-left: 1rem;
     font-weight: 600;
 }
+
+
+button:focus {
+    outline: 0.23rem solid blue;
+    outline-offset: 0.20rem;
+}

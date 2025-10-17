@@ -65,6 +65,7 @@ export class DragDropUploadService {
                 console.log("getDropped()_droppedFile.relativePath, fileEntry: ", droppedFile.relativePath, fileEntry);
             }
         }
+        console.log("getDropped()_this.files().relativePath", this.files().map(file => file.relativePath));
         this.sharedGalleryService.saveToLocalStorage("addedImages", this.files());
     }
 
@@ -75,8 +76,8 @@ export class DragDropUploadService {
         reader.onload = (e: any) => { // This event is triggered when the file is read successfully. 
             this.addImage({ // This adds the image to the images array. 
                 src: e.target.result,
-                alt: "",
-                relativePath
+                alt: this.sharedGalleryService.normaliseFileName(file.name),
+                relativePath: this.sharedGalleryService.normaliseFileName(relativePath)
             });
         };
         reader.readAsDataURL(file); // This reads the file as a data URL, which is suitable for displaying images in the browser. 
