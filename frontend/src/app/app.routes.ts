@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
 
-import { GalleryComponent } from './gallery/gallery.component';
+import { GalleryComponent } from './gallery/components/gallery.component';
 import { DragDropUploadComponent } from './drag-drop-upload/drag-drop-upload.component';
 import { ViewAllComponent } from './view-all/view-all.component';
-import { DeviceSettingsComponent } from './device-settings/device-settings.component';
+import { DeviceSettingsComponent } from './device-settings/components/device-settings.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { LogoutComponent } from './auth/logout/logout.component';

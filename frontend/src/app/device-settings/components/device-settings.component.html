@@ -22,16 +22,11 @@
       data-bs-parent="#device-settings-interval-accordion"
     >
       <div class="accordion-body interval-container">
-        @if(deviceImageLength() > 1){
+        @if(deviceImagesLength() > 1){
         <div class="interval-time">
-          <form
-            (ngSubmit)="onSetTime(intervalTime.value)"
-            [formGroup]="intervalForm"
-          >
+          <form (ngSubmit)="onSetTime(intervalTime.value)" [formGroup]="intervalForm">
             <div class="input-group">
-              <label for="interval-time-input" class="form-label"
-                >Interval time (in ms):</label
-              >
+              <label for="interval-time-input" class="form-label">Interval time (in ms):</label>
               <div class="input-row">
                 <input
                   type="number"
@@ -51,10 +46,9 @@
               </div>
             </div>
           </form>
-          @if(intervalTimeFormControl.invalid && (intervalTimeFormControl.dirty
-          || intervalTimeFormControl.touched)){
+          @if(intervalTimeFormControl.invalid && (intervalTimeFormControl.dirty || intervalTimeFormControl.touched)){
           <p class="error-message">
-            {{ intervalFormErrorMessages || "\u00A0" }}
+            {{ intervalFormErrorMessages || '\u00A0' }}
           </p>
           <!-- \u00A0 is used to add a non-breaking space. Non-breaking spaces are used to prevent the error message from being shifted to the right. -->
           }
@@ -70,11 +64,7 @@
             role="button"
           />
 
-          <button
-            type="button"
-            class="btn btn-primary stop-diashow-button"
-            (click)="stopDiashow()"
-          >
+          <button type="button" class="btn btn-primary stop-diashow-button" (click)="stopDiashow()">
             Stop diashow
           </button>
         </div>
@@ -106,7 +96,7 @@
       class="accordion-collapse collapse show"
       data-bs-parent="#device-settings-gallery-accordion"
     >
-      @if(deviceImageLength() > 0){
+      @if(deviceImagesLength() > 0){
 
       <div class="accordion-body">
         @for(i of chosenImages(); track i.src){
@@ -114,40 +104,24 @@
           [src]="i.src"
           [alt]="i.alt"
           (click)="onHighlightImageSelection(i.src)"
-          [ngClass]="
-            galleryHighlightSrcs().includes(i.src)
-              ? 'image-selected'
-              : 'image-unselected'
-          "
-          (keydown.enter)="
-            onHighlightImageSelection(i.src); $event.preventDefault()
-          "
-          (keydown.space)="
-            onHighlightImageSelection(i.src); $event.preventDefault()
-          "
-          [attr.aria-pressed]="galleryHighlightSrcs().includes(i.src)"
+          [ngClass]="selectedSrcs()?.includes(i.src) ? 'image-selected' : 'image-unselected'"
+          (keydown.enter)="onHighlightImageSelection(i.src); $event.preventDefault()"
+          (keydown.space)="onHighlightImageSelection(i.src); $event.preventDefault()"
+          [attr.aria-pressed]="selectedSrcs()?.includes(i.src)"
           tabindex="0"
           role="button"
         />
         }
       </div>
-      <button
-        class="delete-images-button btn btn-danger"
-        (click)="onRemoveImage()"
-      >
-        Delete
-      </button>
+      <button class="delete-images-button btn btn-danger" (click)="onRemoveImage()">Delete</button>
 
       } @else {
       <p tabindex="0">No images to display.</p>
-      <button
-        class="fetch-selected-images-buttton btn btn-primary"
-        (click)="onFetchSelectedImages()"
-      >
+      <button class="fetch-selected-images-buttton btn btn-primary" (click)="onFetchSelectedImages()">
         Fetch selected images
       </button>
       }
-      <p tabindex="0">Number of images: {{ deviceImageLength() }}</p>
+      <p tabindex="0">Number of images: {{ deviceImagesLength() }}</p>
     </div>
   </div>
 </div>

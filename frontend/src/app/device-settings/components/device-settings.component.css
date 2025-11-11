@@ -20,7 +20,7 @@ button {
     font-weight: 600;
 }
 
-img:focus,
+/* img:focus, */
 button:focus,
 p:focus {
     outline: 0.20rem solid blue;

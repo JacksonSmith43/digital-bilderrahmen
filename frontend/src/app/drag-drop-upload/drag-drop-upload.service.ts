@@ -1,86 +1,103 @@
-import { inject, Injectable, signal } from "@angular/core";
-import { NgxFileDropEntry } from "ngx-file-drop";
-import { SharedGalleryService } from "../gallery/shared-gallery.service";
+import { inject, Injectable, signal } from '@angular/core';
+import { NgxFileDropEntry } from 'ngx-file-drop';
+import { Store } from '@ngrx/store';
 
-@Injectable({ providedIn: "root" })
+import { selectAddDroppedFiles, selectAddImages, selectIsAdding } from '../gallery/state/gallery.selectors';
+import { GalleryActions } from '../gallery/state/gallery.actions';
+import { ImageType } from '../shared/model/image-type.model';
+import { LocalStorageRelatedService } from '../shared/services/localstorage-related.service';
+import { FileNameService } from '../shared/services/file-name.service';
+
+@Injectable({ providedIn: 'root' })
 export class DragDropUploadService {
-    sharedGalleryService = inject(SharedGalleryService);
-    files = signal<NgxFileDropEntry[]>([]);
-    images = this.sharedGalleryService.images;
+  localStorageRelatedService = inject(LocalStorageRelatedService);
+  private fileNameService = inject(FileNameService);
 
-    constructor() {
-        console.log("DragDropUploadService INIT.");
+  store = inject(Store);
 
-        const savedImages = this.sharedGalleryService.getImages('addedImages');
+  files = signal<NgxFileDropEntry[]>([]);
 
-        if (savedImages.length > 0) {
-            this.images.set(savedImages);
-        }
+  droppedFiles$ = this.store.select(selectAddDroppedFiles);
+  addedImages$ = this.store.select(selectAddImages);
+  isAdding$ = this.store.select(selectIsAdding);
+
+  constructor() {
+    console.log('DragDropUploadService INIT.');
+
+    this.loadSavedImages();
+  }
+
+  loadSavedImages() {
+    console.log('loadSavedImages().');
+    try {
+      const savedImages = this.localStorageRelatedService.getImages('addedImages');
+
+      if (savedImages.length > 0) {
+        this.store.dispatch(GalleryActions.addImagesSuccess(savedImages));
+      }
+    } catch (error) {
+      console.error('loadSavedImages()_Error: ', error);
     }
+  }
 
+  removeAddedImages(srcsToRemove: string[]) {
+    console.log('removeAddedImages().');
+    this.store.dispatch(GalleryActions.removeAddedImages({ srcsToRemove }));
+  }
 
-    addImage(image: { src: string, alt: string, relativePath: string }) {
-        console.log("addImage().");
+  removeGalleryImages(srcsToRemove: string[]) {
+    console.log('removeGalleryImages().');
+    console.log('removeGalleryImages()_srcsToRemove: ', srcsToRemove);
 
-        this.images.update(imgs => { // This updates the images array.
-            const currentImgs = Array.isArray(imgs) ? imgs : []; // This makes sure that imgs is an array.
-            return [...currentImgs, image];
+    this.store.dispatch(GalleryActions.removeAddedImages({ srcsToRemove }));
+    this.localStorageRelatedService.syncImageStores();
+
+    return this.addedImages$;
+  }
+
+  getDropped(files: NgxFileDropEntry[]) {
+    console.log('getDropped().');
+
+    this.files.set(files);
+    // Is it a file?
+    for (const droppedFile of files) {
+      if (droppedFile.fileEntry.isFile) {
+        const fileEntry = droppedFile.fileEntry as FileSystemFileEntry; // Casts the fileEntry to FileSystemFileEntry to access file methods.
+        fileEntry.file((file: File) => {
+          this.getHandleFile(file, droppedFile.relativePath);
+          // Here you can access the real file
+          console.log('getDropped()_droppedFile.relativePath, file: ', droppedFile.relativePath, file);
+          this.store.dispatch(GalleryActions.addDroppedFiles({ files: [droppedFile] }));
         });
-        this.sharedGalleryService.saveToLocalStorage("addedImages", this.images());
+      } else {
+        // It was a directory (empty directories are added, otherwise only files)
+        const fileEntry = droppedFile.fileEntry as FileSystemDirectoryEntry;
+        console.log('getDropped()_droppedFile.relativePath, fileEntry: ', droppedFile.relativePath, fileEntry);
+      }
     }
+    console.log(
+      'getDropped()_this.files().relativePath',
+      this.files().map(file => file.relativePath)
+    );
+  }
 
-    removeGalleryImages(srcsToRemove: string[]) {
-        console.log("removeGalleryImages().");
-        console.log("removeGalleryImages()_srcsToRemove: ", srcsToRemove);
+  getHandleFile(file: File, relativePath: string) {
+    console.log('getHandleFile().');
 
-        const updatedImages = this.sharedGalleryService.removeImages("addedImages", srcsToRemove);
+    const reader = new FileReader(); // This is used to read the file as a data URL.
 
-        this.images.set(updatedImages);
-        console.log("removeGalleryImages()_images(): ", this.images());
-
-        const allUpdatedImages = this.sharedGalleryService.syncImageStores();
-        console.log("removeGalleryImages()_allUpdatedImages: ", allUpdatedImages);
-
-        return allUpdatedImages;
-    }
-
-    getDropped(files: NgxFileDropEntry[]) {
-        console.log("getDropped().");
-
-        this.files.set(files);
-        for (const droppedFile of files) {
-
-            // Is it a file?
-            if (droppedFile.fileEntry.isFile) {
-                const fileEntry = droppedFile.fileEntry as FileSystemFileEntry; // Casts the fileEntry to FileSystemFileEntry to access file methods. 
-                fileEntry.file((file: File) => {
-                    this.getHandleFile(file, droppedFile.relativePath);
-                    // Here you can access the real file
-                    console.log("getDropped()_droppedFile.relativePath, file: ", droppedFile.relativePath, file);
-                });
-
-            } else {
-                // It was a directory (empty directories are added, otherwise only files)
-                const fileEntry = droppedFile.fileEntry as FileSystemDirectoryEntry;
-                console.log("getDropped()_droppedFile.relativePath, fileEntry: ", droppedFile.relativePath, fileEntry);
-            }
-        }
-        console.log("getDropped()_this.files().relativePath", this.files().map(file => file.relativePath));
-        this.sharedGalleryService.saveToLocalStorage("addedImages", this.files());
-    }
-
-    getHandleFile(file: File, relativePath: string) {
-        console.log("getHandleFile().");
-
-        const reader = new FileReader(); // This is used to read the file as a data URL. 
-        reader.onload = (e: any) => { // This event is triggered when the file is read successfully. 
-            this.addImage({ // This adds the image to the images array. 
-                src: e.target.result,
-                alt: this.sharedGalleryService.normaliseFileName(file.name),
-                relativePath: this.sharedGalleryService.normaliseFileName(relativePath)
-            });
-        };
-        reader.readAsDataURL(file); // This reads the file as a data URL, which is suitable for displaying images in the browser. 
-    }
-
+    // This event is triggered when the file is read successfully.
+    reader.onload = (e: any) => {
+      // This adds the image to the images array.
+      const image: ImageType = {
+        src: e.target.result,
+        alt: this.fileNameService.normaliseFileName(file.name),
+        relativePath: this.fileNameService.normaliseFileName(relativePath),
+      };
+      this.store.dispatch(GalleryActions.addImages({ image }));
+      this.localStorageRelatedService.saveToLocalStorage('addedImages', image);
+      console.log('getHandleFile()_image', image);
+    };
+    reader.readAsDataURL(file); // This reads the file as a data URL, which is suitable for displaying images in the browser.
+  }
 }

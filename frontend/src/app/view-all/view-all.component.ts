@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 
 import { DragDropUploadComponent } from "../drag-drop-upload/drag-drop-upload.component";
-import { GalleryComponent } from "../gallery/gallery.component";
+import { GalleryComponent } from "../gallery/components/gallery.component";
 import { AuthService } from '../auth/auth.service';
 
 @Component({

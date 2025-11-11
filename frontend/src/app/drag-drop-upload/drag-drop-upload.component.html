@@ -1,44 +1,68 @@
 <div class="row drag-and-drop-upload-container">
+  @if(this.authService.currentUser() !== undefined){
+  <div class="center">
+    <!-- @if(isAdding$ | async){
+    <img
+      src="../../assets/loading-circle-icon.gif"
+      alt="Adding image."
+      tabindex="0"
+    />
+    } -->
 
-    @if(this.authService.currentUser() !== undefined){
-    <div class="center">
+    <ngx-file-drop
+      dropZoneLabel="Drop files here"
+      (onFileDrop)="dropped($event)"
+      (onFileOver)="fileOver($event)"
+      (onFileLeave)="fileLeave($event)"
+    >
+      <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+        <ng-container *ngIf="setOpenFileSelector(openFileSelector)"></ng-container>
+        Drag and drop upload
+        <button class="browse-files-button" type="button" (click)="openFileSelector()">
+          Browse Files
+        </button>
+      </ng-template>
+    </ngx-file-drop>
 
-        <ngx-file-drop dropZoneLabel="Drop files here" (onFileDrop)="dropped($event)" (onFileOver)="fileOver($event)"
-            (onFileLeave)="fileLeave($event)">
+    <div class="upload-table">
+      @if(files().length > 0){
 
-            <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
-                <ng-container *ngIf="setOpenFileSelector(openFileSelector)"></ng-container>
-                Drag and drop upload
-                <button class="browse-files-button" type="button" (click)="openFileSelector()">Browse Files</button>
-            </ng-template>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Preview</th>
+          </tr>
+        </thead>
+        <tbody class="upload-name-style">
+          @for(file of files(); track file.relativePath){
+          <tr>
+            <td>
+              <strong>{{ file.relativePath }}</strong>
+            </td>
 
-        </ngx-file-drop>
+            <td class="image-preview">
+              @if(addedImages$ | async; as images){ @if(getImageForFile(file, images); as image){
+              <img class="preview-image" [src]="image.src" [alt]="image.relativePath" />
 
-        <div class="upload-table">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                    </tr>
-                </thead>
-                <tbody class="upload-name-style">
-                    @for(item of files(); track item.relativePath; let i = $index){
-                    <tr>
-                        <td><strong>{{ item.relativePath }}</strong></td>
-
-                        @for(image of this.dragDropUploadService.images(); track image){
-                        @if(item.relativePath === image.relativePath){
-                        <td><img class="preview-image" [src]="image.src" [alt]="image.relativePath" /></td>
-                        }
-                        }
-                    </tr>
-                    }
-
-                </tbody>
-            </table>
-        </div>
+              }@else {
+              <p>Processing image.</p>
+              }}
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      }@else {
+      <div class="no-files">
+        <p>No files added yet.</p>
+      </div>
+      }
     </div>
-    }@else {
-    <p class="not-logged-in">You are not logged in. Please login to be able to do anything_Drag_Drop.</p>
-    }
+  </div>
+  }@else {
+  <p class="not-logged-in">
+    You are not logged in. Please login to be able to do anything_Drag_Drop.
+  </p>
+  }
 </div>

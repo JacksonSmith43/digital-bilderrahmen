@@ -23,6 +23,8 @@ At one point, when trying to solve the CORS issue an error
 Certain software has to be installed before starting: 
 - [Node.js und npm](https://nodejs.org/) 
 - [Angular CLI](https://angular.io/cli): `npm install -g @angular/cli`
+- NgRx (installing it not globally): `npx -p @angular/cli ng add @ngrx/store @ngrx/effects @ngrx/store-devtools @ngrx/reducers @ngrx/actions`
+
 
 
 ## Things to install

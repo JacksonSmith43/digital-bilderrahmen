@@ -6,36 +6,39 @@ import { CommonModule } from '@angular/common';
 import { DragDropUploadService } from './drag-drop-upload.service';
 import { NavbarService } from '../navbar/navbar.service';
 import { AuthService } from '../auth/auth.service';
+import { FileNameService } from '../shared/services/file-name.service';
 
 @Component({
   selector: 'app-drag-drop-upload',
   imports: [NgxFileDropModule, CommonModule],
   templateUrl: './drag-drop-upload.component.html',
-  styleUrl: './drag-drop-upload.component.css'
+  styleUrl: './drag-drop-upload.component.css',
 })
-
 export class DragDropUploadComponent implements AfterViewInit, OnInit {
-
   navService = inject(NavbarService);
   dragDropUploadService = inject(DragDropUploadService);
   authService = inject(AuthService);
+  private fileNameService = inject(FileNameService);
 
-  imageUrls = this.dragDropUploadService.images;
+  imageUrls = this.dragDropUploadService.addedImages$;
   files = this.dragDropUploadService.files;
 
-  private openFileSelectorFn?: () => void; // Stores a function that opens the file selector dialog (provided by ngx-file-drop). 
+  addedImages$ = this.dragDropUploadService.addedImages$;
+  isAdding$ = this.dragDropUploadService.isAdding$;
 
-  setOpenFileSelector(fn: () => void) { // This method is called (from the template) to save the file selector function for later use. 
-    this.openFileSelectorFn = fn; // The value of the function is saved in the openFileSelectorFn variable. 
+  private openFileSelectorFn?: () => void; // Stores a function that opens the file selector dialog (provided by ngx-file-drop).
+
+  setOpenFileSelector(fn: () => void) {
+    // This method is called (from the template) to save the file selector function for later use.
+    this.openFileSelectorFn = fn; // The value of the function is saved in the openFileSelectorFn variable.
   }
-
 
   ngOnInit(): void {
     this.files.set([]);
   }
 
   ngAfterViewInit() {
-    console.log("DragDropUploadComponent_ngAfterViewInit().");
+    console.log('DragDropUploadComponent_ngAfterViewInit().');
 
     if (this.navService.isAddImage && this.openFileSelectorFn) {
       this.openFileSelectorFn();
@@ -43,18 +46,33 @@ export class DragDropUploadComponent implements AfterViewInit, OnInit {
     }
   }
 
+  getImageForFile(file: NgxFileDropEntry, addedImage: any[]): any {
+    // console.log('getImageForFile().');
+    let found = addedImage.find(img => img.relativePath === file.relativePath);
+
+    if (!found) {
+      const normalisedFile = this.fileNameService.normaliseFileName(file.relativePath);
+      found = addedImage.find(
+        img =>
+          this.fileNameService.normaliseFileName(img.relativePath) === normalisedFile ||
+          this.fileNameService.normaliseFileName(img.alt) === normalisedFile
+      );
+    }
+
+    return found; // Returns the found image (src, alt, relativePath) or undefined if not found.
+  }
 
   public dropped(files: NgxFileDropEntry[]) {
-    console.log("dropped: ", files);
+    console.log('dropped: ', files);
     this.dragDropUploadService.getDropped(files);
+    console.log('addedImages$', this.addedImages$);
   }
 
   public fileOver(event: any) {
-    console.log("fileOver: ", event);
+    console.log('fileOver: ', event);
   }
 
   public fileLeave(event: any) {
-    console.log("fileLeave: ", event);
+    console.log('fileLeave: ', event);
   }
-
 }
