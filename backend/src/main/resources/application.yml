@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: bilderrahmen-backend
+  
+  # Database connection
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bilderrahmen
+    username: admin
+    password: admin123
+    driver-class-name: org.postgresql.Driver
+  
+  # JPA/Hibernate settings
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # Erstellt Tabellen automatisch für Development
+    show-sql: true          # Zeigt SQL-Queries in der Konsole
+    
+# Server configuration  
+server:
+  port: 8080

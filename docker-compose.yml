@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: bilderrahmen-db
+    environment:
+      POSTGRES_DB: bilderrahmen
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bilderrahmen-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: bilderrahmen-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@bilderrahmen.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "8081:80"
+    depends_on:
+      - postgres
+    networks:
+      - bilderrahmen-network
+
+volumes:
+  postgres_data:
+
+networks:
+  bilderrahmen-network:
+    driver: bridge
