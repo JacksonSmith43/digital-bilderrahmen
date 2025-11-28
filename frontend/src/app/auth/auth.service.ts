@@ -18,7 +18,8 @@ export class AuthService {
     return this.http.post(`/auth/login/${email}`, password, { responseType: 'text' });
   }
 
-  logout(email: string, password: string) {
-    return this.http.post(`/auth/logout/${email}`, password, { responseType: 'text' });
+  // Stateless (does not save previous states) logout. No backend required.
+  logout() {
+    this.currentUser.set(undefined);
   }
 }

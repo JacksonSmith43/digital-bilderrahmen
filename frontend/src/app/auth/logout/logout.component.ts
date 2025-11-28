@@ -12,15 +12,8 @@ export class LogoutComponent {
   authService = inject(AuthService);
   router = inject(Router);
 
-  email = this.authService.currentUser()?.email ?? ''; // ?? "" is Optional Chaining.
-  password = this.authService.currentUser()?.password ?? '';
-
   constructor() {
-    this.authService.logout(this.email, this.password).subscribe({
-      next: () => {
-        this.authService.currentUser.set(undefined);
-        this.router.navigateByUrl('/login');
-      },
-    });
+    this.authService.logout();
+    this.router.navigateByUrl('/login');
   }
 }
