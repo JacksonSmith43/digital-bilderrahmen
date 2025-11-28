@@ -3,7 +3,7 @@ import { NgxFileDropEntry } from 'ngx-file-drop';
 import { NgxFileDropModule } from 'ngx-file-drop';
 import { CommonModule } from '@angular/common';
 
-import { DragDropUploadService } from './drag-drop-upload.service';
+import { DragDropUploadService } from './service/drag-drop-upload.service';
 import { NavbarService } from '../navbar/navbar.service';
 import { AuthService } from '../auth/auth.service';
 import { FileNameService } from '../shared/services/file-name.service';
@@ -20,11 +20,11 @@ export class DragDropUploadComponent implements AfterViewInit, OnInit {
   authService = inject(AuthService);
   private fileNameService = inject(FileNameService);
 
-  imageUrls = this.dragDropUploadService.addedImages$;
+  // imageUrls = this.dragDropUploadService.addedImages$;
   files = this.dragDropUploadService.files;
 
-  addedImages$ = this.dragDropUploadService.addedImages$;
-  isAdding$ = this.dragDropUploadService.isAdding$;
+  addedImages = this.dragDropUploadService.addedImages;
+  // isAdding$ = this.dragDropUploadService.isAdding$;
 
   private openFileSelectorFn?: () => void; // Stores a function that opens the file selector dialog (provided by ngx-file-drop).
 
@@ -65,7 +65,7 @@ export class DragDropUploadComponent implements AfterViewInit, OnInit {
   public dropped(files: NgxFileDropEntry[]) {
     console.log('dropped: ', files);
     this.dragDropUploadService.getDropped(files);
-    console.log('addedImages$', this.addedImages$);
+    console.log('addedImages$', this.addedImages());
   }
 
   public fileOver(event: any) {

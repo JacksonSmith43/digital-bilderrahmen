@@ -3,25 +3,24 @@ import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router } from '@angular/router';
 
 import { AuthService } from '../auth.service';
+
 @Component({
   selector: 'app-register',
   imports: [ReactiveFormsModule],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.css'
+  styleUrl: './register.component.css',
 })
-
 export class RegisterComponent {
-  private authService = inject(AuthService)
+  private authService = inject(AuthService);
   private router = inject(Router);
 
   isRegistrationSuccessful = false;
   errorMessage = signal<string | undefined>(undefined);
 
   registerForm = new FormGroup({
-    email: new FormControl("", [Validators.required, Validators.email]),
-    password: new FormControl("", [Validators.required, Validators.minLength(6), Validators.maxLength(20)]),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required, Validators.minLength(6), Validators.maxLength(20)]),
   });
-
 
   get emailControl() {
     return this.registerForm.controls.email;
@@ -32,7 +31,7 @@ export class RegisterComponent {
   }
 
   onSubmit(email: string, password: string) {
-    console.log("onSubmit().");
+    console.log('onSubmit().');
 
     if (this.registerForm.invalid) {
       this.isRegistrationSuccessful = false;
@@ -48,20 +47,18 @@ export class RegisterComponent {
         next: () => {
           this.isRegistrationSuccessful = true;
 
-          setTimeout((() => {
+          setTimeout(() => {
             this.isRegistrationSuccessful = false;
             this.registerForm.reset();
-            this.router.navigateByUrl("/login");
-
-          }), 2000)
+            this.router.navigateByUrl('/login');
+          }, 2000);
         },
-        error: (error) => {
-          console.error("onSubmit()_error: ", error);
+        error: error => {
+          console.error('onSubmit()_error: ', error);
           this.errorMessage.set(error.message);
           this.isRegistrationSuccessful = false;
-        }
+        },
       });
     }
   }
-
 }

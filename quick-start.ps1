@@ -89,14 +89,77 @@ function Start-Services {
     }
     
     Write-Info "Starting Angular in background... with npm start"
-    $FrontendJob = Start-Job -ScriptBlock {
-        Set-Location "frontend"
-        npm start 2>&1 | Out-File "..\angular.log" -Append
+    
+    # Clear old log file
+    if (Test-Path "angular.log") {
+        Remove-Item "angular.log" -Force
     }
     
-    Write-Success "[OK] Angular starting (Job ID: $($FrontendJob.Id))"
+    # Use Start-Process instead of Start-Job for better file output
+    $angularProcess = Start-Process -FilePath "powershell.exe" `
+        -ArgumentList "-NoProfile", "-Command", "cd frontend; npm start 2>&1 | Tee-Object -FilePath ..\angular.log" `
+        -WorkingDirectory $PWD `
+        -WindowStyle Hidden `
+        -PassThru
+    
+    Write-Success "[OK] Angular starting (Process ID: $($angularProcess.Id))"
     Write-Info "  - Frontend: http://localhost:4200"
     Write-Info "  - Logs: angular.log"
+    Write-Host ""
+    
+    # Wait for Angular to compile and check for errors
+    Write-Info "Checking Angular compilation..."
+    
+    $maxWait = 30
+    $waited = 0
+    $compiled = $false
+    
+    while ($waited -lt $maxWait) {
+        Start-Sleep -Seconds 2
+        $waited += 2
+        
+        if (Test-Path "angular.log") {
+            $angularLog = Get-Content "angular.log" -Raw -ErrorAction SilentlyContinue
+            
+            # Check for compilation failure
+            if ($angularLog -match "Application bundle generation failed") {
+                Write-Error "[ERROR] Angular compilation FAILED!"
+                Write-Host ""
+                Write-Host "Recent errors:" -ForegroundColor Yellow
+                Get-Content "angular.log" | Select-String "\[ERROR\]" | Select-Object -First 10 | ForEach-Object { 
+                    Write-Warning "  $_" 
+                }
+                Write-Host ""
+                Write-Warning "Full log: angular.log | Fix TypeScript errors!"
+                $compiled = $true
+                break
+            }
+            
+            # Check for successful compilation
+            if ($angularLog -match "Application bundle generation complete") {
+                Write-Success "[OK] Angular compiled successfully"
+                $compiled = $true
+                break
+            }
+            
+            # Check for TypeScript errors
+            if ($angularLog -match "\[ERROR\]") {
+                Write-Error "[ERROR] TypeScript errors detected!"
+                Write-Host ""
+                Get-Content "angular.log" | Select-String "\[ERROR\]" | Select-Object -First 5 | ForEach-Object { 
+                    Write-Warning "  $_" 
+                }
+                Write-Host ""
+                Write-Warning "Check angular.log for details"
+            }
+        }
+        
+        Write-Host "." -NoNewline
+    }
+    
+    if (-not $compiled) {
+        Write-Warning "`n[WARN] Angular still compiling... check angular.log"
+    }
     Write-Host ""
     
     # Summary
@@ -138,9 +201,9 @@ function Stop-Services {
     Write-Host ""
     Write-Host "Stopping Services..." -ForegroundColor Red
     
-    # Stop jobs
-    Get-Job | Stop-Job
-    Get-Job | Remove-Job
+    # Stop jobs (for Spring Boot)
+    Get-Job | Stop-Job -ErrorAction SilentlyContinue
+    Get-Job | Remove-Job -ErrorAction SilentlyContinue
     Write-Success "[OK] Background jobs stopped"
     
     # Stop Docker
@@ -150,7 +213,8 @@ function Stop-Services {
     # Kill processes
     Get-Process -Name "java" -ErrorAction SilentlyContinue | Stop-Process -Force
     Get-Process -Name "node" -ErrorAction SilentlyContinue | Stop-Process -Force
-    Write-Success "[OK] Java and Node processes stopped"
+    Get-Process -Name "ng" -ErrorAction SilentlyContinue | Stop-Process -Force
+    Write-Success "[OK] Java, Node, and Angular processes stopped"
     
     Write-Host ""
     Write-Success "All services stopped"

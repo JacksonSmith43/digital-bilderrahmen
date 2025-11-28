@@ -7,9 +7,8 @@ import { Router } from '@angular/router';
   selector: 'app-login',
   imports: [ReactiveFormsModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
 })
-
 export class LoginComponent {
   private authService = inject(AuthService);
   router = inject(Router);
@@ -17,11 +16,9 @@ export class LoginComponent {
   isLoginSuccessful = false;
 
   loginForm = new FormGroup({
-    email: new FormControl("", [Validators.required, Validators.email]),
-    password: new FormControl("", [Validators.required, Validators.minLength(6), Validators.maxLength(20)]),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required, Validators.minLength(6), Validators.maxLength(20)]),
   });
-
-
 
   get emailControl() {
     return this.loginForm.controls.email;
@@ -32,7 +29,7 @@ export class LoginComponent {
   }
 
   onSubmit(email: string, password: string) {
-    console.log("onSubmit().");
+    console.log('onSubmit().');
 
     if (this.loginForm.invalid) {
       this.isLoginSuccessful = false;
@@ -40,16 +37,18 @@ export class LoginComponent {
     }
 
     this.authService.login(email, password).subscribe({
-      next: (user) => {
+      next: user => {
         this.authService.currentUser.set(user);
-        this.router.navigateByUrl("/viewAll");
+        this.isLoginSuccessful = true;
+        setTimeout(() => {
+          this.router.navigateByUrl('/viewAll');
+        }, 1000);
       },
-      error: (error) => {
-        console.error("onSubmit()_error: ", error);
+      error: error => {
+        console.error('onSubmit()_error: ', error);
         this.errorMessage.set(error.message);
         this.isLoginSuccessful = false;
-      }
-    })
+      },
+    });
   }
-
 }

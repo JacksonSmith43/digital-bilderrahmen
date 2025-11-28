@@ -56,13 +56,13 @@
         <br />
 
         <div class="interval-images">
-          <img
+          <!-- <img
             *ngIf="chosenImages()[currentImageIndex]"
             [src]="chosenImages()[currentImageIndex].src"
             [alt]="chosenImages()[currentImageIndex].alt"
             tabindex="0"
             role="button"
-          />
+          /> -->
 
           <button type="button" class="btn btn-primary stop-diashow-button" (click)="stopDiashow()">
             Stop diashow
@@ -99,7 +99,7 @@
       @if(deviceImagesLength() > 0){
 
       <div class="accordion-body">
-        @for(i of chosenImages(); track i.src){
+        <!-- @for(i of chosenImages(); track i.src){
         <img
           [src]="i.src"
           [alt]="i.alt"
@@ -111,7 +111,7 @@
           tabindex="0"
           role="button"
         />
-        }
+        } -->
       </div>
       <button class="delete-images-button btn btn-danger" (click)="onRemoveImage()">Delete</button>
 

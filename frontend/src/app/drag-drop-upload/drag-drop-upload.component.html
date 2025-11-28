@@ -42,7 +42,7 @@
             </td>
 
             <td class="image-preview">
-              @if(addedImages$ | async; as images){ @if(getImageForFile(file, images); as image){
+              @if(addedImages()){ @if(getImageForFile(file, addedImages()); as image){
               <img class="preview-image" [src]="image.src" [alt]="image.relativePath" />
 
               }@else {

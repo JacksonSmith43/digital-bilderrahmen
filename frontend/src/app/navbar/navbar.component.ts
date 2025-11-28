@@ -3,7 +3,6 @@ import { RouterLink } from "@angular/router";
 
 import { NavbarService } from './navbar.service';
 import { AuthService } from '../auth/auth.service';
-import { User as FireAuthUser } from '@angular/fire/auth';
 import { User } from '../auth/login/login.model';
 
 @Component({
@@ -16,20 +15,20 @@ import { User } from '../auth/login/login.model';
 export class NavbarComponent {
   private navService = inject(NavbarService);
   authService = inject(AuthService);
-
-  constructor() {
-    this.authService.user$.subscribe({ // This is required to get the current user, so that the navbar can be updated when the user logs in or out. 
-      next: (user: FireAuthUser | null) => {
-        if (user) {
-          const applicationUser: User = {
-            email: user.email!,
-            id: user.uid
-          };
-          this.authService.currentUser.set(applicationUser);
-        }
-      }
-    });
-  }
+  
+  // constructor() {
+  //   this.authService.currentUser.subscribe({ // This is required to get the current user, so that the navbar can be updated when the user logs in or out. 
+  //     next: (user) => {
+  //       if (user) {
+  //         const applicationUser: User = {
+  //           email: user.email!,
+  //           id: user.uid
+  //         };
+  //         this.authService.currentUser.set(applicationUser);
+  //       }
+  //     }
+  //   });
+  // }
 
   onAllView() {
     return this.navService.getAllView();

@@ -23,7 +23,7 @@ export class FileNameService {
 
   extractImageName(imageSrc: string, imageObj?: ImageType): string {
     if (imageSrc.startsWith('data:')) {
-      let extractedName = imageObj?.relativePath || imageObj?.alt;
+      let extractedName = imageObj?.fileName;
 
       if (!extractedName || extractedName.includes('data:image') || extractedName.includes('base64')) {
         const timestamp = Date.now();
@@ -66,27 +66,26 @@ export class FileNameService {
     return imageName;
   }
 
-  generateBase64ImageName(img: ImageType, name?: string): ImageType {
-    console.log('generateBase64ImageName().');
+  // generateBase64ImageName(img: ImageType, name?: string): ImageType {
+  //   console.log('generateBase64ImageName().');
 
-    if (img.src.startsWith('data:')) {
-      console.log('generateBase64ImageName()_Base64 image.');
+  //   if (img.src.startsWith('data:')) {
+  //     console.log('generateBase64ImageName()_Base64 image.');
 
-      let cleanName = name;
-      if (name?.includes('data:image') || name?.includes('base64') || !name) {
-        const timestamp = Date.now();
-        cleanName = `base64_${timestamp}.jpg`;
-        console.warn('generateBase64ImageName()_Using fallback name:', cleanName);
-      }
+  //     let cleanName = name;
+  //     if (name?.includes('data:image') || name?.includes('base64') || !name) {
+  //       const timestamp = Date.now();
+  //       cleanName = `base64_${timestamp}.jpg`;
+  //       console.warn('generateBase64ImageName()_Using fallback name:', cleanName);
+  //     }
 
-      console.log('generateBase64ImageName()_final name:', cleanName);
+  //     console.log('generateBase64ImageName()_final name:', cleanName);
 
-      return {
-        src: img.src,
-        alt: cleanName,
-        relativePath: cleanName,
-      };
-    }
-    return img;
-  }
+  //     return {
+  //       src: img.src,
+  //       fileName: cleanName,
+  //     };
+  //   }
+  //   return img;
+  // }
 }
