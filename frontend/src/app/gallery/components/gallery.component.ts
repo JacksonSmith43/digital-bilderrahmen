@@ -5,6 +5,7 @@ import { AuthService } from '../../auth/auth.service';
 import { ImageType } from '../../shared/model/image-type.model';
 import { LocalStorageRelatedService } from '../../shared/services/localstorage-related.service';
 import { GalleryService } from '../services/gallery.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-gallery',
@@ -19,9 +20,9 @@ export class GalleryComponent implements OnInit {
 
   selectedSrcs = this.galleryService.selectedSrcs;
   galleryImages = this.galleryService.galleryImages;
-  galleryImagesLength = computed(() => this.galleryService.galleryImages().length);
   isRemoving = this.galleryService.isRemoving;
 
+  galleryImagesLength = computed(() => this.galleryService.galleryImages().length);
   isImageLoaded = computed(
     () => this.galleryService.galleryImages() !== undefined && this.galleryService.galleryImages() !== null
   );
@@ -33,14 +34,15 @@ export class GalleryComponent implements OnInit {
       let galleryImages: ImageType[] = this.localStorageRelatedService.getImages('galleryImages');
       console.log('ngOnInit()_galleryImages: ', galleryImages);
       console.log('ngOnInit()_galleryImages.length: ', galleryImages.length);
-      
+
+      console.log('ngOnInit()_galleryImages()', this.galleryImages());
+
       this.onFetchAllImages();
 
       if (addedImages.length > 0) {
         let allImages = [...galleryImages, ...addedImages];
         console.log('ngOnInit()_allImages: ', allImages);
         this.localStorageRelatedService.saveToLocalStorage('galleryImages', allImages);
-      
       } else if (addedImages.length === 0) {
         this.localStorageRelatedService.saveToLocalStorage('galleryImages', galleryImages);
       }
@@ -51,7 +53,11 @@ export class GalleryComponent implements OnInit {
 
   onHighlightImageSelection(src: string) {
     console.log('onHighlightImageSelection().');
-    return this.galleryService.galleryHighlightSrcs(src);
+    this.galleryService.getHighlightImageSelection(src);
+  }
+
+  isImageSelected(src: string): boolean {
+    return this.selectedSrcs().includes(src);
   }
 
   onRemoveImage(image: ImageType) {
@@ -65,25 +71,19 @@ export class GalleryComponent implements OnInit {
     console.log('onSelectForDevice().');
   }
 
-  onUploadAllImages() {
-    console.log('onUploadAllImages().');
-
-    this.galleryService.uploadAllImages(this.galleryImages()).subscribe({
-      next: uploadedImages => {
-        console.log('onUploadAllImages()_Images uploaded successfully: ', uploadedImages);
-        this.galleryImages.set(uploadedImages);
-      },
-      error: error => console.error('onUploadAllImages()_Upload failed: ', error),
-    });
-  }
-
   onFetchAllImages() {
     console.log('onFetchAllImages().');
 
     this.galleryService.fetchAllImages().subscribe({
       next: images => {
         console.log('onFetchAllImages()_Images fetched successfully: ', images);
+        console.log('onFetchAllImages()_Number of images: ', images.length);
+        console.log('onFetchAllImages()_First image filePath: ', images[0]?.filePath);
         this.galleryImages.set(images);
+        console.log('onFetchAllImages()_this.galleryImages: ', this.galleryImages());
+
+        // Save to localStorage after images have been loaded.
+        this.localStorageRelatedService.saveToLocalStorage('galleryImages', this.galleryImages());
       },
       error: error => console.error('onFetchAllImages()_Fetch failed: ', error),
     });

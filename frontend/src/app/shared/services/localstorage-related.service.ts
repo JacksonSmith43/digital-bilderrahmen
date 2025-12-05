@@ -1,18 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { NgxFileDropEntry } from 'ngx-file-drop';
-import { firstValueFrom } from 'rxjs';
 
 import { ImageType } from '../model/image-type.model';
 import { FileNameService } from './file-name.service';
 
 @Injectable({ providedIn: 'root' })
 export class LocalStorageRelatedService {
-  private store = inject(Store);
   private fileNameService = inject(FileNameService);
-
-  // galleryImages$ = this.store.select(selectUpdateGalleryImages);
-  // addedImages$ = this.store.select(selectAddImages);
 
   getImages(key: 'galleryImages' | 'addedImages' | 'chosenImagesSrcs') {
     console.log('getImages().');
@@ -31,34 +24,11 @@ export class LocalStorageRelatedService {
 
   saveToLocalStorage(
     key: 'galleryImages' | 'addedImages' | 'chosenImagesSrcs' | 'deletedSrcArr',
-    images: string[] | ImageType[] | ImageType | NgxFileDropEntry[]
+    images: string[] | ImageType[] | ImageType | File
   ) {
     console.log('saveToLocalStorage().');
     localStorage.setItem(key, JSON.stringify(images));
-    // this.store.dispatch(SharedActions.clearSelection());
   }
-
-  // async syncAllImageStores(): Promise<ImageType[]> {
-  //   console.log('syncAllImageStores().');
-
-  //   localStorage.removeItem('galleryImages');
-  //   localStorage.removeItem('addedImages');
-
-  //   const galleryImages = await firstValueFrom(this.galleryImages$);
-  //   const addedImages = await firstValueFrom(this.addedImages$);
-
-  //   this.saveToLocalStorage('galleryImages', galleryImages);
-  //   this.saveToLocalStorage('addedImages', addedImages);
-
-  //   console.log('syncAllImageStores()_galleryImages.length: ', galleryImages.length);
-  //   console.log('syncAllImageStores()_addedImages.length: ', addedImages.length);
-  //   console.log('syncAllImageStores()_galleryImages: ', galleryImages);
-
-  //   return galleryImages;
-  // }
-
-
- 
 
   async savingSizeCheck(key: string, images: string[], imagesSrc: ImageType[]) {
     const jsonString = JSON.stringify(imagesSrc);
@@ -84,5 +54,4 @@ export class LocalStorageRelatedService {
       }
     }
   }
-
 }

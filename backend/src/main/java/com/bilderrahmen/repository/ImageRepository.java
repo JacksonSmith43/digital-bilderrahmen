@@ -11,19 +11,17 @@ import java.time.LocalDateTime;
 @Repository
 public interface ImageRepository extends JpaRepository<Image, Long> {
 
-    // List<Image> findByFileName(String fileName);
+    List<Image> findByFileName(String fileName);
 
-    // List<Image> findByDescription(String description);
+    List<Image> findByFilePath(String filePath);
 
-    // List<Image> findByFilePath(String filePath);
+    List<Image> findByFileSize(Long fileSize);
 
-    // List<Image> findByFileSize(Long fileSize);
-
-    // List<Image> findByUploadDate(LocalDateTime uploadDate);
+    List<Image> findByUploadDate(LocalDateTime uploadDate);
 
     // List<Image> findAllByUploadDateDesc();
 
-    // List<Image> findAll();
+    List<Image> findAll();
 
     // void deleteByFileName(@Param("fileName") Long fileName);
 

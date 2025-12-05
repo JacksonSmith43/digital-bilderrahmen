@@ -9,25 +9,25 @@
     <div class="col-auto text-center">
       @if(isImageLoaded()){ 
         @if((galleryImagesLength() )> 0){ 
-          @for(i of galleryImages(); track i.src; let index = $index; let last = $last){
-          <img
-            [src]="i.src"
+          @for(i of galleryImages(); track i.id; let index = $index; let last = $last){
+          <img 
+          [src]="i.filePath"
             [alt]="i.fileName"
             (click)="onHighlightImageSelection(i.src)"
             (keydown.enter)="onHighlightImageSelection(i.src); $event.preventDefault()"
             (keydown.space)="onHighlightImageSelection(i.src); $event.preventDefault()"
-            [ngClass]="selectedSrcs() ? 'image-selected' : 'image-unselected'"
-            [attr.aria-pressed]="onHighlightImageSelection(i.src)"
+            [ngClass]="isImageSelected(i.src) ? 'image-selected' : 'image-unselected'"
+            [attr.aria-pressed]="isImageSelected(i.src)"
             tabindex="0"
             role="button"
           />
-      @if(last){
-      <p class="image-number" tabindex="0">Number of images: {{ galleryImagesLength() }}</p>
-      <button class="btn btn-danger" (click)="onRemoveImage(i)" [disabled]="isRemoving()" >Delete</button>
-      <button class="btn btn-primary" (click)="onSelectForDevice(i)">Select for Device</button>
-      <button class="btn btn-primary" (click)="onUploadAllImages()">Upload all images</button>
-      <button class="btn btn-primary" (click)="onFetchAllImages()">Fetch all images</button>
-      } } }@else {
+          @if(last){
+            <p class="image-number" tabindex="0">Number of images: {{ galleryImagesLength() }}</p>
+            <button class="btn btn-danger" (click)="onRemoveImage(i)" [disabled]="isRemoving()" >Delete</button>
+            <button class="btn btn-primary" (click)="onSelectForDevice(i)">Select for Device</button>
+            <button class="btn btn-primary" (click)="onFetchAllImages()">Fetch all images</button>
+          } 
+        } }@else {
       <p tabindex="0" role="status">No images to display</p>
       <button class="btn btn-primary" (click)="onFetchAllImages()">Fetch all images</button>
       } }@else {

@@ -1,5 +1,4 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
@@ -7,7 +6,6 @@ import { ImageType } from '../../shared/model/image-type.model';
 
 @Injectable({ providedIn: 'root' })
 export class GalleryService {
-  store = inject(Store);
   private http = inject(HttpClient);
 
   selectedSrcs = signal<string[]>([]);
@@ -17,10 +15,6 @@ export class GalleryService {
 
   constructor() {
     console.log('GalleryService INIT.');
-  }
-
-  get galleryHighlightSrcs() {
-    return this.getHighlightImageSelection;
   }
 
   getHighlightImageSelection(src: string) {
@@ -43,8 +37,13 @@ export class GalleryService {
     return this.http.delete<void>(`/api/gallery/images/${id}`);
   }
 
-  uploadAllImages(images: ImageType[]): Observable<ImageType[]> {
-    return this.http.post<ImageType[]>(`/api/gallery/images/upload`, images);
+  uploadImage(file: File, description?: string): Observable<ImageType> {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (description) {
+      formData.append('description', description);
+    }
+    return this.http.post<ImageType>(`/api/gallery/images/upload`, formData);
   }
 
   fetchAllImages(): Observable<ImageType[]> {

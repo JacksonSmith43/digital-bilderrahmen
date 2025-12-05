@@ -1,5 +1,5 @@
 <div class="row drag-and-drop-upload-container">
-  @if(this.authService.currentUser() !== undefined){
+   @if(this.authService.currentUser() !== undefined){ 
   <div class="center">
     <!-- @if(isAdding$ | async){
     <img
@@ -42,7 +42,8 @@
             </td>
 
             <td class="image-preview">
-              @if(addedImages()){ @if(getImageForFile(file, addedImages()); as image){
+              @if(addedImages()){ 
+                @if(getImageForFile(file, addedImages()); as image){
               <img class="preview-image" [src]="image.src" [alt]="image.relativePath" />
 
               }@else {

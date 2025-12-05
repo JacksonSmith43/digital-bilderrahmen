@@ -17,9 +17,6 @@ public class Image {
     @Column(name = "file_path", nullable = false)
     private String filePath;
 
-    @Column
-    private String description;
-
     @Column(name = "upload_date", nullable = false)
     private LocalDateTime uploadDate;
 
@@ -30,14 +27,13 @@ public class Image {
         this.uploadDate = LocalDateTime.now();
     }
 
-     public Image(Long id) {
+    public Image(Long id) {
         this.id = id;
     }
 
-    public Image(String fileName, String filePath, String description, Long fileSize) {
+    public Image(String fileName, String filePath, Long fileSize) {
         this.fileName = fileName;
         this.filePath = filePath;
-        this.description = description;
         this.fileSize = fileSize;
     }
 
@@ -63,14 +59,6 @@ public class Image {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public LocalDateTime getUploadDate() {

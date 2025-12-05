@@ -5,13 +5,16 @@ import com.bilderrahmen.repository.ImageRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ImageService {
@@ -35,18 +38,29 @@ public class ImageService {
         }
     }
 
-    public Image saveImage(Image image) {
-        try {
-            // Validation.
-            if (image.getFileName() == null || image.getFileName().isEmpty()) {
-                throw new IllegalArgumentException("saveImage()_Filename is not allowed to be empty.");
-            }
+    public Image saveImageFile(MultipartFile file) throws IOException {
+        System.out.println("saveImageFile().");
 
-            return imageRepository.save(image);
-        } catch (Exception e) {
-            System.err.println("saveImage()_Error saving image: " + e.getMessage());
-            return null;
+        Path uploadDir = Paths.get("uploads");
+        if (!Files.exists(uploadDir)) {
+            // Create uploads directory if it doesn't exist.
+            Files.createDirectories(uploadDir);
         }
+
+        String originalFilename = file.getOriginalFilename();
+      
+        // Save file to disk.
+        Path filePath = uploadDir.resolve(originalFilename);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        // Create Image entity.
+        Image image = new Image();
+        image.setFileName(originalFilename);
+        image.setFilePath("/uploads/" + originalFilename);
+        image.setFileSize(file.getSize());
+
+        // Save to database. 
+        return imageRepository.save(image);
     }
 
     public boolean deleteImageById(Long id) {

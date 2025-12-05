@@ -20,16 +20,13 @@ export class DragDropUploadComponent implements AfterViewInit, OnInit {
   authService = inject(AuthService);
   private fileNameService = inject(FileNameService);
 
-  // imageUrls = this.dragDropUploadService.addedImages$;
   files = this.dragDropUploadService.files;
-
   addedImages = this.dragDropUploadService.addedImages;
-  // isAdding$ = this.dragDropUploadService.isAdding$;
 
   private openFileSelectorFn?: () => void; // Stores a function that opens the file selector dialog (provided by ngx-file-drop).
 
+  // This method is called (from the template) to save the file selector function for later use.
   setOpenFileSelector(fn: () => void) {
-    // This method is called (from the template) to save the file selector function for later use.
     this.openFileSelectorFn = fn; // The value of the function is saved in the openFileSelectorFn variable.
   }
 
@@ -50,12 +47,14 @@ export class DragDropUploadComponent implements AfterViewInit, OnInit {
     // console.log('getImageForFile().');
     let found = addedImage.find(img => img.relativePath === file.relativePath);
 
-    if (!found) {
+    if (!found && file.relativePath) {
       const normalisedFile = this.fileNameService.normaliseFileName(file.relativePath);
       found = addedImage.find(
-        img =>
-          this.fileNameService.normaliseFileName(img.relativePath) === normalisedFile ||
-          this.fileNameService.normaliseFileName(img.alt) === normalisedFile
+        img => {
+          const normalisedImgPath = img.relativePath ? this.fileNameService.normaliseFileName(img.relativePath) : null;
+          const normalisedImgAlt = img.alt ? this.fileNameService.normaliseFileName(img.alt) : null;
+          return normalisedImgPath === normalisedFile || normalisedImgAlt === normalisedFile;
+        }
       );
     }
 
@@ -64,8 +63,9 @@ export class DragDropUploadComponent implements AfterViewInit, OnInit {
 
   public dropped(files: NgxFileDropEntry[]) {
     console.log('dropped: ', files);
+    this.navService.isAddImage = true;
     this.dragDropUploadService.getDropped(files);
-    console.log('addedImages$', this.addedImages());
+    console.log('this.addedImages()', this.addedImages());
   }
 
   public fileOver(event: any) {

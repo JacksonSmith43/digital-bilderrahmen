@@ -22,7 +22,7 @@ public class SecurityConfig { // So that spring-boot-starter-security does not a
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for REST API
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/api/**").permitAll() // Allow all /auth and /api endpoints
+                        .requestMatchers("/auth/**", "/api/**", "/uploads/**").permitAll() // Allow all /auth, /api and /uploads endpoints
                         .anyRequest().authenticated())
                 .formLogin(form -> form.disable()) // Disable form login (no redirect to /login)
                 .httpBasic(basic -> basic.disable()); // Disable HTTP Basic auth
@@ -37,6 +37,7 @@ public class SecurityConfig { // So that spring-boot-starter-security does not a
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(Arrays.asList("*")); // Allow frontend to read all response headers
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
