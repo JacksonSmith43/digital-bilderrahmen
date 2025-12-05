@@ -9,9 +9,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Makes uploads/ Ordner under /uploads/** available.
+        // Makes backend/uploads/ directory available under /uploads/** URL
         registry.addResourceHandler("/uploads/**")
-                // Looks for: backend/uploads/foto.jpg (in the filesystem).
-                .addResourceLocations("file:uploads/");
+                // Looks for: backend/uploads/foto.jpg (in the filesystem)
+                .addResourceLocations("file:backend/uploads/");
     }
 }

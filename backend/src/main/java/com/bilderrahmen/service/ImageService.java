@@ -41,7 +41,8 @@ public class ImageService {
     public Image saveImageFile(MultipartFile file) throws IOException {
         System.out.println("saveImageFile().");
 
-        Path uploadDir = Paths.get("uploads");
+        // Uses backend/uploads directory relative to project root.  
+        Path uploadDir = Paths.get("backend", "uploads");
         if (!Files.exists(uploadDir)) {
             // Create uploads directory if it doesn't exist.
             Files.createDirectories(uploadDir);
