@@ -5,7 +5,6 @@ import { AuthService } from '../../auth/auth.service';
 import { ImageType } from '../../shared/model/image-type.model';
 import { LocalStorageRelatedService } from '../../shared/services/localstorage-related.service';
 import { GalleryService } from '../services/gallery.service';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-gallery',
@@ -14,7 +13,7 @@ import { Observable } from 'rxjs';
   styleUrl: './gallery.component.css',
 })
 export class GalleryComponent implements OnInit {
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
   private localStorageRelatedService = inject(LocalStorageRelatedService);
   private galleryService = inject(GalleryService);
 
@@ -32,6 +31,7 @@ export class GalleryComponent implements OnInit {
     try {
       let addedImages: ImageType[] = this.localStorageRelatedService.getImages('addedImages');
       let galleryImages: ImageType[] = this.localStorageRelatedService.getImages('galleryImages');
+
       console.log('ngOnInit()_galleryImages: ', galleryImages);
       console.log('ngOnInit()_galleryImages.length: ', galleryImages.length);
 

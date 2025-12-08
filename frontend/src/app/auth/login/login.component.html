@@ -40,7 +40,7 @@
             <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">Login</button>
         </div>
 
-        @if(isLoginSuccessful && errorMessage() === undefined){
+        @if(authService.isLoginSuccessful && errorMessage() === undefined){
         <p class="success-message">Successful login.</p>
 
         }@else if(errorMessage() ){

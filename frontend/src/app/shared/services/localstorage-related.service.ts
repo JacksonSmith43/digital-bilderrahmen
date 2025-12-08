@@ -30,6 +30,27 @@ export class LocalStorageRelatedService {
     localStorage.setItem(key, JSON.stringify(images));
   }
 
+  saveUserToLocalStorage(key: 'userEmail', email: string) {
+    console.log('saveUserToLocalStorage().');
+    localStorage.setItem(key, JSON.stringify(email));
+  }
+
+  getUser(key: 'userEmail') {
+    console.log('getUser().');
+
+    const savedUsers = localStorage.getItem(key);
+    if (savedUsers) {
+      try {
+        console.log('getUser()_savedImages: ', savedUsers);
+        return JSON.parse(savedUsers);
+   
+      } catch (error) {
+        console.error(`getUser()_Error parsing ${key}:`, error);
+      }
+    }
+    return [];
+  }
+
   async savingSizeCheck(key: string, images: string[], imagesSrc: ImageType[]) {
     const jsonString = JSON.stringify(imagesSrc);
     const sizeInKB = (new Blob([jsonString]).size / 1024).toFixed(2);

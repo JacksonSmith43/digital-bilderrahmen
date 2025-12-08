@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection, isDevMode } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, isDevMode, APP_INITIALIZER } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
@@ -7,6 +7,16 @@ import { provideStore } from '@ngrx/store';
 import { provideHttpClient } from '@angular/common/http';
 
 import { routes } from './app.routes';
+import { AuthService } from './auth/auth.service';
+
+// Initialize auth service before app starts
+export function initializeAuth(authService: AuthService) {
+  return () => {
+    console.log('APP_INITIALIZER: Loading user from localStorage');
+    // Constructor is called automatically, so this just ensures the service is initialized
+    return Promise.resolve();
+  };
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,5 +30,11 @@ export const appConfig: ApplicationConfig = {
     provideStore({}),
     provideEffects([]),
     provideStoreDevtools(),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeAuth,
+      deps: [AuthService],
+      multi: true
+    }
   ],
 };

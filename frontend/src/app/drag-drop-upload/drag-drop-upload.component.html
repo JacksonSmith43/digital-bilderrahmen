@@ -1,5 +1,5 @@
 <div class="row drag-and-drop-upload-container">
-   @if(this.authService.currentUser() !== undefined){ 
+   @if(this.authService.currentUser() !== undefined || authService.isLoginSuccessful){ 
   <div class="center">
     <!-- @if(isAdding$ | async){
     <img

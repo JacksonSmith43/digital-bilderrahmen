@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { environment } from '../environments/environment';
 import { NavbarComponent } from "./navbar/navbar.component";
+import { AuthService } from './auth/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,13 @@ import { NavbarComponent } from "./navbar/navbar.component";
 })
 
 export class AppComponent {
-  isProd = environment.prod; // Is it the production environment. 
+  isProd = environment.prod; // Is it the production environment.
+  
+  // Inject AuthService to ensure it's initialized on app startup
+  private authService = inject(AuthService);
+  
+  constructor() {
+    console.log('AppComponent initialized - AuthService loaded');
+  }
 }
 

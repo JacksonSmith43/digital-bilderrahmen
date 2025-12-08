@@ -2,6 +2,7 @@ import { Component, signal, inject } from '@angular/core';
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
+import { LocalStorageRelatedService } from '../../shared/services/localstorage-related.service';
 
 @Component({
   selector: 'app-login',
@@ -10,10 +11,11 @@ import { Router } from '@angular/router';
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
   router = inject(Router);
+  localStorageService = inject(LocalStorageRelatedService);
+
   errorMessage = signal<string | undefined>(undefined);
-  isLoginSuccessful = false;
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -32,14 +34,17 @@ export class LoginComponent {
     console.log('onSubmit().');
 
     if (this.loginForm.invalid) {
-      this.isLoginSuccessful = false;
+      this.authService.isLoginSuccessful = false;
       return;
     }
 
     this.authService.login(email, password).subscribe({
       next: user => {
+        console.log('login()_user', user);
         this.authService.currentUser.set(user);
-        this.isLoginSuccessful = true;
+        this.authService.isLoginSuccessful = true;
+        this.localStorageService.saveUserToLocalStorage('userEmail', email);
+
         setTimeout(() => {
           this.router.navigateByUrl('/viewAll');
         }, 1000);
@@ -47,7 +52,7 @@ export class LoginComponent {
       error: error => {
         console.error('onSubmit()_error: ', error);
         this.errorMessage.set(error.message);
-        this.isLoginSuccessful = false;
+        this.authService.isLoginSuccessful = false;
       },
     });
   }

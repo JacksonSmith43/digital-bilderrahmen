@@ -1,5 +1,5 @@
 <div class="container images-container">
-  @if(getCurrentUser() !== undefined){
+  @if(getCurrentUser() !== undefined || authService.isLoginSuccessful){
 
   <p>Filter</p>
 
