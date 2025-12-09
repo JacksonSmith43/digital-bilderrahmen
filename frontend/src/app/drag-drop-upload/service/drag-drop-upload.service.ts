@@ -63,12 +63,11 @@ export class DragDropUploadService {
               console.log('getDropped()_Upload successful: ', uploadedImage);
 
               // Add uploaded image to addedImages signal.
-              const currentImages = this.addedImages();
-              this.addedImages.set([...currentImages, uploadedImage]);
+              this.addedImages.set([...this.addedImages(), uploadedImage]);
               console.log('getDropped()_addedImages', this.addedImages());
 
               // Also display preview using FileReader.
-              this.getHandleFile(file, uploadedImage);
+              this.getHandleFile(file, uploadedImage, droppedFile.relativePath);
             },
             error: error => {
               console.error('getDropped()_Upload failed: ', error);
@@ -87,24 +86,33 @@ export class DragDropUploadService {
     );
   }
 
-  getHandleFile(file: File, uploadedImage: ImageType) {
+  getHandleFile(file: File, uploadedImage: ImageType, relativePath: string) {
     console.log('getHandleFile().');
 
     const reader = new FileReader();
 
     // This event is triggered when the file is read successfully.
     reader.onload = (e: any) => {
-      // Create preview image with base64 src for immediate display.
-      const previewImage: ImageType = {
-        ...uploadedImage, // Use backend data (id, filePath, etc.)
-        src: e.target.result, // Add base64 preview for immediate display.
-      };
+      const currentImages = this.addedImages();
 
-      console.log('getHandleFile()_preview image created: ', previewImage);
+      const updatedImages = currentImages.map(img => {
+        if (img.id === uploadedImage.id) {
+          console.log('getHandleFile()_Updating image with src: ', e.target.result.substring(0, 50) + '...');
+          return {
+            ...img,
+            src: e.target.result, // Add base64 preview.
+            relativePath: relativePath, // Add for matching.
+          };
+        }
+        return img;
+      });
+
+      this.addedImages.set(updatedImages);
+
+      this.localStorageRelatedService.saveToLocalStorage('addedImages', this.addedImages());
     };
-    reader.readAsDataURL(file); // This reads the file as a data URL, which is suitable for displaying images in the browser.
-    console.log('getDropped()_getHandleFile', this.addedImages());
-    this.localStorageRelatedService.saveToLocalStorage("addedImages", this.addedImages());
+
+    reader.readAsDataURL(file);
     this.navService.isAddImage = false;
   }
 }

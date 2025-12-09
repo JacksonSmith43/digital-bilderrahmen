@@ -42,13 +42,16 @@
             </td>
 
             <td class="image-preview">
-              @if(addedImages()){ 
+              @if(addedImages().length > 0){ 
                 @if(getImageForFile(file, addedImages()); as image){
-              <img class="preview-image" [src]="image.src" [alt]="image.relativePath" />
-
+                <img  class="preview-image" [src]="image.src || image.filePath" [alt]="image.fileName"
+                />  <!-- filePath is the path to the backend not just a string. It does the Get request, because of the proxy.conf file. -->
               }@else {
-              <p>Processing image.</p>
-              }}
+              <p>Processing image...</p>
+              }
+            }@else {
+              <p>No images uploaded yet.</p>
+            }
             </td>
           </tr>
           }

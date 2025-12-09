@@ -9,11 +9,11 @@ import { provideHttpClient } from '@angular/common/http';
 import { routes } from './app.routes';
 import { AuthService } from './auth/auth.service';
 
-// Initialize auth service before app starts
+// Initialise auth service before app starts. 
 export function initializeAuth(authService: AuthService) {
   return () => {
-    console.log('APP_INITIALIZER: Loading user from localStorage');
-    // Constructor is called automatically, so this just ensures the service is initialized
+    console.log('APP_INITIALISER: Loading user from localStorage.');
+    // Constructor is called automatically, so this just ensures the service is initialised. 
     return Promise.resolve();
   };
 }

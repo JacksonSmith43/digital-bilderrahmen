@@ -36,35 +36,35 @@ export class FileNameService {
     }
   }
 
-  getImageFileName(alt?: string, relativePath?: string) {
-    console.log('getImageFileName().');
-    let imageName: string = '';
+  // getImageFileName(alt?: string, relativePath?: string) {
+  //   console.log('getImageFileName().');
+  //   let imageName: string = '';
 
-    if (relativePath && relativePath.trim() !== '') {
-      // If a relative path is provided, use it.
-      const pathParts = relativePath.split(/[/\\]/); // This will extract the file name from the path.
-      const fileName = pathParts[pathParts.length - 1];
-      imageName = fileName.replace(/[^a-zA-Z0-9_\-\.]/g, ' ');
+  //   if (relativePath && relativePath.trim() !== '') {
+  //     // If a relative path is provided, use it.
+  //     const pathParts = relativePath.split(/[/\\]/); // This will extract the file name from the path.
+  //     const fileName = pathParts[pathParts.length - 1];
+  //     imageName = fileName.replace(/[^a-zA-Z0-9_\-\.]/g, ' ');
 
-      if (imageName.length < 3) {
-        imageName = `image_rel_${Date.now()}_${imageName}`;
-      }
-    } else if (alt && alt.trim() !== '') {
-      imageName = alt.replace(/[^a-zA-Z0-9_\-\.]/g, ' ');
+  //     if (imageName.length < 3) {
+  //       imageName = `image_rel_${Date.now()}_${imageName}`;
+  //     }
+  //   } else if (alt && alt.trim() !== '') {
+  //     imageName = alt.replace(/[^a-zA-Z0-9_\-\.]/g, ' ');
 
-      if (imageName.length < 3) {
-        imageName = `image_alt_${Date.now()}_${imageName}`;
-      }
-    } else {
-      // If both alt and relativePath are empty, generate a random name.
-      const randomString = Math.random().toString(36).substring(2, 8);
+  //     if (imageName.length < 3) {
+  //       imageName = `image_alt_${Date.now()}_${imageName}`;
+  //     }
+  //   } else {
+  //     // If both alt and relativePath are empty, generate a random name.
+  //     const randomString = Math.random().toString(36).substring(2, 8);
 
-      imageName = `image_random_${Date.now()}_${randomString}`; // Incase both the alt and relativePath are empty.
-    }
+  //     imageName = `image_random_${Date.now()}_${randomString}`; // Incase both the alt and relativePath are empty.
+  //   }
 
-    console.log('getImageFileName()_imageName: ', imageName);
-    return imageName;
-  }
+  //   console.log('getImageFileName()_imageName: ', imageName);
+  //   return imageName;
+  // }
 
   // generateBase64ImageName(img: ImageType, name?: string): ImageType {
   //   console.log('generateBase64ImageName().');

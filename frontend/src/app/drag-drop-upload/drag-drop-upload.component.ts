@@ -7,6 +7,7 @@ import { DragDropUploadService } from './service/drag-drop-upload.service';
 import { NavbarService } from '../navbar/navbar.service';
 import { AuthService } from '../auth/auth.service';
 import { FileNameService } from '../shared/services/file-name.service';
+import { ImageType } from '../shared/model/image-type.model';
 
 @Component({
   selector: 'app-drag-drop-upload',
@@ -43,29 +44,29 @@ export class DragDropUploadComponent implements AfterViewInit, OnInit {
     }
   }
 
-  getImageForFile(file: NgxFileDropEntry, addedImage: any[]): any {
+  getImageForFile(file: NgxFileDropEntry, addedImage: ImageType[]): ImageType | undefined {
     // console.log('getImageForFile().');
-    let found = addedImage.find(img => img.relativePath === file.relativePath);
+    let found = addedImage.find(img => img.fileName === file.relativePath);
 
+    // Try normalised match if it has not been found.
     if (!found && file.relativePath) {
       const normalisedFile = this.fileNameService.normaliseFileName(file.relativePath);
-      found = addedImage.find(
-        img => {
-          const normalisedImgPath = img.relativePath ? this.fileNameService.normaliseFileName(img.relativePath) : null;
-          const normalisedImgAlt = img.alt ? this.fileNameService.normaliseFileName(img.alt) : null;
-          return normalisedImgPath === normalisedFile || normalisedImgAlt === normalisedFile;
-        }
-      );
+
+      found = addedImage.find(img => {
+        const normalisedImgPath = img.fileName ? this.fileNameService.normaliseFileName(img.fileName) : null;
+        console.log('getImageForFile()_Not found.');
+        return normalisedImgPath === normalisedFile;
+      });
     }
 
-    return found; // Returns the found image (src, alt, relativePath) or undefined if not found.
+    return found; // Returns the found image or undefined if not found.
   }
 
   public dropped(files: NgxFileDropEntry[]) {
     console.log('dropped: ', files);
     this.navService.isAddImage = true;
     this.dragDropUploadService.getDropped(files);
-    console.log('this.addedImages()', this.addedImages());
+    console.log('dropped()_this.addedImages()', this.addedImages());
   }
 
   public fileOver(event: any) {
