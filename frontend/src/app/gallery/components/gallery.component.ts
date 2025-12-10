@@ -51,13 +51,15 @@ export class GalleryComponent implements OnInit {
     }
   }
 
-  onHighlightImageSelection(src: string) {
+  onHighlightImageSelection(filePath: string) {
     console.log('onHighlightImageSelection().');
-    this.galleryService.getHighlightImageSelection(src);
+    console.log('onHighlightImageSelection()_filePath: ', filePath);
+
+    this.galleryService.getHighlightImageSelection(filePath);
   }
 
-  isImageSelected(src: string): boolean {
-    return this.selectedSrcs().includes(src);
+  isImageSelected(filePath: string): boolean {
+    return this.selectedSrcs().includes(filePath);
   }
 
   onRemoveImage(image: ImageType) {

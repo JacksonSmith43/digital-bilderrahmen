@@ -17,18 +17,21 @@ export class GalleryService {
     console.log('GalleryService INIT.');
   }
 
-  getHighlightImageSelection(src: string) {
+  getHighlightImageSelection(filePath: string) {
     console.log('getHighlightImageSelection().');
 
     const selectedSrcs = this.selectedSrcs();
+    console.log('getHighlightImageSelection()_filePath: ', filePath);
 
     // Checks if the image is already selected.
-    if (selectedSrcs.includes(src)) {
-      this.selectedSrcs.set(selectedSrcs.filter(i => i !== src)); // Removes the image from the selection if it is already selected. i => i !== index is a filter function that returns all elements that are not equal to the index of the clicked image.
+    if (selectedSrcs.includes(filePath)) {
+      this.selectedSrcs.set(selectedSrcs.filter(i => i !== filePath)); // Removes the image from the selection if it is already selected. i => i !== index is a filter function that returns all elements that are not equal to the index of the clicked image.
+      console.log('getHighlightImageSelection()_selectedSrcs: ', selectedSrcs);
 
       // Adds the image to the selection if it has not already been selected.
     } else {
-      this.selectedSrcs.set([...selectedSrcs, src]);
+      this.selectedSrcs.set([...selectedSrcs, filePath]);
+      console.log('getHighlightImageSelection()_New image selected_selectedSrcs: ', selectedSrcs);
     }
     console.log('getHighlightImageSelection()_this.selectedSrcs(): ', this.selectedSrcs());
   }

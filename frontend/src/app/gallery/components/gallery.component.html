@@ -13,11 +13,11 @@
           <img 
           [src]="i.filePath"
             [alt]="i.fileName"
-            (click)="onHighlightImageSelection(i.src)"
-            (keydown.enter)="onHighlightImageSelection(i.src); $event.preventDefault()"
-            (keydown.space)="onHighlightImageSelection(i.src); $event.preventDefault()"
-            [ngClass]="isImageSelected(i.src) ? 'image-selected' : 'image-unselected'"
-            [attr.aria-pressed]="isImageSelected(i.src)"
+            (click)="onHighlightImageSelection(i.filePath)"
+            (keydown.enter)="onHighlightImageSelection(i.filePath); $event.preventDefault()"
+            (keydown.space)="onHighlightImageSelection(i.filePath); $event.preventDefault()"
+            [ngClass]="isImageSelected(i.filePath) ? 'image-selected' : 'image-unselected'"
+            [attr.aria-pressed]="isImageSelected(i.filePath)"
             tabindex="0"
             role="button"
           />
