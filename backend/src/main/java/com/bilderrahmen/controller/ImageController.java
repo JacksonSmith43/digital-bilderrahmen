@@ -54,30 +54,24 @@ public class ImageController {
         }
     }
 
-    // @GetMapping("/deleted/{id}")
-    // public ResponseEntity<String> getDeletedImageId(@PathVariable Long id) {
-    // System.out.println("getDeletedImageId().");
-    // return ResponseEntity.ok("Deleted image ID: " + id);
-    // }
-
-    // @DeleteMapping("/{id}") // /api/gallery/images/{id}
-    // public ResponseEntity<Boolean> deleteImage(@PathVariable Long id) { //
+    @DeleteMapping("/deleted/{id}") // /api/gallery/images/deleted/{id}
     // @PathVariable extracts the ID out of the URL and converts it into a Long.
-    // System.out.println("deleteImage().");
+    public ResponseEntity<Boolean> deleteImage(@PathVariable Long id) {
+        System.out.println("deleteImage().");
 
-    // try {
-    // boolean isDeleted = imageService.deleteImageById(id);
+        try {
+            boolean isDeleted = imageService.deleteImageById(id);
 
-    // if (isDeleted) {
-    // return ResponseEntity.ok(true); // 200 Ok.
+            if (isDeleted) {
+                return ResponseEntity.ok(true); // 200 Ok.
 
-    // } else {
-    // return ResponseEntity.notFound().build(); // 404 Not found.
-    // }
-    // } catch (Exception e) {
-    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
-    // // 500 Error.
-    // }
+            } else {
+                return ResponseEntity.notFound().build(); // 404 Not found.
+            }
+        } catch (Exception e) {
+            // 500 Error.
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+        }
 
-    // }
+    }
 }

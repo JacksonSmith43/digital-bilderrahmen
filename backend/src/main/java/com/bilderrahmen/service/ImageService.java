@@ -14,7 +14,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class ImageService {
@@ -41,7 +40,7 @@ public class ImageService {
     public Image saveImageFile(MultipartFile file) throws IOException {
         System.out.println("saveImageFile().");
 
-        // Uses backend/uploads directory relative to project root.  
+        // Uses backend/uploads directory relative to project root.
         Path uploadDir = Paths.get("backend", "uploads");
         if (!Files.exists(uploadDir)) {
             // Create uploads directory if it doesn't exist.
@@ -49,7 +48,7 @@ public class ImageService {
         }
 
         String originalFilename = file.getOriginalFilename();
-      
+
         // Save file to disk.
         Path filePath = uploadDir.resolve(originalFilename);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -60,7 +59,7 @@ public class ImageService {
         image.setFilePath("/uploads/" + originalFilename);
         image.setFileSize(file.getSize());
 
-        // Save to database. 
+        // Save to database.
         return imageRepository.save(image);
     }
 
@@ -77,7 +76,7 @@ public class ImageService {
 
             Optional<Image> imageObject = imageRepository.findById(id);
             if (imageObject.isPresent()) {
-                deletePhysicalFile(imageObject.get().getFilePath());
+                deletePhysicalFile(imageObject.get().getFileName());
             }
 
             imageRepository.deleteById(id); // Deletes it out of the database.
@@ -91,9 +90,19 @@ public class ImageService {
 
     private void deletePhysicalFile(String fileName) {
         System.out.println("deletePhysicalFile().");
+        System.out.println("deletePhysicalFile()_fileName: " + fileName);
+
         try {
-            Path path = Paths.get("uploads/" + fileName);
-            Files.deleteIfExists(path); // Deletes the file from the hard drive.
+            Path path = Paths.get("backend", "uploads", fileName);
+
+            boolean deleted = Files.deleteIfExists(path);
+
+            if (deleted) {
+                System.out.println("deletePhysicalFile()_Successfully deleted: " + path);
+
+            } else {
+                System.out.println("deletePhysicalFile()_File not found: " + path);
+            }
 
         } catch (IOException e) {
             System.err.println("deletePhysicalFile()_Could not delete the file: " + e.getMessage());

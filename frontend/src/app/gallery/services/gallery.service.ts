@@ -8,7 +8,7 @@ import { ImageType } from '../../shared/model/image-type.model';
 export class GalleryService {
   private http = inject(HttpClient);
 
-  selectedSrcs = signal<string[]>([]);
+  selectedSrcs = signal<ImageType[]>([]);
   galleryImages = signal<ImageType[]>([]);
   galleryImagesLength = signal<number>(0);
   isRemoving = signal<boolean>(false);
@@ -17,30 +17,30 @@ export class GalleryService {
     console.log('GalleryService INIT.');
   }
 
-  getHighlightImageSelection(filePath: string) {
+  getHighlightImageSelection(image: ImageType) {
     console.log('getHighlightImageSelection().');
 
-    const selectedSrcs = this.selectedSrcs();
-    console.log('getHighlightImageSelection()_filePath: ', filePath);
-
     // Checks if the image is already selected.
-    if (selectedSrcs.includes(filePath)) {
-      this.selectedSrcs.set(selectedSrcs.filter(i => i !== filePath)); // Removes the image from the selection if it is already selected. i => i !== index is a filter function that returns all elements that are not equal to the index of the clicked image.
-      console.log('getHighlightImageSelection()_selectedSrcs: ', selectedSrcs);
+    if (this.selectedSrcs().includes(image)) {
+      this.selectedSrcs.set(this.selectedSrcs().filter(i => i !== image)); // Removes the image from the selection if it is already selected. i => i !== index is a filter function that returns all elements that are not equal to the index of the clicked image.
 
       // Adds the image to the selection if it has not already been selected.
     } else {
-      this.selectedSrcs.set([...selectedSrcs, filePath]);
-      console.log('getHighlightImageSelection()_New image selected_selectedSrcs: ', selectedSrcs);
+      this.selectedSrcs.set([...this.selectedSrcs(), image]);
+      console.log('getHighlightImageSelection()_New image selected_selectedSrcs: ', this.selectedSrcs());
     }
     console.log('getHighlightImageSelection()_this.selectedSrcs(): ', this.selectedSrcs());
   }
 
-  deleteImage(id: number): Observable<void> {
-    return this.http.delete<void>(`/api/gallery/images/${id}`);
+  deleteImage(images: ImageType): Observable<ImageType> {
+    console.log('deleteImage().');
+
+    return this.http.delete<ImageType>(`/api/gallery/images/deleted/${images.id}`);
   }
 
   uploadImage(file: File, description?: string): Observable<ImageType> {
+    console.log('uploadImage().');
+
     const formData = new FormData();
     formData.append('file', file);
     if (description) {
@@ -50,6 +50,8 @@ export class GalleryService {
   }
 
   fetchAllImages(): Observable<ImageType[]> {
+    console.log('fetchAllImages().');
+
     return this.http.get<ImageType[]>(`/api/gallery/images`);
   }
 }
