@@ -41,14 +41,32 @@ button {
   font-weight: 600;
 }
 
-/* img:focus, TODOD: Add this again or change it, so that select (green) is still visible or that this only counts for keyboards. */
+.filter-container {
+  display: grid;
+
+  margin-top: 1rem;
+  padding: 1rem 1rem;
+  width: 20rem;
+}
+
+.filter-container button {
+  width: 20rem;
+  height: 2rem;
+}
+
+.accordion-body {
+  padding-top: 0rem;
+}
+
+img:focus, /* TODOD: Change it, so that select (green) is still visible or that this only counts for keyboards.  */ 
 button:focus,
-p:focus {
+p:focus,
+input:focus {
   outline: 0.23rem solid blue;
   outline-offset: 0.2rem;
 }
 
-img[role="button"]:hover {
+img[role='button']:hover {
   transform: scale(1.05);
   transition: transform 0.2s ease;
 }
