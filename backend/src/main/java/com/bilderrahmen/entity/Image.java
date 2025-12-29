@@ -23,6 +23,9 @@ public class Image {
     @Column(name = "file_size")
     private Long fileSize;
 
+    @Column(name = "is_selected_for_device")
+    private Boolean isSelectedForDevice;
+
     public Image() {
         this.uploadDate = LocalDateTime.now();
     }
@@ -31,10 +34,11 @@ public class Image {
         this.id = id;
     }
 
-    public Image(String fileName, String filePath, Long fileSize) {
+    public Image(String fileName, String filePath, Long fileSize, Boolean isSelectedForDevice) {
         this.fileName = fileName;
         this.filePath = filePath;
         this.fileSize = fileSize;
+        this.isSelectedForDevice = isSelectedForDevice;
     }
 
     public Long getId() {
@@ -75,5 +79,13 @@ public class Image {
 
     public void setFileSize(Long fileSize) {
         this.fileSize = fileSize;
+    }
+
+    public Boolean getIsSelectedForDevice() {
+        return isSelectedForDevice;
+    }
+
+    public void setIsSelectedForDevice(Boolean isSelectedForDevice) {
+        this.isSelectedForDevice = isSelectedForDevice;
     }
 }

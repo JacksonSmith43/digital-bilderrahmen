@@ -22,7 +22,7 @@ public class SecurityConfig { // So that spring-boot-starter-security does not a
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for REST API
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/api/**", "/uploads/**", "/deleted/**").permitAll() // Allow all /auth, /api, /uploads and /deleted endpoints
+                        .requestMatchers("/auth/**", "/api/**", "/uploads/**", "/deleted/**", "/device/**").permitAll() // Allow all /auth, /api, /uploads and /deleted, /device endpoints
                         .anyRequest().authenticated())
                 .formLogin(form -> form.disable()) // Disable form login (no redirect to /login)
                 .httpBasic(basic -> basic.disable()); // Disable HTTP Basic auth

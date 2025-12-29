@@ -106,8 +106,40 @@ export class GalleryComponent implements OnInit {
     });
   }
 
-  onSelectForDevice(image: ImageType) {
+  onSelectForDevice() {
     console.log('onSelectForDevice().');
+
+    const imagesToSelect = this.selectedSrcs();
+
+    if (imagesToSelect.length === 0) {
+      console.log('onSelectForDevice()_No images selected.');
+      return;
+    }
+
+    console.log('onSelectForDevice()_Selecting images length:', imagesToSelect.length);
+    let completedSelections = 0;
+
+    // Iterates through all of the selected images for the device.
+    imagesToSelect.forEach(image => {
+      this.galleryService.selectImageForDevice(image.id).subscribe({
+        next: () => {
+          completedSelections++;
+          console.log(`onSelectForDevice()_Selected ${completedSelections}/${imagesToSelect.length}`);
+
+          // When all selections are complete. 
+          if (completedSelections === imagesToSelect.length) {
+            this.localStorageRelatedService.saveToLocalStorage('chosenImagesSrcs', imagesToSelect);
+            this.onFetchAllImages(); 
+            console.log('onSelectForDevice()_All selections complete.');
+            this.galleryService.selectedSrcs.set([]);
+          }
+        },
+        error: error => {
+          console.error('onSelectForDevice()_Error selecting image:', error);
+          completedSelections++;
+        },
+      });
+    });
   }
 
   onFetchAllImages() {
@@ -124,6 +156,7 @@ export class GalleryComponent implements OnInit {
 
         // Save to localStorage after images have been loaded.
         this.localStorageRelatedService.saveToLocalStorage('galleryImages', this.galleryImages());
+        this.localStorageRelatedService.saveToLocalStorage('addedImages', []);
       },
       error: error => console.error('onFetchAllImages()_Fetch failed: ', error),
     });

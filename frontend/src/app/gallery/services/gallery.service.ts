@@ -3,10 +3,12 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 import { ImageType } from '../../shared/model/image-type.model';
+import { LocalStorageRelatedService } from '../../shared/services/localstorage-related.service';
 
 @Injectable({ providedIn: 'root' })
 export class GalleryService {
   private http = inject(HttpClient);
+  localStorageService = inject(LocalStorageRelatedService);
 
   selectedSrcs = signal<ImageType[]>([]);
   galleryImages = signal<ImageType[]>([]);
@@ -53,5 +55,12 @@ export class GalleryService {
     console.log('fetchAllImages().');
 
     return this.http.get<ImageType[]>(`/api/gallery/images`);
+  }
+
+  selectImageForDevice(imageId: number): Observable<void> {
+    console.log('selectImageForDevice().');
+    console.log('selectImageForDevice()_id:', imageId);
+
+    return this.http.post<void>(`/api/device/images/${imageId}`, {});
   }
 }

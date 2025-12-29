@@ -25,6 +25,7 @@
             <p class="image-number" tabindex="0">Number of images: {{ galleryImagesLength() }}</p>
             <button class="btn btn-danger" (click)="onRemoveSelectedImages()" [disabled]="isRemoving() || selectedSrcs().length === 0" >Delete Selected ({{ selectedSrcs().length }})</button>
             <button class="btn btn-primary" (click)="onFetchAllImages()">Fetch all images</button>
+            <button class="btn btn-primary" (click)="onSelectForDevice()">Select For Device</button>
           } 
         } }@else {
       <p tabindex="0" role="status">No images to display</p>

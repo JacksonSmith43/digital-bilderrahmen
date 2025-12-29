@@ -18,4 +18,5 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
     List<Image> findByUploadDate(LocalDateTime uploadDate);
 
+    List<Image> findByIsSelectedForDevice(Boolean isSelectedForDevice);
 }

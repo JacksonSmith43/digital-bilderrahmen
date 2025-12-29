@@ -58,6 +58,7 @@ public class ImageService {
         image.setFileName(originalFilename);
         image.setFilePath("/uploads/" + originalFilename);
         image.setFileSize(file.getSize());
+        image.setIsSelectedForDevice(false);
 
         // Save to database.
         return imageRepository.save(image);
@@ -106,6 +107,33 @@ public class ImageService {
 
         } catch (IOException e) {
             System.err.println("deletePhysicalFile()_Could not delete the file: " + e.getMessage());
+        }
+    }
+
+    public boolean setCurrentIdPartOfSelectedDeviceImages(Long id) {
+        System.out.println("setCurrentIdPartOfSelectedDeviceImages().");
+        System.out.println("setCurrentIdPartOfSelectedDeviceImages()_id: " + id);
+
+        try {
+            // Load existing image from database.
+            Optional<Image> imageOptional = imageRepository.findById(id);
+
+            if (imageOptional.isEmpty()) {
+                System.err.println("setCurrentIdPartOfSelectedDeviceImages()_Image not found with id: " + id);
+                return false;
+            }
+
+            // Update existing image.
+            Image image = imageOptional.get();
+            image.setIsSelectedForDevice(true);
+            imageRepository.save(image);
+
+            System.out.println("setCurrentIdPartOfSelectedDeviceImages()_Successfully updated image: " + id);
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("setCurrentIdPartOfSelectedDeviceImages()_Error: " + e.getMessage());
+            return false;
         }
     }
 
