@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { AuthService } from '../../auth/auth.service';
@@ -17,14 +17,29 @@ export class GalleryComponent implements OnInit {
   private localStorageRelatedService = inject(LocalStorageRelatedService);
   private galleryService = inject(GalleryService);
 
+  filterState = signal<'allImages' | 'deviceImages' | 'notDeviceImages'>('allImages');
+
   selectedSrcs = this.galleryService.selectedSrcs;
   galleryImages = this.galleryService.galleryImages;
   isRemoving = this.galleryService.isRemoving;
 
-  galleryImagesLength = computed(() => this.galleryService.galleryImages().length);
+  galleryImagesLength = computed(() => this.filteredImageStates().length);
   isImageLoaded = computed(
     () => this.galleryService.galleryImages() !== undefined && this.galleryService.galleryImages() !== null
   );
+
+  filteredImageStates = computed(() => {
+    if (this.filterState().includes('allImages')) {
+      return this.galleryImages();
+
+    } else if (this.filterState().includes('deviceImages')) {
+      return this.galleryImages().filter(image => image.isSelectedForDevice);
+
+    } else {
+      console.log("filteredImageStates_notDeviceImages.");
+      return this.galleryImages().filter(image => !image.isSelectedForDevice);
+    }
+  });
 
   async ngOnInit() {
     console.log('GalleryComponent INIT.');
@@ -126,10 +141,10 @@ export class GalleryComponent implements OnInit {
           completedSelections++;
           console.log(`onSelectForDevice()_Selected ${completedSelections}/${imagesToSelect.length}`);
 
-          // When all selections are complete. 
+          // When all selections are complete.
           if (completedSelections === imagesToSelect.length) {
             this.localStorageRelatedService.saveToLocalStorage('chosenImagesSrcs', imagesToSelect);
-            this.onFetchAllImages(); 
+            this.onFetchAllImages();
             console.log('onSelectForDevice()_All selections complete.');
             this.galleryService.selectedSrcs.set([]);
           }

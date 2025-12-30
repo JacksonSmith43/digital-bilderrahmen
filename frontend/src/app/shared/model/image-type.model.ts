@@ -5,4 +5,5 @@ export interface ImageType {
   filePath: string;
   uploadDate?: Date; // ISO 8601 format from LocalDateTime.
   fileSize?: number;
+  isSelectedForDevice: false;
 }
