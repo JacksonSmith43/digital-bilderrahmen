@@ -5,22 +5,14 @@
 <div class="accordion" id="device-settings-interval-accordion">
   <div class="accordion-item">
     <h2 class="accordion-header">
-      <button
-        class="accordion-button"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#collapseDisplayedImagesInterval"
-        aria-expanded="true"
-        aria-controls="collapseDisplayedImagesInterval"
-      >
+      <button class="accordion-button" type="button" data-bs-toggle="collapse"
+        data-bs-target="#collapseDisplayedImagesInterval" aria-expanded="true"
+        aria-controls="collapseDisplayedImagesInterval">
         Interval settings
       </button>
     </h2>
-    <div
-      id="collapseDisplayedImagesInterval"
-      class="accordion-collapse collapse show"
-      data-bs-parent="#device-settings-interval-accordion"
-    >
+    <div id="collapseDisplayedImagesInterval" class="accordion-collapse collapse show"
+      data-bs-parent="#device-settings-interval-accordion">
       <div class="accordion-body interval-container">
         @if(deviceImagesLength() > 1){
         <div class="interval-time">
@@ -28,19 +20,10 @@
             <div class="input-group">
               <label for="interval-time-input" class="form-label">Interval time (in ms):</label>
               <div class="input-row">
-                <input
-                  type="number"
-                  class="form-control"
-                  id="interval-time-input"
-                  placeholder="1000"
-                  #intervalTime
-                  formControlName="intervalTimeInput"
-                />
-                <button
-                  type="submit"
-                  class="btn btn-primary interval-time-button"
-                  [disabled]="intervalTimeFormControl.invalid"
-                >
+                <input type="number" class="form-control" id="interval-time-input" placeholder="1000" #intervalTime
+                  formControlName="intervalTimeInput" />
+                <button type="submit" class="btn btn-primary interval-time-button"
+                  [disabled]="intervalTimeFormControl.invalid">
                   Set Time
                 </button>
               </div>
@@ -56,13 +39,10 @@
         <br />
 
         <div class="interval-images">
-          <!-- <img
-            *ngIf="chosenImages()[currentImageIndex]"
-            [src]="chosenImages()[currentImageIndex].src"
-            [alt]="chosenImages()[currentImageIndex].alt"
-            tabindex="0"
-            role="button"
-          /> -->
+          @if(deviceImages()[currentImageIndex]) {
+          <img [src]="deviceImages()[currentImageIndex].filePath"
+            [alt]="deviceImages()[currentImageIndex].fileName || 'Device image'" tabindex="0" role="img" />
+          }
 
           <button type="button" class="btn btn-primary stop-diashow-button" (click)="stopDiashow()">
             Stop diashow
@@ -76,3 +56,32 @@
   </div>
 </div>
 
+<div class="accordion" id="device-settings-gallery-accordion">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDisplayedImages"
+        aria-expanded="true" aria-controls="collapseDisplayedImages">
+        Device Images
+      </button>
+    </h2>
+
+    <div id="collapseDisplayedImages" class="accordion-collapse collapse show"
+      data-bs-parent="#device-settings-gallery-accordion">
+      @if(deviceImagesLength() > 0){
+
+      <div class="accordion-body">
+        @for(i of images(); track i.id){
+        <img [src]="i.filePath" [alt]="i.fileName" tabindex="0" role="button" />
+        }
+      </div>
+
+      } @else {
+      <p tabindex="0">No images to display.</p>
+      <button class="fetch-selected-images-buttton btn btn-primary" (click)="onFetchImages()">
+        Fetch images
+      </button>
+      }
+      <p tabindex="0">Number of images: {{ deviceImagesLength() }}</p>
+    </div>
+  </div>
+</div>

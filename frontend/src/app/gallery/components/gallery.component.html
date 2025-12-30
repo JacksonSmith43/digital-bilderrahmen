@@ -43,7 +43,7 @@
   <div class="images">
     <div class="col-auto text-center">
       @if(isImageLoaded()){
-      @if((galleryImagesLength()) > 0){
+      @if(galleryImagesLength() > 0){
       @for(i of filteredImageStates(); track i.id; let index = $index; let last = $last){
 
       <img [src]="i.filePath" [alt]="i.fileName" (click)="onHighlightImageSelection(i)"
@@ -52,7 +52,7 @@
         [ngClass]="isImageSelected(i) ? 'image-selected' : 'image-unselected'" [attr.aria-pressed]="isImageSelected(i)"
         tabindex="0" role="button" />
       @if(last){
-      <p class="image-number" tabindex="0">Number of images: {{ galleryImagesLength() }}</p>
+      <p class="image-number" tabindex="0">Number of images: {{ filteredImagesLength() }} / {{ galleryImagesLength() }}</p>
 
       @if(selectedSrcs().length > 0 ){
       <button class="btn btn-danger" (click)="onRemoveSelectedImages()">

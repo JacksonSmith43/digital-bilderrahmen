@@ -23,20 +23,21 @@ export class GalleryComponent implements OnInit {
   galleryImages = this.galleryService.galleryImages;
   isRemoving = this.galleryService.isRemoving;
 
-  galleryImagesLength = computed(() => this.filteredImageStates().length);
+  galleryImagesLength = computed(() => this.galleryImages().length);
+  filteredImagesLength = computed(() => this.filteredImageStates().length);
   isImageLoaded = computed(
     () => this.galleryService.galleryImages() !== undefined && this.galleryService.galleryImages() !== null
   );
 
   filteredImageStates = computed(() => {
-    if (this.filterState().includes('allImages')) {
+    if (this.filterState() === 'allImages') {
       return this.galleryImages();
-
-    } else if (this.filterState().includes('deviceImages')) {
-      return this.galleryImages().filter(image => image.isSelectedForDevice);
-
+    } else if (this.filterState() === 'deviceImages') {
+      let deviceImagesFiltered = this.galleryImages().filter(image => image.isSelectedForDevice);
+      this.localStorageRelatedService.saveToLocalStorage("deviceImages", deviceImagesFiltered);
+      return deviceImagesFiltered;
     } else {
-      console.log("filteredImageStates_notDeviceImages.");
+      console.log('filteredImageStates_notDeviceImages.');
       return this.galleryImages().filter(image => !image.isSelectedForDevice);
     }
   });
@@ -143,7 +144,7 @@ export class GalleryComponent implements OnInit {
 
           // When all selections are complete.
           if (completedSelections === imagesToSelect.length) {
-            this.localStorageRelatedService.saveToLocalStorage('chosenImagesSrcs', imagesToSelect);
+             this.localStorageRelatedService.saveToLocalStorage('deviceImages', imagesToSelect);
             this.onFetchAllImages();
             console.log('onSelectForDevice()_All selections complete.');
             this.galleryService.selectedSrcs.set([]);

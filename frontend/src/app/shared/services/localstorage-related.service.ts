@@ -7,7 +7,7 @@ import { FileNameService } from './file-name.service';
 export class LocalStorageRelatedService {
   private fileNameService = inject(FileNameService);
 
-  getImages(key: 'galleryImages' | 'addedImages' | 'chosenImagesSrcs') {
+  getImages(key: 'galleryImages' | 'addedImages' | 'deviceImages') {
     console.log('getImages().');
 
     const savedImages = localStorage.getItem(key);
@@ -23,7 +23,7 @@ export class LocalStorageRelatedService {
   }
 
   saveToLocalStorage(
-    key: 'galleryImages' | 'addedImages' | 'chosenImagesSrcs' | 'deletedSrcArr',
+    key: 'galleryImages' | 'addedImages' | 'deviceImages' | 'deletedSrcArr',
     images: string[] | ImageType[] | ImageType | File
   ) {
     console.log('saveToLocalStorage().');
