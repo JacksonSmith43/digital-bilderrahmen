@@ -52,19 +52,21 @@
         [ngClass]="isImageSelected(i) ? 'image-selected' : 'image-unselected'" [attr.aria-pressed]="isImageSelected(i)"
         tabindex="0" role="button" />
       @if(last){
-      <p class="image-number" tabindex="0">Number of images: {{ filteredImagesLength() }} / {{ galleryImagesLength() }}</p>
+      <p class="image-number" tabindex="0">Number of images: {{ filteredImagesLength() }} / {{ galleryImagesLength() }}
+      </p>
 
       @if(selectedSrcs().length > 0 ){
-      <button class="btn btn-danger" (click)="onRemoveSelectedImages()">
-        Delete Selected ({{ selectedSrcs().length}})
+      <button class="btn btn-danger" (click)="onRemoveImages()">
+        Delete Images ({{ selectedSrcs().length}})
       </button>
 
       }@else{
-      <button class="btn btn-danger" [disabled]="isRemoving() || selectedSrcs().length === 0">Delete Selected</button>
+      <button class="btn btn-danger" [disabled]="isRemoving() || selectedSrcs().length === 0"
+        title="Images will be deleted from the backend, therefore also from the device.">Delete Images</button>
       }
 
       <button class="btn btn-primary" (click)="onFetchAllImages()">Fetch all images</button>
-      <button class="btn btn-primary" (click)="onSelectForDevice()">Select For Device</button>
+      <button class="btn btn-primary" (click)="onToggleImageOnDevice()">Add/Remove From Device</button>
       }
       } }@else {
       <p tabindex="0" role="status">No images to display</p>

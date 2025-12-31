@@ -110,29 +110,29 @@ public class ImageService {
         }
     }
 
-    public boolean setCurrentIdPartOfSelectedDeviceImages(Long id) {
-        System.out.println("setCurrentIdPartOfSelectedDeviceImages().");
-        System.out.println("setCurrentIdPartOfSelectedDeviceImages()_id: " + id);
+    public boolean toggleDeviceImagesState(Long id, boolean isOnDevice) {
+        System.out.println("toggleCurrentIdPartOfSelectedDeviceImages().");
+        System.out.println("toggleCurrentIdPartOfSelectedDeviceImages()_id: " + id);
 
         try {
             // Load existing image from database.
             Optional<Image> imageOptional = imageRepository.findById(id);
 
             if (imageOptional.isEmpty()) {
-                System.err.println("setCurrentIdPartOfSelectedDeviceImages()_Image not found with id: " + id);
+                System.err.println("toggleCurrentIdPartOfSelectedDeviceImages()_Image not found with id: " + id);
                 return false;
             }
 
             // Update existing image.
             Image image = imageOptional.get();
-            image.setIsSelectedForDevice(true);
+            image.setIsSelectedForDevice(isOnDevice);
+
             imageRepository.save(image);
 
-            System.out.println("setCurrentIdPartOfSelectedDeviceImages()_Successfully updated image: " + id);
             return true;
 
         } catch (Exception e) {
-            System.err.println("setCurrentIdPartOfSelectedDeviceImages()_Error: " + e.getMessage());
+            System.err.println("toggleCurrentIdPartOfSelectedDeviceImages()_Error: " + e.getMessage());
             return false;
         }
     }

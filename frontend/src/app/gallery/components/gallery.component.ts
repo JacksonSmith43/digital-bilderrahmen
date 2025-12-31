@@ -32,10 +32,12 @@ export class GalleryComponent implements OnInit {
   filteredImageStates = computed(() => {
     if (this.filterState() === 'allImages') {
       return this.galleryImages();
+
     } else if (this.filterState() === 'deviceImages') {
       let deviceImagesFiltered = this.galleryImages().filter(image => image.isSelectedForDevice);
-      this.localStorageRelatedService.saveToLocalStorage("deviceImages", deviceImagesFiltered);
+      this.localStorageRelatedService.saveToLocalStorage('deviceImages', deviceImagesFiltered);
       return deviceImagesFiltered;
+   
     } else {
       console.log('filteredImageStates_notDeviceImages.');
       return this.galleryImages().filter(image => !image.isSelectedForDevice);
@@ -83,7 +85,7 @@ export class GalleryComponent implements OnInit {
     return this.selectedSrcs().includes(image);
   }
 
-  onRemoveSelectedImages() {
+  onRemoveImages() {
     console.log('onRemoveSelectedImages().');
     const imagesToDelete = this.selectedSrcs();
 
@@ -122,36 +124,44 @@ export class GalleryComponent implements OnInit {
     });
   }
 
-  onSelectForDevice() {
-    console.log('onSelectForDevice().');
+  onToggleImageOnDevice() {
+    console.log('onToggleImageOnDevice().');
 
     const imagesToSelect = this.selectedSrcs();
 
     if (imagesToSelect.length === 0) {
-      console.log('onSelectForDevice()_No images selected.');
+      console.log('onToggleImageOnDevice()_No images selected.');
       return;
     }
 
-    console.log('onSelectForDevice()_Selecting images length:', imagesToSelect.length);
+    console.log('onToggleImageOnDevice()_Selecting images length:', imagesToSelect.length);
     let completedSelections = 0;
 
     // Iterates through all of the selected images for the device.
     imagesToSelect.forEach(image => {
-      this.galleryService.selectImageForDevice(image.id).subscribe({
+      const newState = !image.isSelectedForDevice; // Toggles the state.
+
+      this.galleryService.toggleImageForDevice(image.id, newState).subscribe({
         next: () => {
           completedSelections++;
-          console.log(`onSelectForDevice()_Selected ${completedSelections}/${imagesToSelect.length}`);
+          console.log(`onToggleImageOnDevice()_Selected ${completedSelections}/${imagesToSelect.length}`);
 
           // When all selections are complete.
           if (completedSelections === imagesToSelect.length) {
-             this.localStorageRelatedService.saveToLocalStorage('deviceImages', imagesToSelect);
             this.onFetchAllImages();
-            console.log('onSelectForDevice()_All selections complete.');
+
+            // TODO: Improve the device localStorage accuracy.
+            let deviceImages = this.galleryImages().filter(image => image.isSelectedForDevice);
+            this.localStorageRelatedService.saveToLocalStorage('deviceImages', deviceImages);
+
+            console.log('onToggleImageOnDevice()_All selections/removeale complete.');
+            console.log(`onToggleImageOnDevice()_ID: ${image.id}, newState: ${newState}.`);
+
             this.galleryService.selectedSrcs.set([]);
           }
         },
         error: error => {
-          console.error('onSelectForDevice()_Error selecting image:', error);
+          console.error('onToggleImageOnDevice()_Error toggling image selection:', error);
           completedSelections++;
         },
       });

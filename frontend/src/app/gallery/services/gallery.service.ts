@@ -57,10 +57,10 @@ export class GalleryService {
     return this.http.get<ImageType[]>(`/api/gallery/images`);
   }
 
-  selectImageForDevice(imageId: number): Observable<void> {
-    console.log('selectImageForDevice().');
-    console.log('selectImageForDevice()_id:', imageId);
+  toggleImageForDevice(imageId: number, isSelectedForDevice: boolean): Observable<void> {
+    console.log('toggleImageForDevice().');
+    console.log('toggleImageForDevice()_imageId:', imageId);
 
-    return this.http.post<void>(`/api/device/images/${imageId}`, {});
+    return this.http.post<void>(`/api/gallery/images/${imageId}/${isSelectedForDevice}`, {});
   }
 }

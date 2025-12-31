@@ -54,8 +54,8 @@ public class ImageController {
         }
     }
 
-    @DeleteMapping("/deleted/{id}") // /api/gallery/images/deleted/{id}
     // @PathVariable extracts the ID out of the URL and converts it into a Long.
+    @DeleteMapping("/deleted/{id}") // /api/gallery/images/deleted/{id}
     public ResponseEntity<Boolean> deleteImage(@PathVariable Long id) {
         System.out.println("deleteImage().");
 
@@ -72,6 +72,31 @@ public class ImageController {
             // 500 Error.
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
         }
-
     }
+
+    @PostMapping("/{id}/{isOnDevice}")
+    public ResponseEntity<Void> toggleImageForDevice(@PathVariable Long id, @PathVariable boolean isOnDevice) {
+        System.out.println("toggleImageForDevice()_id: " + id);
+        System.out.println("toggleImageForDevice()_isOnDevice: " + isOnDevice);
+
+        try {
+
+            if (id == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            boolean success = imageService.toggleDeviceImagesState(id, isOnDevice);
+
+            if (success) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+
+        } catch (Exception e) {
+            System.err.println("toggleImageForDevice()_Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }
