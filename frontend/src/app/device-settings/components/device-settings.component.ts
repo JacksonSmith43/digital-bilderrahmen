@@ -44,19 +44,13 @@ export class DeviceSettingsComponent implements OnInit {
   onFetchImages() {
     console.log('onFetchImages().');
 
-    let deviceImages;
-
     let galleryImagesStorage = this.localStorageService.getImages('galleryImages');
-    let deviceImagesStorage = this.localStorageService.getImages('deviceImages');
 
-    if (deviceImagesStorage.length > 0) {
-      deviceImages = this.deviceImages.set(deviceImagesStorage);
-    } else {
-      let deviceImages = galleryImagesStorage.filter((image: ImageType) => image.isSelectedForDevice);
-      this.deviceImages.set(deviceImages);
+    let deviceImages = galleryImagesStorage.filter((image: ImageType) => image.isSelectedForDevice);
+    this.deviceImages.set(deviceImages);
 
-      this.localStorageService.saveToLocalStorage('deviceImages', deviceImages);
-    }
+    this.localStorageService.saveToLocalStorage('deviceImages', deviceImages);
+
     console.log('onFetchImages()_this.deviceImages()', this.deviceImages());
 
     return deviceImages;

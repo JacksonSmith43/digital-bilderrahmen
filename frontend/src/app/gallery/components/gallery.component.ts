@@ -32,12 +32,10 @@ export class GalleryComponent implements OnInit {
   filteredImageStates = computed(() => {
     if (this.filterState() === 'allImages') {
       return this.galleryImages();
-
     } else if (this.filterState() === 'deviceImages') {
       let deviceImagesFiltered = this.galleryImages().filter(image => image.isSelectedForDevice);
       this.localStorageRelatedService.saveToLocalStorage('deviceImages', deviceImagesFiltered);
       return deviceImagesFiltered;
-   
     } else {
       console.log('filteredImageStates_notDeviceImages.');
       return this.galleryImages().filter(image => !image.isSelectedForDevice);
@@ -150,10 +148,6 @@ export class GalleryComponent implements OnInit {
           if (completedSelections === imagesToSelect.length) {
             this.onFetchAllImages();
 
-            // TODO: Improve the device localStorage accuracy.
-            let deviceImages = this.galleryImages().filter(image => image.isSelectedForDevice);
-            this.localStorageRelatedService.saveToLocalStorage('deviceImages', deviceImages);
-
             console.log('onToggleImageOnDevice()_All selections/removeale complete.');
             console.log(`onToggleImageOnDevice()_ID: ${image.id}, newState: ${newState}.`);
 
@@ -183,6 +177,9 @@ export class GalleryComponent implements OnInit {
         // Save to localStorage after images have been loaded.
         this.localStorageRelatedService.saveToLocalStorage('galleryImages', this.galleryImages());
         this.localStorageRelatedService.saveToLocalStorage('addedImages', []);
+
+        let deviceImages = this.galleryImages().filter(image => image.isSelectedForDevice);
+        this.localStorageRelatedService.saveToLocalStorage('deviceImages', deviceImages);
       },
       error: error => console.error('onFetchAllImages()_Fetch failed: ', error),
     });
