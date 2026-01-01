@@ -1,6 +1,6 @@
 # Getting Started
 ## Startup Sequence
-### Short Version: .\quick-start.ps1. Step one to three can be skipped if the short version is used. 
+### Short Version: .\quick-start.ps1. Step one to three can be skipped if the short version is used. Docker has to have been running first though. 
 ### Step 1: Start the Database (PostgreSQL)
 
 ```powershell
@@ -35,6 +35,10 @@ This will run as a Node.js process and will display the website, whilst sending 
 This uses the port: 4200.
 
 The Frontend runs on: http://localhost:4200
+
+### Step 4: Start Spring
+This can be done by running one of the Java Applications in the IDE. 
+
 
 > [!Note]
 > For more information regarding frontend setup, look at the Frontend Readme file.
