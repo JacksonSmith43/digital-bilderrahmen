@@ -66,7 +66,8 @@
       }
 
       <button class="btn btn-primary" (click)="onFetchAllImages()">Fetch all images</button>
-      <button class="btn btn-primary" (click)="onToggleImageOnDevice()">Add/Remove From Device</button>
+      <button class="btn btn-primary" (click)="onToggleImageOnDevice()"
+        [disabled]=" selectedSrcs().length === 0">Add/Remove From Device</button>
       }
       } }@else {
       <p tabindex="0" role="status">No images to display</p>

@@ -49,7 +49,7 @@ export class LoginComponent {
 
         setTimeout(() => {
           this.authService.successMessage.set('');
-          this.router.navigateByUrl('/viewAll');
+          this.router.navigateByUrl('/gallery');
         }, 1000);
       },
       error: error => {

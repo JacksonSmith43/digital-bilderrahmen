@@ -14,10 +14,6 @@ export class NavbarComponent {
   private navService = inject(NavbarService);
   authService = inject(AuthService);
 
-  onAllView() {
-    return this.navService.getAllView();
-  }
-
   onPicturesView() {
     return this.navService.getPictureView();
   }

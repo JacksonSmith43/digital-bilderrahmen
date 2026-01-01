@@ -1,118 +1,117 @@
 h3,
 p {
-    text-align: center;
-    font-weight: bold;
-    margin-top: 1rem;
+  text-align: center;
+  font-weight: bold;
+  margin-top: 1rem;
 }
 
 label {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 img {
-    object-fit: cover;
-    width: 8rem;
-    height: 8rem;
-    margin: 1rem 1rem;
+  object-fit: cover;
+  width: 8rem;
+  height: 8rem;
+  margin: 1rem 1rem;
 }
 
 button {
-    font-weight: 600;
+  font-weight: 600;
 }
 
-/* img:focus, */
+img:focus,
 button:focus,
 p:focus {
-    outline: 0.20rem solid blue;
-    outline-offset: 0.20rem;
-    box-shadow: 0 0 0.30rem rgba(0, 123, 255, 0.6);
+  outline: 0.2rem solid blue;
+  outline-offset: 0.2rem;
+  box-shadow: 0 0 0.3rem rgba(0, 123, 255, 0.6);
 }
 
 .delete-images-button {
-    margin: 1rem auto;
-    display: flex;
+  margin: 1rem auto;
+  display: flex;
 }
 
 .not-logged-in {
-    text-align: center;
-    font-weight: bold;
-    font-size: large;
-    margin-top: 1rem;
-    padding: 12rem 0rem;
+  text-align: center;
+  font-weight: bold;
+  font-size: large;
+  margin-top: 1rem;
+  padding: 12rem 0rem;
 }
 
 .interval-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-
 .interval-time-button {
-    margin-left: 1rem;
+  margin-left: 1rem;
 }
 
 .interval-time-button :disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .input-group {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .input-row {
-    display: flex;
+  display: flex;
 }
 
 .interval-time input {
-    width: 5rem;
-    background-color: rgb(94, 87, 87);
+  width: 5rem;
+  background-color: rgb(94, 87, 87);
 }
 
 .interval-time {
-    position: relative;
-    max-height: 5.5rem;
+  position: relative;
+  max-height: 5.5rem;
 }
 
 .stop-diashow-button {
-    display: flex;
-    margin-top: 1rem;
+  display: flex;
+  margin-top: 1rem;
 }
 
 .error-message {
-    color: red;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-height: 4.5rem;
-    margin: 0;
-    padding: 0;
+  color: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-height: 4.5rem;
+  margin: 0;
+  padding: 0;
 }
 
 .fetch-selected-images-buttton {
-    display: flex;
-    margin: 1rem auto;
+  display: flex;
+  margin: 1rem auto;
 }
 
 .image-selected {
-    outline: 0.23rem solid green;
-    outline-offset: 0.20rem;
+  outline: 0.23rem solid green;
+  outline-offset: 0.2rem;
 }
 
 .image-unselected {
-    outline: 0.23rem solid black;
+  outline: 0.23rem solid black;
 }
 
 .image-delete-selected {
-    outline: 0.23rem solid red;
+  outline: 0.23rem solid red;
 }
 
-img[role="button"]:hover {
-    transform: scale(1.05);
-    transition: transform 0.2s ease;
+img[role='button']:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
 }

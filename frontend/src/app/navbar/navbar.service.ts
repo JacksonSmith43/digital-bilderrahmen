@@ -1,46 +1,37 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-
 export class NavbarService {
-
   isAddImage = false;
-  selectedView: "viewAll" | "viewPictures" | "viewDragDrop" | "deviceSettings" = "viewAll";
+  selectedView: 'viewPictures' | 'viewDragDrop' | 'deviceSettings' = 'viewPictures';
 
   getSelectedViewLabel() {
     switch (this.selectedView) {
-      case "viewAll":
-        return "View All";
+      case 'viewPictures':
+        return 'View Pictures';
 
-      case "viewPictures":
-        return "View Pictures";
+      case 'viewDragDrop':
+        return 'View Drag Drop';
 
-      case "viewDragDrop":
-        return "View Drag Drop";
-
-      case "deviceSettings":
-        return "View Device Settings";
+      case 'deviceSettings':
+        return 'View Device Settings';
 
       default:
-        return "View";
+        return 'View';
     }
   }
 
   getPictureView() {
-    this.selectedView = "viewPictures";
+    this.selectedView = 'viewPictures';
   }
 
   getDragDropView() {
-    this.selectedView = "viewDragDrop";
-  }
-
-  getAllView() {
-    this.selectedView = "viewAll";
+    this.selectedView = 'viewDragDrop';
   }
 
   getDeviceSettingsView() {
-    this.selectedView = "deviceSettings"
+    this.selectedView = 'deviceSettings';
   }
 }
