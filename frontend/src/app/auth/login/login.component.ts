@@ -42,10 +42,13 @@ export class LoginComponent {
       next: user => {
         console.log('login()_user', user);
         this.authService.currentUser.set(user);
+        this.authService.isLoggedOut.set(false);
         this.authService.isLoginSuccessful = true;
         this.localStorageService.saveUserToLocalStorage('userEmail', email);
+        this.authService.successMessage.set('Successful login.');
 
         setTimeout(() => {
+          this.authService.successMessage.set('');
           this.router.navigateByUrl('/viewAll');
         }, 1000);
       },

@@ -41,10 +41,13 @@
         </div>
 
         @if(authService.isLoginSuccessful && errorMessage() === undefined){
-        <p class="success-message">Successful login.</p>
+        <p class="success-message">{{this.authService.successMessage()}}</p>
 
         }@else if(errorMessage() ){
         <p class="error-message">{{errorMessage()}}</p>
+
+        }@else if(authService.isLoggedOut()){
+        <p class="success-message">{{this.authService.successMessage()}}</p>
         }
 
 

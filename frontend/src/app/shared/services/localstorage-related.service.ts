@@ -32,18 +32,17 @@ export class LocalStorageRelatedService {
 
   saveUserToLocalStorage(key: 'userEmail', email: string) {
     console.log('saveUserToLocalStorage().');
-    localStorage.setItem(key, JSON.stringify(email));
+    sessionStorage.setItem(key, JSON.stringify(email)); // sessionStorage: Clears when tab/browser closes.
   }
 
   getUser(key: 'userEmail') {
     console.log('getUser().');
 
-    const savedUsers = localStorage.getItem(key);
+    const savedUsers = sessionStorage.getItem(key);
     if (savedUsers) {
       try {
         console.log('getUser()_savedImages: ', savedUsers);
         return JSON.parse(savedUsers);
-   
       } catch (error) {
         console.error(`getUser()_Error parsing ${key}:`, error);
       }

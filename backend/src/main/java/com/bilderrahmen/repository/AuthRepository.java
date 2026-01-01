@@ -17,6 +17,4 @@ public interface AuthRepository extends JpaRepository<Auth, Long> {
     List<Auth> findByPassword(String password);
 
     void deleteById(Long id);
-    
- 
 }

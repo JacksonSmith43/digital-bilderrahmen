@@ -12,12 +12,16 @@ export class AuthService {
   localStorageService = inject(LocalStorageRelatedService);
 
   currentUser = signal<User | undefined | any>(undefined);
+  isLoggedOut = signal<boolean>(true);
+  successMessage = signal<string>('');
+
   isLoginSuccessful = false;
 
   constructor() {
     console.log('AuthService_constructor().');
 
-    const userEmail = this.localStorageService.getUser('userEmail');
+    const userEmail = sessionStorage.getItem('userEmail');
+
     if (userEmail) {
       console.log('AuthService: User found in localStorage:', userEmail);
       this.currentUser.set({ email: userEmail });
@@ -33,9 +37,8 @@ export class AuthService {
     return this.http.post(`/auth/login/${email}`, password, { responseType: 'text' });
   }
 
-  // Stateless (does not save previous states) logout. No backend required.
   logout() {
-    localStorage.removeItem('userEmail');
+    sessionStorage.removeItem('userEmail'); // sessionStorage: Clears when tab/browser closes.
     this.currentUser.set(undefined);
   }
 }

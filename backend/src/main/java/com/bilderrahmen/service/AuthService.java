@@ -36,8 +36,8 @@ public class AuthService {
         System.out.println("checkEmailExists().");
 
         try {
-            List<Auth> emailExists = authRepository.findByEmail(email); // Equivalent: SELECT * FROM authentication
-                                                                        // WHERE email = 'birgit@gmail.com'
+            // Equivalent: SELECT * FROM authentication WHERE email = 'birgit@gmail.com'.
+            List<Auth> emailExists = authRepository.findByEmail(email);
 
             if (!emailExists.isEmpty()) { // At least one entry exists.
                 System.out.println("checkEmailExists()_Email already exists in the database.");
