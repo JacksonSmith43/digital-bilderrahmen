@@ -6,12 +6,13 @@ import { DeviceSettingsComponent } from './device-settings/components/device-set
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { LogoutComponent } from './auth/logout/logout.component';
+import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
-  { path: '', component: GalleryComponent },
-  { path: 'gallery', component: GalleryComponent },
-  { path: 'addImages', component: DragDropUploadComponent },
-  { path: 'deviceSettings', component: DeviceSettingsComponent },
+  { path: '', component: GalleryComponent, canActivate: [authGuard] },
+  { path: 'gallery', component: GalleryComponent, canActivate: [authGuard] },
+  { path: 'addImages', component: DragDropUploadComponent, canActivate: [authGuard] },
+  { path: 'deviceSettings', component: DeviceSettingsComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'logout', component: LogoutComponent },

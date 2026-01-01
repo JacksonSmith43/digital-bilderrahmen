@@ -18,7 +18,7 @@
         </div>
 
         <div class="password-container form-group col">
-            <label for="password">Password</label>
+            <label for="password" title="Allowed length: 6-20 characters.">Password</label>
             <input type="password" id="password" placeholder="password123" formControlName="password" #passwordInput>
 
             @if(passwordControl.invalid && (passwordControl.dirty || passwordControl.touched)){
