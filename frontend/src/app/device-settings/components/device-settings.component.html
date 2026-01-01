@@ -1,6 +1,9 @@
+@if(this.authService.currentUser() !== undefined || authService.isLoginSuccessful){
+
 <h3>Device Settings</h3>
 <p>Version:</p>
 <p>Switch device off</p>
+
 
 <div class="accordion" id="device-settings-interval-accordion">
   <div class="accordion-item">
@@ -85,3 +88,7 @@
     </div>
   </div>
 </div>
+
+}@else {
+<p class="not-logged-in">You are not logged in. Please login to be able to do anything_Device_View.</p>
+}

@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { ImageType } from '../../shared/model/image-type.model';
 import { GalleryService } from '../../gallery/services/gallery.service';
 import { LocalStorageRelatedService } from '../../shared/services/localstorage-related.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-device-settings',
@@ -16,6 +17,7 @@ import { LocalStorageRelatedService } from '../../shared/services/localstorage-r
 export class DeviceSettingsComponent implements OnInit {
   galleryService = inject(GalleryService);
   localStorageService = inject(LocalStorageRelatedService);
+  authService = inject(AuthService);
 
   deviceImages = signal<ImageType[]>([]);
 
