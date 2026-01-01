@@ -8,12 +8,11 @@ import { RegisterComponent } from './auth/register/register.component';
 import { LogoutComponent } from './auth/logout/logout.component';
 
 export const routes: Routes = [
-    { path: "", component: GalleryComponent },
-    { path: "gallery", component: GalleryComponent },
-    { path: "dragDrop", component: DragDropUploadComponent },
-    { path: "deviceSettings", component: DeviceSettingsComponent },
-    { path: "login", component: LoginComponent },
-    { path: "register", component: RegisterComponent },
-    { path: "logout", component: LogoutComponent },
-
+  { path: '', component: GalleryComponent },
+  { path: 'gallery', component: GalleryComponent },
+  { path: 'addImages', component: DragDropUploadComponent },
+  { path: 'deviceSettings', component: DeviceSettingsComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'logout', component: LogoutComponent },
 ];

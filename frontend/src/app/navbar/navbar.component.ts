@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { NavbarService } from './navbar.service';
 import { AuthService } from '../auth/auth.service';
 
 @Component({
@@ -11,22 +10,5 @@ import { AuthService } from '../auth/auth.service';
   styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
-  private navService = inject(NavbarService);
   authService = inject(AuthService);
-
-  onPicturesView() {
-    return this.navService.getPictureView();
-  }
-
-  onDragDropView() {
-    return this.navService.getDragDropView();
-  }
-
-  onDeviceSettingsView() {
-    return this.navService.getDeviceSettingsView();
-  }
-
-  getSelectedViewLabel() {
-    return this.navService.getSelectedViewLabel();
-  }
 }
